@@ -7,7 +7,11 @@ var Trail={
 		isDashed: true,
 		isShape: true,
 		isInfo: true,
-		point: [],
+		point: [{
+			color: "",
+			size: "",
+			data:[]
+		}],
 		line: [],
 		dashed: [],
 		shape: [],
@@ -18,7 +22,7 @@ var ShipsData={};
 var TimeControl={
 		speed: 1,
 		startTime: '',
-		video: [] //碰撞时间，碰撞经纬度，碰撞概述
+		video: [] 
 };
 var ArGis={
 		baseUrl: window.location.href.replace("index.html","")+"arcgis_js_api/library/3.16",
@@ -28,6 +32,7 @@ var ArGis={
 			//加载数据
 		},
 		initMap: function(){
+			//加载工具
 			
 			//绘制碰撞点
 			Draws.point(124, 33,[226, 119, 40], 10, {
