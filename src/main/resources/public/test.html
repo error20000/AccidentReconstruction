@@ -78,8 +78,8 @@
       setInterval(function(){
     	  view.graphics.removeAll();
     	  Utils.point(124,30+count, [226, 119, 40], view);
-    	  count = count + 1/24;
-      },1000/24);
+    	  count = count + 0.01*1/60;
+      },1000/60);
       
       
 	});

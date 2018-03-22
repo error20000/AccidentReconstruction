@@ -1,48 +1,34 @@
 
-var Utils = {
-		
-		point: function(lon, lat, color, veiw){
-			require(["esri/Color","esri/Graphic"], function (Color, Graphic) {
-				var point = {
-				        type: "point", // autocasts as new Point()
-				        longitude: lon,
-				        latitude: lat
-				      };
+var Draws = {
+		trail: function(){
+			
+		},
+		ship: function(){
+			
+		},
+		point: function(lon, lat, color, size, attr, template){
+			require(["esri/geometry/Point", "esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleLineSymbol","esri/Color","esri/graphic","esri/InfoTemplate"], 
+					function (Point, SimpleMarkerSymbol, SimpleLineSymbol, Color, Graphic, InfoTemplate) {
+					var geometry = new Point({
+				        x: lon,
+				        y: lat,
+				        spatialReference: {"wkid": 4326 }
+				      });
 
-				      // Create a symbol for drawing the point
-				      var markerSymbol = {
-				        type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
-				        color: new Color(color) //[226, 119, 40],
-				      };
-				      
-				   // Create an object for storing attributes related to the line
-				      var lineAtt = {
-				        Name: "Keystone Pipeline",
-				        Owner: "TransCanada",
-				        Length: "3,456 km"
-				      };
-
-				      // Create a graphic and add the geometry and symbol to it
-				      var pointGraphic = new Graphic({
-				        geometry: point,
-				        symbol: markerSymbol,
-				        attributes: lineAtt,
-				        popupTemplate: { // autocasts as new PopupTemplate()
-				          title: "{Name}",
-				          content: [{
-				            type: "fields",
-				            fieldInfos: [{
-				              fieldName: "Name"
-				            }, {
-				              fieldName: "Owner"
-				            }, {
-				              fieldName: "Length"
-				            }]
-				          }]
-				        }
+				      var symbol = new SimpleMarkerSymbol({
+				    	  style: SimpleMarkerSymbol.STYLE_CIRCLE,
+				    	  size: size ? size : 10,
+				    	  color: color ? new Color(color) : [226, 119, 40]
 				      });
 				      
-				      veiw.graphics.add(pointGraphic);
+				      var point = new Graphic({
+					        geometry: geometry,
+					        symbol: symbol.toJson(),
+					        attributes: attr,
+					        infoTemplate: template
+				      	});
+				      
+				      ArGis.map.graphics.add(point);
 			});
 			 
 		}
