@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Insert title here</title>
+</head>
+<script src="https://cdn.bootcss.com/vue/2.5.13/vue.js"></script>
+
+<style type="text/css">
+
+    html{
+    	font-size: 24px;
+    }
+    .play-container {
+            position: relative;
+            background-color: gray;
+     }
+        
+     .play-container .time-wrap {
+         color: #dcdcdc;
+         display: flex;
+         align-items: center;
+         padding: 0 0.4167rem;
+         margin: 0.2778rem 0;
+      }
+      .play-container .time-wrap .progress-wrap {
+          flex: 1;
+          height: 0.0833rem;
+          position: relative;
+          margin: 0 0.2778rem;
+          background-color: #6c6b70;
+         	cursor: pointer;
+       }
+     .play-container .time-wrap .progress-bar {	
+           width: 100%;
+           height: 100%;
+           position: relative;
+           z-index: 1;
+       }
+     .play-container  .time-wrap .progress {
+           left: 0;
+           top: 0;
+           height: 100%;
+           position: absolute;
+           background-color: #3195fd
+       }
+    .play-container  .progress-dot {
+           top: 50%;
+           position: absolute;
+           width: 0.3333rem;
+           height: 0.3333rem;
+           border-radius: 100%;
+           background-color: #3195fd;
+           transform: translate3d(0, -50%, 0);
+       }
+             
+      .play-container .play-operateBox {
+           display: flex;
+           align-items: center;
+           margin-bottom: 0.2778rem;
+       }
+      .play-container .play-detail {
+	        flex: 1;
+	        text-align: center;
+	        padding: 0.2778rem 0;
+	     }
+      .play-container   .play-detail > span {
+            width: 0.9167rem;
+            height: 0.9167rem;
+            vertical-align: middle;
+            display:inline-block;
+            background-size:contain;
+            background-repeat:no-repeat;
+            background-position:50%;
+         	cursor: pointer;
+         	user-select:none;
+        }
+     .play-container   .play-detail .prev {
+            background: url("images/play-prev.png") center  no-repeat;
+        }
+      .play-container  .play-detail .play {
+            margin: 0 0.5556rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            background: url("images/play-play.png") center  no-repeat;
+        }
+      .play-container  .play-detail .pause {
+        	background: url("images/play-pause.png") center  no-repeat;
+        }
+		  
+	.play-container	.play-detail .next {
+            background: url("images/play-next.png") center  no-repeat;
+        }      	
+		
+    
+    
+</style>
+<body>
+
+<div id="app">
+ 	<div class="play-container">
+ 			 <div class="time-wrap">
+                   <div class="start-time">{{ curPlayTime | formatDate }}</div>
+                   <div class="progress-wrap">
+                       <div class="progress-bar" @click = "updateProgress" ref = "progressBar"></div>
+                       <div class="progress" :style = "{width: progress + '%'}"></div>
+                       <div class="progress-dot" ref = "progressDot" :style = "{'margin-left': progress + '%'}"></div>
+                   </div>
+                   <div class="end-time">{{ endTime | formatDate }}</div>
+               </div>
+               <div class="play-operateBox">
+                   <div class="play-detail">
+				        <span class = "prev" @click = "changePlay('prev')"></span>
+				        <span class = "play" @click = "changePlayState" :class = "{pause: paused}"></span>
+				        <span class = "next" @click = "changePlay('next')"></span>
+				    </div>
+               </div>
+      </div>
+</div>
+<script type="text/javascript">
+var app = new Vue({
+	  el: '#app',
+	  data() {
+          return {
+              isShowList: false,              // 是否显示歌曲列表
+              curPlayTime: 0,                 // 当前播放时间(秒为单位)
+              progress: 0,                    // 当前歌曲播放进度
+              progressSpeed: 0,               // 进度条前进的速度
+              endTime: 0,                     // 歌曲结束时间(秒为单位)
+              progressTimer: null,            // 控制进度条的定时器
+              showModeTip: false,             // 是否显示提示
+              modeSwitch: false ,            // 防止连续点击
+              paused: false,					//暂停
+              canMoveProgressDot: false			//暂停
+          }
+      },
+      computed: {
+      },
+      created() {
+          this.init();
+      },
+      methods: {
+          // 初始化
+          init() {
+        	  this.initPlay();
+          },
+          // 初始化播放信息
+          initPlay() {
+              this.progress = 0;
+              this.curPlayTime = 0;
+              this.endTime = 3*60;
+              this.progressSpeed = Number((100 / this.endTime).toFixed(2));
+              if(this.progressTimer) {
+                  this.clearTimer();
+              }
+              this.progressGo();
+          },
+          // 时间进度条前进
+          progressGo() {
+              this.curPlayTime++;
+              this.progress += this.progressSpeed;
+              if(this.progress < 100) {
+                  this.progressTimer = setTimeout(() => {
+                      this.progressGo();
+                  }, 1000);
+              }
+              else {
+                  this.progress = 100;
+                  this.curPlayTime = this.endTime;
+                  this.paused = true;
+              }
+          },
+          // 点击进度条更新时间
+          updateProgress(evt) {
+              const offsetX = evt.offsetX;
+              const targetWidth = this.$refs.progressBar.offsetWidth;
+              this.progress = Number((offsetX / targetWidth * 100).toFixed(2));
+              this.curPlayTime = parseInt((this.endTime * this.progress / 100).toFixed(2));
+
+          },
+          // 清除定时器
+          clearTimer() {
+              clearTimeout(this.progressTimer);
+          },
+          // 切换状态 play or paused
+          changePlayState() {
+              this.paused = !this.paused;
+              if(this.paused){
+            	  this.clearTimer();
+              }else{
+            	  if(this.progress == 100){
+            		  this.progress = 0;
+            		  this.curPlayTime = 0;
+            	  }
+            	  this.progressGo();
+              }
+          },
+          // 切歌 上一首 or 下一首
+          changePlay(operate) {
+              if(operate === "next"){
+            	  this.progress += this.progressSpeed * 5;
+            	  this.curPlayTime += this.progressSpeed * 5;
+            	  if(this.progress >= 100) {
+            		  this.progress = 100;
+            		  this.curPlayTime = this.endTime;
+            	  }
+              }else{
+            	  this.progress -= this.progressSpeed * 5;
+            	  this.curPlayTime -= this.progressSpeed * 5;
+            	  if(this.progress <= 0) {
+            		  this.progress = 0;
+            		  this.curPlayTime = 0;
+            	  }
+              }            
+          }
+      },
+      filters: {
+          // 进度条时间过滤器
+          formatDate(time) {
+              let minutes = parseInt(time / 60);
+              let seconds = parseInt(time % 60);
+              if(minutes < 10) {
+                  minutes = `0${minutes}`;
+              }
+              if(seconds < 10) {
+                  seconds = `0${seconds}`;
+              }
+              return `${minutes}:${seconds}`;
+          }
+      }
+	})
+
+</script>
+</body>
+</html>
