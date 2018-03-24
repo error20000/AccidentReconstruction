@@ -12,12 +12,17 @@
     width: 100%;
   }
 </style>
+<script>
+var ArGis={
+		baseUrl: "/arcgis_js_api/library/4.5"
+};
+</script>
     <link rel="stylesheet" href="/arcgis_js_api/library/4.5/dijit/themes/claro/claro.css" />
     <link rel="stylesheet" href="/arcgis_js_api/library/4.5/esri/css/main.css" />
     <!-- <script src="http://127.0.0.1:8085/arcgis_js_api/library/4.5/dojo/dojo.js"></script> -->
     <script src="/arcgis_js_api/library/4.5/init.js"></script>
 <script>
-var view;
+
 	require([
 	  "esri/Map",
 	  "esri/views/MapView",  "esri/Graphic", "esri/widgets/ScaleBar",
@@ -26,7 +31,7 @@ var view;
 	  var map = new Map({
 	    basemap: "streets"
 	  });
-	  view = new MapView({
+	 var view = new MapView({
 	    container: "viewDiv",  // Reference to the scene div created in step 5
 	    map: map,  // Reference to the map object created before the scene
 	    zoom: 0,  // Sets zoom level based on level of detail (LOD)
