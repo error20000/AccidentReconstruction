@@ -1,0 +1,36 @@
+
+.row{
+	width: 100%;
+}
+
+/* map */
+#viewDiv{
+	width: 100%;
+	height: 500px;
+	display: inline-block;
+}
+
+/* video */
+#videoDiv{
+	width: 100%;
+	height: 500px;
+	display: inline-block;
+}
+/* control */
+#playDiv{
+	width: 100%;
+	position: relative;
+}
+
+/* ship */
+#shipDiv{
+	width: 100%;
+	
+}
+
+
+/* message */
+#msgDiv{
+	width: 100%;
+	
+}
