@@ -6,14 +6,14 @@
 /* map */
 #viewDiv{
 	width: 100%;
-	height: 500px;
+	height: 300px;
 	display: inline-block;
 }
 
 /* video */
 #videoDiv{
 	width: 100%;
-	height: 500px;
+	height: 400px;
 	display: inline-block;
 }
 /* control */

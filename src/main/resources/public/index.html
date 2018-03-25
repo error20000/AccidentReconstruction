@@ -109,7 +109,12 @@
 			</el-col>
 			<el-col :span="12">
 				<div id="msgDiv">
-					<el-tag type="info">标签三</el-tag>
+					<div type="info">1号船从伊朗哈尔克岛装载凝析油开航</div>
+					<div type="info">1号船从伊朗哈尔克岛装载凝析油开航</div>
+					<div type="info">1号船从伊朗哈尔克岛装载凝析油开航</div>
+					<div type="info">1号船从伊朗哈尔克岛装载凝析油开航</div>
+					<div type="info">1号船从伊朗哈尔克岛装载凝析油开航</div>
+					<div type="info">1号船从伊朗哈尔克岛装载凝析油开航</div>
 				</div>
 			</el-col>
 	</el-row>
@@ -150,12 +155,15 @@
 			ArGis.view.ui.add(scaleBar, {
 			  position: "bottom-left"
 			}); 
+			
+			console.log(ArGis.view);
 	  
 			ArGis.view.then(function(){
 				ArGis.initMap();
 				ArGis.initTrail();
 				ArGis.initShips();
 				ArGis.initTimeLine();
+				ArGis.view.graphics[0].emit("click");
 			}); 
 	});
 </script>
