@@ -8,7 +8,22 @@ var Config = {
 		select: 0,
 		shipsSelect: [],
 		shipsForm:{
-			name: "123"
+			mmsi:'',
+			shipLength: 0,
+			shipWidth: 0,
+			name: '',
+			showName: '',
+			callSign:'',
+			shipType:'',
+			left: 0,
+			trail: 0,
+			lat: 0, 
+			lon: 0, 
+			real: false, 
+			time: '', 
+			speed: 0, 
+			cos: 0, 
+			head: 0
 		},
 		
 		msgEvent: "",
@@ -36,20 +51,21 @@ var Ships=[{
 	paths:[],
 	trailColor: "",
 	trailSize: "",
-	data: [{lat:30.1976, lon:124.9822, real:true, time: "2018-03-24 12:00:00", speed: 11, cos: 4, head:359,mmsi:0,name:"1" },
-			{lat:30.1977, lon:124.9822, real:true, time: "2018-03-24 12:00:01", speed: 11, cos: 4, head:359,mmsi:0,name:"1" },
-			{lat:30.1978, lon:124.9822, real:true, time: "2018-03-24 12:00:02", speed: 11, cos: 4, head:359,mmsi:0,name:"1" },
-			{lat:30.1979, lon:124.9822, real:true, time: "2018-03-24 12:00:03", speed: 11, cos: 4, head:359,mmsi:0,name:"1" },
-			{lat:30.198, lon:124.9822, real:true, time: "2018-03-24 12:00:04", speed: 11, cos: 4, head:359,mmsi:0,name:"1" },
-			{lat:30.1981, lon:124.9822, real:true, time: "2018-03-24 12:00:05", speed: 11, cos: 4, head:359,mmsi:0,name:"1", event: function(){console.log("time event!");} },
-			{lat:30.1982, lon:124.9822, real:true, time: "2018-03-24 12:00:06", speed: 11, cos: 4, head:359,mmsi:0,name:"1" },
-			{lat:30.1983, lon:124.9822, real:true, time: "2018-03-24 12:00:07", speed: 11, cos: 4, head:359,mmsi:0,name:"1" },
-			{lat:30.1984, lon:124.9822, real:true, time: "2018-03-24 12:00:08", speed: 11, cos: 4, head:359,mmsi:0,name:"1" },
-			{lat:30.1985, lon:124.9822, real:true, time: "2018-03-24 12:00:09", speed: 11, cos: 4, head:359,mmsi:0,name:"1" },
-			{lat:30.1986, lon:124.9822, real:true, time: "2018-03-24 12:00:10", speed: 11, cos: 4, head:359,mmsi:0,name:"1" }
+	data: [{lat:30.1976, lon:124.9822, real:true, time: "2018-03-24 12:00:00", speed: 11, cos: 4, head:359,mmsi:0 },
+			{lat:30.1977, lon:124.9822, real:true, time: "2018-03-24 12:00:01", speed: 11, cos: 4, head:359,mmsi:0 },
+			{lat:30.1978, lon:124.9822, real:true, time: "2018-03-24 12:00:02", speed: 11, cos: 4, head:359,mmsi:0 },
+			{lat:30.1979, lon:124.9822, real:true, time: "2018-03-24 12:00:03", speed: 11, cos: 4, head:359,mmsi:0 },
+			{lat:30.198, lon:124.9822, real:true, time: "2018-03-24 12:00:04", speed: 11, cos: 4, head:359,mmsi:0 },
+			{lat:30.1981, lon:124.9822, real:true, time: "2018-03-24 12:00:05", speed: 11, cos: 4, head:359,mmsi:0, event: function(){console.log("time event!");} },
+			{lat:30.1982, lon:124.9822, real:true, time: "2018-03-24 12:00:06", speed: 11, cos: 4, head:359,mmsi:0 },
+			{lat:30.1983, lon:124.9822, real:true, time: "2018-03-24 12:00:07", speed: 11, cos: 4, head:359,mmsi:0 },
+			{lat:30.1984, lon:124.9822, real:true, time: "2018-03-24 12:00:08", speed: 11, cos: 4, head:359,mmsi:0 },
+			{lat:30.1985, lon:124.9822, real:true, time: "2018-03-24 12:00:09", speed: 11, cos: 4, head:359,mmsi:0 },
+			{lat:30.1986, lon:124.9822, real:true, time: "2018-03-24 12:00:10", speed: 11, cos: 4, head:359,mmsi:0 }
 
 	]
 }];
+var ShipInfoTemp = {};
 var CurShipInfo = {
 		
 };
@@ -68,6 +84,17 @@ ArGis={
 		center: [124, 30],
 		initData: function(){
 			//加载数据
+			//基础数据
+			for (var i = 0; i < ShipInfoData.length; i++) {
+				//转换数据结构方便查询
+				ShipInfoTemp[ShipInfoData[i].mmsi] = ShipInfoData[i];
+				//基础数据
+				var info = ShipInfoData[i];
+				info.data = [];
+				Ships[i] = info;
+			}
+			//轨迹数据
+			
 			
 			//ship
 			for (var i = 0; i < Ships.length; i++) {
