@@ -146,6 +146,9 @@
 		  });
 	
 		  ArGis.view.ui.add(toggle, "top-right");
+		  ArGis.view.ui.add(new Fullscreen({
+		        view: ArGis.view
+		  }), "top-right");
 		
 			var scaleBar = new ScaleBar({
 				  view: ArGis.view,
