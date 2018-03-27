@@ -23,26 +23,38 @@ var Utils = {
 				      var symbol  = {
 				  		    type: "simple-marker",  
 				  		    color: params.color ? new Color(params.color) : [226, 119, 40],
-				  		     size: (params.size ? params.size : 8) + "px"
+				  		     size: (params.size ? params.size : 8) + "px",
+						    outline: {
+						    	style:"none"
+						    }
 				  		  };
 
 				      var point = new Graphic({
 				    	  	geometry: geometry,
 						    symbol: symbol,
-						    attributes: params.attr
+						    attributes: params.attr,
+						    visible: false
 				      	});
 
 				      if(params.template){
 				    	  point.popupTemplate = params.template;
 				      }
 				      
-				      ArGis.view.graphics.add(point);
+				      var temp = Config.trailPoint[params.attr.mmsi];
+						if(!temp){
+							temp = [point];
+						}else{
+							temp.push(point);
+						}
+						Config.trailPoint[params.attr.mmsi] = temp;
+				      
+//				      ArGis.view.graphics.add(point);
 			});
 		},
 		drawLine: function(params){
 			require(["esri/Color","esri/Graphic"], 
 					function (Color, Graphic) {
-				 		var geometry = {
+				 	  var geometry = {
 					        type: "polyline", 
 					        paths: params.paths
 					      };
@@ -64,7 +76,6 @@ var Utils = {
 				    	  line.popupTemplate = params.template;
 				      }
 				      
-				      console.log(line);
 				      ArGis.view.graphics.add(line);
 			});
 		},
@@ -73,28 +84,71 @@ var Utils = {
 					function (Color, Graphic) {
 				 		var geometry = {
 					        type: "polyline", 
-					        paths: paths
+					        paths: params.paths
 					      };
 						
 				      var symbol  = {
 				  		    type: "simple-line",  
-				  		    color: color ? new Color(color) : [226, 119, 40],
-				  		    width: (width ? width : 1) + "px",
-				  		    style: style ? style : "solid"
+				  		    color: params.color ? new Color(params.color) : [226, 119, 40],
+				  		    width: (params.width ? params.width : 1) + "px",
+				  		    style: params.style ? params.style : "solid"
 				  		  };
 
 				      var point = new Graphic({
 				    	  	geometry: geometry,
 						    symbol: symbol,
-						    attributes: attr,
-						    popupTemplate: template
+						    attributes: params.attr
 				      	});
 				      
-				      ArGis.view.graphics.add(point);
+				      if(params.template){
+				    	  point.popupTemplate = params.template;
+				      }
+				      
+				      var temp = Config.trailShape[params.attr.mmsi];
+						if(!temp){
+							temp = [point];
+						}else{
+							temp.push(point);
+						}
+						Config.trailShape[params.attr.mmsi] = temp;
+			});
+		},
+		drawInfo: function(params){
+			require(["esri/Color","esri/Graphic"], 
+					function (Color, Graphic) {
+				 		var geometry = {
+					        type: "polyline", 
+					        paths: params.paths
+					      };
+						
+				      var symbol  = {
+				  		    type: "simple-line",  
+				  		    color: params.color ? new Color(params.color) : [226, 119, 40],
+				  		    width: (params.width ? params.width : 1) + "px",
+				  		    style: params.style ? params.style : "solid"
+				  		  };
+
+				      var point = new Graphic({
+				    	  	geometry: geometry,
+						    symbol: symbol,
+						    attributes: params.attr
+				      	});
+				      
+				      if(params.template){
+				    	  point.popupTemplate = params.template;
+				      }
+				      
+				      var temp = Config.trailInfo[params.attr.mmsi];
+						if(!temp){
+							temp = [point];
+						}else{
+							temp.push(point);
+						}
+						Config.trailInfo[params.attr.mmsi] = temp;
 			});
 		},
 		removeGraphicsByType: function(type) {
-			　var graphics = ArGis.view.graphics;
+			var graphics = ArGis.view.graphics;
 			var delArray = [];
 			graphics.forEach(function(item, i){
 			  if(item.attributes && item.attributes.type == type){
@@ -144,4 +198,4 @@ var Utils = {
 		    t = t.replace('w', weekdayS[date.getDay()]);
 		    return t;
 		}
-}
+};

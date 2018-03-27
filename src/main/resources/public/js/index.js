@@ -34,14 +34,11 @@ var Config = {
 		isTrailShowDashed: false,
 		isTrailShowShape: false,
 		isTrailShowInfo: false,
-		trailPoint: [{
-			color: "",
-			size: ""
-		}],
-		trailLine: [],
-		trailDashed: [],
-		trailShape: [],
-		trailInfo: []
+		trailPoint: {},
+		trailLine: {},
+		trailDashed: {},
+		trailShape: {},
+		trailInfo: {}
 		
 };
 
@@ -65,10 +62,8 @@ var Ships=[{
 
 	]
 }];
-var ShipInfoTemp = {};
-var CurShipInfo = {
-		
-};
+
+var CurShipInfo = {};
 var TimeEvent = {
 		
 };
@@ -86,22 +81,54 @@ ArGis={
 			//加载数据
 			//基础数据
 			for (var i = 0; i < ShipInfoData.length; i++) {
-				//转换数据结构方便查询
-				ShipInfoTemp[ShipInfoData[i].mmsi] = ShipInfoData[i];
-				//基础数据
 				var info = ShipInfoData[i];
 				info.data = [];
 				Ships[i] = info;
+				
 			}
 			//轨迹数据
-			
+			var shipsTemp = {};
+			for (var i = 0; i < ShipTrailData.length; i++) {
+				var key = ShipTrailData[i].Mmsi;
+				var change = {
+						mmsi: ShipTrailData[i].Mmsi,
+						lat: Number(ShipTrailData[i].Lat),
+						lon: Number(ShipTrailData[i].Long),
+						time: ShipTrailData[i].UpdateTime,
+						speed: Number(ShipTrailData[i].Speed),
+						cog: Number(ShipTrailData[i].Cog),
+						head: Number(ShipTrailData[i].Head),
+						unkonw: ShipTrailData[i].unkonw,
+						real: true
+				};
+				var obj = shipsTemp[key];
+				if(!obj){
+					obj = {
+						mmsi: key,
+						data: []
+					};
+					obj.data.push(change);
+					shipsTemp[key] = obj;
+				}else{
+					obj.data.push(change);
+					shipsTemp[key] = obj;
+				}
+			}
+			for (var i = 0; i < Ships.length; i++) {
+				Ships[i].data = shipsTemp[Ships[i].mmsi].data;
+				delete shipsTemp[Ships[i].mmsi];
+			}
+			/*for (var k in shipsTemp) {
+				Ships.push(shipsTemp[k]);
+			}*/
+			console.log(Ships);
 			
 			//ship
 			for (var i = 0; i < Ships.length; i++) {
 				var ship = Ships[i];
 				var select = {
 						value: i,
-						label: ship.name
+						label: ship.showName
 				};
 				Config.shipsSelect.push(select);
 				//select
@@ -160,7 +187,49 @@ ArGis={
 					});
 		},
 		initTrail: function(){
-			this.drawTrail();
+			for (var i = 0; i < Ships.length; i++) {
+				var ship = Ships[i];
+				for (var j = 0; j < ship.data.length; j++) {
+					var point = ship.data[j];
+					if(point.real){
+						//点
+						Utils.drawPoint({
+							lon: point.lon,
+							lat: point.lat,
+							color: point.color,
+							size: point.size,
+							attr: {mmsi: ship.mmsi, type: "trail_point"},
+							template:{}
+						});
+						//线
+						var tempLine = Config.trailLine[ship.mmsi];
+						if(!tempLine){
+							tempLine = [[point.lon, point.lat]];
+						}else{
+							tempLine.push([point.lon, point.lat]);
+						}
+						Config.trailLine[ship.mmsi] = tempLine;
+						//形状
+						Utils.drawShape({
+							paths: [],
+							color: point.color,
+							width: "",
+							style: "",
+							attr: {mmsi: ship.mmsi, type: "trail_shape"},
+							template:{}
+						});
+						//事件
+						Utils.drawInfo({
+							paths: [],
+							color: point.color,
+							width: "",
+							style: "",
+							attr: {mmsi: ship.mmsi, type: "trail_info"},
+							template:{}
+						});
+					}
+				}
+			}
 		},
 		initShips: function(){
 			
@@ -256,118 +325,78 @@ ArGis={
 			}
 		},
 		clearTrail: function(){
+			this.clearTrailPoint();
+			this.clearTrailLine();
+			this.clearTrailDash();
+			this.clearTrailShape();
+			this.clearTrailInfo();
+		},
+		clearTrailPoint: function(){
 			Utils.removeGraphicsByType("trail_point");
+		},
+		clearTrailLine: function(){
 			Utils.removeGraphicsByType("trail_line");
+		},
+		clearTrailDash: function(){
 			Utils.removeGraphicsByType("trail_dash");
+		},
+		clearTrailShape: function(){
 			Utils.removeGraphicsByType("trail_shape");
+		},
+		clearTrailInfo: function(){
 			Utils.removeGraphicsByType("trail_info");
 		},
 		showTrailPoint: function(ship){
-			//移除原来的点
-			Utils.removeGraphicsByType("trail_point");
-			//新加
 			if(Config.isTrailShowPoint){
-				for (var i = 0; i < ship.data.length; i++) {
-					var point = ship.data[i];
-					if(point.real){
-						Utils.drawPoint({
-							lon: point.lon,
-							lat: point.lat,
-							color: point.color,
-							size: point.size,
-							attr: {mmsi: ship.mmsi, type: "trail_point"},
-							template:{}
-						});
-					}
-				}
-				
+				/*for (var k in Config.trailPoint) {
+					ArGis.view.graphics.addMany(Config.trailPoint[k]);
+				}*/
 			}
 		},
 		showTrailLine: function(ship){
-			//移除原来的线
-			Utils.removeGraphicsByType("trail_line");
-			//新加
 			if(Config.isTrailShowLine){
-				var params = {
-						paths: [],
-						color: "",
-						width: "",
-						style: "",
-						attr: {mmsi: ship.mmsi, type: "trail_line"},
-						template: {}
-				};
-				for (var i = 0; i < ship.data.length; i++) {
-					var point = ship.data[i];
-					if(point.real){
-						params.paths.push([point.lon, point.lat]);
-					}
+				for (var k in Config.trailLine) {
+					var params = {
+							paths: Config.trailLine[k],
+							color: "",
+							width: "",
+							style: "",
+							attr: {mmsi: ship.mmsi, type: "trail_line"},
+							template: {}
+					};
+					Utils.drawLine(params);
 				}
-				
-				Utils.drawLine(params);
 			}
 		},
 		showTrailDashed: function(ship){
-			//移除原来的虚线
-			Utils.removeGraphicsByType("trail_dash");
-			//新加
 			if(Config.isTrailShowDashed){
-				var params = {
-						paths: [],
-						color: "",
-						width: "",
-						style: "short-dash",
-						attr: {mmsi: ship.mmsi, type: "trail_dash"},
-						template: {}
-				};
-				for (var i = 0; i < ship.data.length; i++) {
-					var point = ship.data[i];
-					if(point.real){
-						params.paths.push([point.lon, point.lat]);
-					}
+				for (var k in Config.trailLine) {
+					var params = {
+							paths: Config.trailLine[k],
+							color: "",
+							width: "",
+							style: "short-dash",
+							attr: {mmsi: ship.mmsi, type: "trail_dash"},
+							template: {}
+					};
+					Utils.drawLine(params);
 				}
-				Utils.drawLine(params);
 			}
 		},
 		showTrailShape: function(ship){
-			//移除原来的虚线
-			Utils.removeGraphicsByType("trail_shape");
-			//新加
 			if(Config.isTrailShowShape){
-				for (var i = 0; i < ship.data.length; i++) {
-					var point = ship.data[i];
-					if(point.real){
-						Utils.drawPoint({
-							lon: point.lon,
-							lat: point.lat,
-							color: point.color,
-							size: point.size,
-							attr: {mmsi: ship.mmsi, type: "trail_shape"},
-							template:{}
-						});
-					}
+				//TODO 需要改为shape
+				for (var k in Config.trailPoint) {
+					ArGis.view.graphics.addMany(Config.trailPoint[k]);
 				}
-				
 			}
 		},
 		showTrailInfo: function(ship){
-			//移除原来的虚线
-			Utils.removeGraphicsByType("trail_info");
-			//新加
 			if(Config.isTrailShowInfo){
-				for (var i = 0; i < ship.data.length; i++) {
-					var point = ship.data[i];
-					if(point.real){
-						Utils.drawPoint({
-							lon: point.lon,
-							lat: point.lat,
-							color: point.color,
-							size: point.size,
-							attr: {mmsi: ship.mmsi, type: "trail_info"},
-							template:{}
-						});
-					}
+				//TODO 需要改为info
+				for (var k in Config.trailPoint) {
+					ArGis.view.graphics.addMany(Config.trailPoint[k]);
 				}
-				
 			}
 		}
 };

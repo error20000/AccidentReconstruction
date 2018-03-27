@@ -28,7 +28,7 @@
     	}
     }();
     function resize(){
-    	var TARGET_WIDTH = 375;
+    	var TARGET_WIDTH = 1366;
     	var scale = (screen.width)  / TARGET_WIDTH;
     	document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=' + TARGET_WIDTH + ', initial-scale=' + scale + ', minimum-scale=' + scale + ', maximum-scale=' + scale + ', user-scalable=0, minimal-ui' );
     }
@@ -39,6 +39,9 @@
 <link rel="stylesheet" href="css/play.css" />
 <link rel="stylesheet" href="css/index.css" />
 
+<script src="js/shipInfoData.js"></script>
+<script src="js/shipEventData.js"></script>
+<script src="js/shipTrailData.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/play.js"></script>
 <script src="js/index.js"></script>
@@ -72,11 +75,11 @@
 						
 						<div id="trailDiv">
 						 		<el-checkbox v-model="isTrailShow" @change="handlerTrail">显示轨迹</el-checkbox>
-						 		<el-checkbox v-model="isTrailShowPoint" @change="handlerTrailChange">点</el-checkbox>
-						 		<el-checkbox v-model="isTrailShowLine" @change="handlerTrailChange">线</el-checkbox>
-						 		<el-checkbox v-model="isTrailShowDashed" @change="handlerTrailChange">虚线</el-checkbox>
-						 		<el-checkbox v-model="isTrailShowShape" @change="handlerTrailChange">形状</el-checkbox>
-						 		<el-checkbox v-model="isTrailShowInfo" @change="handlerTrailChange">事件</el-checkbox>
+						 		<el-checkbox v-model="isTrailShowPoint" @change="handlerTrailChange('point')">点</el-checkbox>
+						 		<el-checkbox v-model="isTrailShowLine" @change="handlerTrailChange('line')">线</el-checkbox>
+						 		<el-checkbox v-model="isTrailShowDashed" @change="handlerTrailChange('dashed')">虚线</el-checkbox>
+						 		<el-checkbox v-model="isTrailShowShape" @change="handlerTrailChange('shape')">形状</el-checkbox>
+						 		<el-checkbox v-model="isTrailShowInfo" @change="handlerTrailChange('info')">事件</el-checkbox>
 						</div>
 					</el-col>
 				</el-row>
@@ -127,8 +130,9 @@
 	  "esri/views/MapView",
 	  "esri/widgets/ScaleBar",  
 	  "esri/widgets/BasemapToggle",
+//      "esri/widgets/Fullscreen",
 	  "dojo/domReady!"
-	], function(Map, MapView, ScaleBar, BasemapToggle){
+	], function(Map, MapView, ScaleBar, BasemapToggle, Fullscreen){
 		
 		ArGis.map = new Map({
 		    basemap: "streets"
@@ -146,9 +150,9 @@
 		  });
 	
 		  ArGis.view.ui.add(toggle, "top-right");
-		  ArGis.view.ui.add(new Fullscreen({
+		  /* ArGis.view.ui.add(new Fullscreen({
 		        view: ArGis.view
-		  }), "top-right");
+		  }), "top-right"); */
 		
 			var scaleBar = new ScaleBar({
 				  view: ArGis.view,
@@ -166,7 +170,8 @@
 				ArGis.initTrail();
 				ArGis.initShips();
 				ArGis.initTimeLine();
-				ArGis.view.graphics[0].emit("click");
+				//ArGis.view.graphics[0].emit("click");
+				
 			}); 
 	});
 </script>
@@ -181,8 +186,24 @@ new Vue({
     		Config.isTrailShowPoint = true;
   	        ArGis.drawTrail();
   	    },
-    	handlerTrailChange: function(evt) {
-  	        ArGis.drawTrail();
+    	handlerTrailChange: function(type) {
+    		if(type == "point"){
+    			//移除原来的点
+    			ArGis.clearTrailPoint();
+    		}else if(type == "line"){
+    			//移除原来的线
+    			ArGis.clearTrailLine();
+    		}else if(type == "dashed"){
+    			//移除原来的虚线
+    			ArGis.clearTrailDash();
+    		}else if(type == "shape"){
+    			//移除原来的虚线
+    			ArGis.clearTrailShape();
+    		}else if(type == "info"){
+    			//移除原来的虚线
+    			ArGis.clearTrailInfo();
+    		}
+    		ArGis.drawTrail();
   	    }
     },
     mounted: function(){
