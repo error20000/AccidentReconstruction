@@ -196,7 +196,7 @@ ArGis={
 						Utils.drawPoint({
 							lon: point.lon,
 							lat: point.lat,
-							color: point.color,
+							color: point.color || ship.trailColor,
 							size: point.size,
 							attr: {mmsi: ship.mmsi, type: "trail_point"},
 							template:{}
@@ -348,55 +348,45 @@ ArGis={
 		},
 		showTrailPoint: function(ship){
 			if(Config.isTrailShowPoint){
-				/*for (var k in Config.trailPoint) {
-					ArGis.view.graphics.addMany(Config.trailPoint[k]);
-				}*/
+				ArGis.view.graphics.addMany(Config.trailPoint[ship.mmsi]);
 			}
 		},
 		showTrailLine: function(ship){
 			if(Config.isTrailShowLine){
-				for (var k in Config.trailLine) {
-					var params = {
-							paths: Config.trailLine[k],
-							color: "",
-							width: "",
-							style: "",
-							attr: {mmsi: ship.mmsi, type: "trail_line"},
-							template: {}
-					};
-					Utils.drawLine(params);
-				}
+				var params = {
+						paths: Config.trailLine[ship.mmsi],
+						color: ship.trailColor,
+						width: ship.trailSize,
+						style: "",
+						attr: {mmsi: ship.mmsi, type: "trail_line"},
+						template: {}
+				};
+				Utils.drawLine(params);
 			}
 		},
 		showTrailDashed: function(ship){
 			if(Config.isTrailShowDashed){
-				for (var k in Config.trailLine) {
-					var params = {
-							paths: Config.trailLine[k],
-							color: "",
-							width: "",
-							style: "short-dash",
-							attr: {mmsi: ship.mmsi, type: "trail_dash"},
-							template: {}
-					};
-					Utils.drawLine(params);
-				}
+				var params = {
+						paths: Config.trailLine[ship.mmsi],
+						color: ship.trailColor,
+						width: ship.trailSize,
+						style: "short-dash",
+						attr: {mmsi: ship.mmsi, type: "trail_dash"},
+						template: {}
+				};
+				Utils.drawLine(params);
 			}
 		},
 		showTrailShape: function(ship){
 			if(Config.isTrailShowShape){
 				//TODO 需要改为shape
-				for (var k in Config.trailPoint) {
-					ArGis.view.graphics.addMany(Config.trailPoint[k]);
-				}
+				ArGis.view.graphics.addMany(Config.trailPoint[ship.mmsi]);
 			}
 		},
 		showTrailInfo: function(ship){
 			if(Config.isTrailShowInfo){
 				//TODO 需要改为info
-				for (var k in Config.trailPoint) {
-					ArGis.view.graphics.addMany(Config.trailPoint[k]);
-				}
+				ArGis.view.graphics.addMany(Config.trailPoint[ship.mmsi]);
 			}
 		}
 };

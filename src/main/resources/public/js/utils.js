@@ -65,7 +65,7 @@ var Utils = {
 				  		    width: (params.width ? params.width : 4) + "px",
 				  		    style: params.style ? params.style : "solid"
 				  		  };
-
+				      
 				      var line = new Graphic({
 				    	  	geometry: geometry,
 						    symbol: symbol,
