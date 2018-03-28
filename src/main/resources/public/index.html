@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="arcgis_js_api/library/4.5/esri/css/main.css" />
 
   <script>
+  	var Center = {lat:30.8506,lon:124.9598};
     var ArGis={
     		baseUrl: "arcgis_js_api/library/4.5"
     };
@@ -143,7 +144,7 @@
 		    container: "viewDiv",  
 		    map: ArGis.map,  
 		    zoom: 4,  
-		    center: ArGis.center 
+		    center: ArGis.center
 		  });
 		
 		  var toggle = new BasemapToggle({
@@ -169,9 +170,9 @@
 	  
 			ArGis.view.then(function(){
 				ArGis.initMap();
-				ArGis.initTrack();
-				ArGis.initShips();
 				ArGis.initTimeLine();
+				ArGis.initShips();
+				ArGis.initTrack();
 			}); 
 	});
 </script>

@@ -1,14 +1,54 @@
 
 var Utils = {
-		createGraphicShip: function(){
+		createGraphicShip: function(ship){
 			
 		},
 		updateShipInfo: function(timePoint){
-			if(CurShipInfo[timePoint]){
+			console.log(timePoint);
+			for (var i = 0; i < Ships.length; i++) {
+				(function(h){
+					var oldLal = Config.shipsShape[h];
+					var lal = Utils.findShipTimePointLaL(Ships[h], timePoint);
+					var lonCount = lal.lon - oldLal.geometry.longitude;
+					var latCount = lal.lat - oldLal.geometry.latitude;
+					setTimeout(() => {
+						ArGis.view.graphics.removeMany(Config.shipsShape);
+						/*var tmp = oldLal.clone();
+						tmp.geometry.longitude = tmp.geometry.longitude + lonCount;
+						tmp.geometry.latitude = tmp.geometry.latitude + latCount;*/
+						var cgp = Utils.createGraphicPoint({
+							lon: oldLal.geometry.longitude + lonCount,
+							lat: oldLal.geometry.latitude + latCount,
+							color: Ships[h].trackColor,
+							size: 4,
+							attr: {mmsi: Ships[h].mmsi, type: "ship_point"},
+							template:{}
+						});
+						Config.shipsShape.push(cgp);
+						console.log(cgp);
+						//加入地图
+						ArGis.view.graphics.add(cgp);
+					}, 1*1000);
+				})(i);
+			}
+			/*if(CurShipInfo[timePoint]){
 				//绘制ship
 				console.log(CurShipInfo[timePoint].time);
 				//绘制shipInfo
 				
+			}*/
+		},
+		findShipTimePointLaL: function(ship, time){
+			var timePoint = {};
+			for (var i = 0; i < ship.timeLine.length; i++) {
+				if(time == ship.timeLine[i].time){
+					timePoint = ship.timeLine[i];
+					break;
+				}
+			}
+			return {
+				lon: timePoint.lon,
+				lat: timePoint.lat
 			}
 		},
 		createGraphicPoint: function(params){
@@ -33,8 +73,7 @@ var Utils = {
 				      point = new Graphic({
 				    	  	geometry: geometry,
 						    symbol: symbol,
-						    attributes: params.attr,
-						    visible: false
+						    attributes: params.attr
 				      	});
 
 				      if(params.template){

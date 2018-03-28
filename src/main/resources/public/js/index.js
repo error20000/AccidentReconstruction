@@ -1,9 +1,8 @@
 
-var Colors=[];
 
 var Config = {
 		defulatColor: [226, 119, 40],
-		defulatTimeFormat: "yyyy-MM-dd HH:mm:ss",
+		defulatTimeFormat: "yyyy/M/d HH:mm:ss",
 		
 		select: 0,
 		shipsSelect: [],
@@ -25,7 +24,7 @@ var Config = {
 			cos: 0, 
 			head: 0
 		},
-		
+		shipsShape: [],
 		msgEvent: "",
 		
 		isTrackShow: false,
@@ -42,26 +41,7 @@ var Config = {
 		
 };
 
-var Ships=[{
-	mmsi: 0,
-	name: "1号船",
-	paths:[],
-	trackColor: "",
-	trackSize: "",
-	data: [{lat:30.1976, lon:124.9822, real:true, time: "2018-03-24 12:00:00", speed: 11, cos: 4, head:359,mmsi:0 },
-			{lat:30.1977, lon:124.9822, real:true, time: "2018-03-24 12:00:01", speed: 11, cos: 4, head:359,mmsi:0 },
-			{lat:30.1978, lon:124.9822, real:true, time: "2018-03-24 12:00:02", speed: 11, cos: 4, head:359,mmsi:0 },
-			{lat:30.1979, lon:124.9822, real:true, time: "2018-03-24 12:00:03", speed: 11, cos: 4, head:359,mmsi:0 },
-			{lat:30.198, lon:124.9822, real:true, time: "2018-03-24 12:00:04", speed: 11, cos: 4, head:359,mmsi:0 },
-			{lat:30.1981, lon:124.9822, real:true, time: "2018-03-24 12:00:05", speed: 11, cos: 4, head:359,mmsi:0, event: function(){console.log("time event!");} },
-			{lat:30.1982, lon:124.9822, real:true, time: "2018-03-24 12:00:06", speed: 11, cos: 4, head:359,mmsi:0 },
-			{lat:30.1983, lon:124.9822, real:true, time: "2018-03-24 12:00:07", speed: 11, cos: 4, head:359,mmsi:0 },
-			{lat:30.1984, lon:124.9822, real:true, time: "2018-03-24 12:00:08", speed: 11, cos: 4, head:359,mmsi:0 },
-			{lat:30.1985, lon:124.9822, real:true, time: "2018-03-24 12:00:09", speed: 11, cos: 4, head:359,mmsi:0 },
-			{lat:30.1986, lon:124.9822, real:true, time: "2018-03-24 12:00:10", speed: 11, cos: 4, head:359,mmsi:0 }
-
-	]
-}];
+var Ships=[];
 
 var CurShipInfo = {};
 var TimeEvent = {
@@ -76,7 +56,7 @@ var TimeControl={
 ArGis={
 		map: "",
 		view: "",
-		center: [124, 30],
+		center: [Center.lon, Center.lat],
 		initData: function(){
 			//加载数据
 			//基础数据
@@ -121,10 +101,9 @@ ArGis={
 			/*for (var k in shipsTemp) {
 				Ships.push(shipsTemp[k]);
 			}*/
-			console.log(Ships);
 			
 			//ship
-			for (var i = 0; i < Ships.length; i++) {
+			for (var i = 0; i < Ships.length && i < 4; i++) {
 				var ship = Ships[i];
 				var select = {
 						value: i,
@@ -155,14 +134,14 @@ ArGis={
 
 			//绘制碰撞点
 			Utils.drawPoint({
-						lon: 124,
-						lat: 33,
+						lon: Center.lon,
+						lat: Center.lat,
 						color: [226, 119, 40],
 						size: 10,
 						attr: {
-							time: "",
-							lon: 124,
-							lat: 33,
+							time: "2018/1/6 19:50:00",
+							lon: Center.lon,
+							lat: Center.lat,
 							content: "test"
 						},
 						template: {
@@ -241,7 +220,23 @@ ArGis={
 //			}, 10);
 		},
 		initShips: function(){
-			
+			var startTime = "2018/1/6 19:00:00"; 
+			for (var i = 0; i < Ships.length; i++) {
+				var lal = Utils.findShipTimePointLaL(Ships[i], startTime);
+				//绘制船型
+				var cgp = Utils.createGraphicPoint({
+					lon: lal.lon,
+					lat: lal.lat,
+					color: Ships[i].trackColor,
+					size: 4,
+					attr: {mmsi: Ships[i].mmsi, type: "ship_point"},
+					template:{}
+				});
+				//加入缓存
+				Config.shipsShape.push(cgp);console.log(cgp);
+				//加入地图
+				ArGis.view.graphics.add(cgp);
+			}
 		},
 		initTimeLine: function(){
 			//处理时间线
@@ -259,7 +254,7 @@ ArGis={
 						head: Number(ShipTimeData[i].Head),
 						real: true
 				};
-				var obj = shipTimeTemp[key];
+				/*var obj = shipTimeTemp[key];
 				if(!obj){
 					obj = {
 						minTime: ShipTimeData[i].UpdateTime,
@@ -277,10 +272,82 @@ ArGis={
 						obj.maxTime = ShipTimeData[i].UpdateTime;
 					}
 					shipTimeTemp[key] = obj;
+				}*/
+				var obj = shipTimeTemp[key];
+				if(!obj){
+					obj = {
+//						minTime: ShipTimeData[i].UpdateTime,
+//						maxTime: ShipTimeData[i].UpdateTime,
+						timePoints: [timePoint]
+					};
+					shipTimeTemp[key] = obj;
+				}else{
+					obj.timePoints.push(timePoint);
+//					if(ShipTimeData[i].UpdateTime < obj.minTime){
+//						obj.minTime = ShipTimeData[i].UpdateTime;
+//					}
+//					if(ShipTimeData[i].UpdateTime > obj.maxTime){
+//						obj.maxTime = ShipTimeData[i].UpdateTime;
+//					}
+					shipTimeTemp[key] = obj;
 				}
 			}
 			// 2、创建虚拟点
-			
+			console.log(shipTimeTemp);
+			for (var i = 0; i < Ships.length && i < Config.shipsSelect.length; i++) {
+				var ship = Ships[i];
+				if(shipTimeTemp[ship.mmsi]){
+					var timePoints = shipTimeTemp[ship.mmsi].timePoints;
+					for (var j = 0; j < timePoints.length - 1; j++) {
+						ship.timeLine = ship.timeLine || [];
+						var tmp1 = timePoints[j];
+						var tmp2 = timePoints[j+1];
+						var count = Math.floor(new Date(tmp2.time).getTime()/1000) - Math.floor(new Date(tmp1.time).getTime()/1000);
+						var latCount = tmp2.lat - tmp1.lat;
+						var lonCount = tmp2.lon - tmp1.lon;
+						var speedCount = tmp2.speed - tmp1.speed;
+						var cogCount = tmp2.cog - tmp1.cog;
+						var headCount = tmp2.head - tmp1.head;
+						ship.timeLine.push(tmp1);
+						for (var k = 1; k < count; k++) {
+							var timeLinePoint = {
+									mmsi: tmp1.mmsi,
+									lat: tmp1.lat + k*latCount/count,
+									lon: tmp1.lon + k*lonCount/count,
+									time: Utils.formatDate(new Date(tmp1.time).getTime() + k*1000, "yyyy/M/d HH:mm:ss"),
+									speed: tmp1.speed + k*speedCount/count,
+									cog: tmp1.cog + k*cogCount/count,
+									head: tmp1.head + k*headCount/count,
+									real: false
+							};
+							ship.timeLine.push(timeLinePoint);
+						}
+					}
+				}
+			}
+			console.log(Ships);
+			// 3、创建事件
+			var shipEventTemp = {};
+			for (var i = 0; i < Ships.length && i < Config.shipsSelect.length; i++) {
+				var ship = Ships[i];
+				if(ship.timeLine){
+					for (var j = 0; j < ship.timeLine.length; j++) {
+						var key = ship.mmsi+"_"+ship.timeLine[j].time;
+						shipEventTemp[key] = i+"_"+j;
+					}
+				}
+			}
+			for (var i = 0; i < ShipEventData.length; i++) {
+				var shipEvent = ShipEventData[i];
+				var key = shipEvent.Mmsi+"_"+shipEvent.UpdateTime;
+				if(shipEventTemp[key]){
+					var shipIndex = shipEventTemp[key].split("_")[0];
+					var timeLineIndex = shipEventTemp[key].split("_")[1];
+					Ships[shipIndex].timeLine[timeLineIndex].eventDesc = shipEvent.EventDesc;
+					Ships[shipIndex].timeLine[timeLineIndex].dcpaDesc = shipEvent.DcpaDesc;
+				}
+			}
+			//播放事件绑定
 			//视频
 			var video = document.getElementById("video");
 			video.onplay = function(evt){
@@ -300,28 +367,9 @@ ArGis={
 				console.log("onwaiting");
 			};
 			//插件
-			var minTime = "";
-			var maxTime = "";
-			for (var i = 0; i < Ships.length; i++) {
-				var ship = Ships[i];
-				for (var j = 0; j < ship.data.length; j++) {
-					if(!minTime){
-						minTime = ship.data[j].time;
-					}else{
-						if(minTime > ship.data[j].time){
-							minTime = ship.data[j].time;
-						}
-					}
-					if(!maxTime){
-						maxTime = ship.data[j].time;
-					}else{
-						if(maxTime < ship.data[j].time){
-							maxTime = ship.data[j].time;
-						}
-					}
-				}
-			}
-			var endTime = Math.floor((new Date(maxTime.replace("-","/")).getTime() - new Date(minTime.replace("-","/")).getTime())/1000);
+			var minTime = "2018/1/6 19:00:00";
+			var maxTime = "2018/1/6 21:30:00";
+			var endTime = Math.floor(new Date(maxTime.replace("-","/")).getTime()/1000) - Math.floor(new Date(minTime.replace("-","/")).getTime()/1000);
 			
 			PlayController.endTime= endTime;
 			PlayController.paused= true;
