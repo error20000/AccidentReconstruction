@@ -1,6 +1,6 @@
 
 var Utils = {
-		trail: function(){
+		createGraphicShip: function(){
 			
 		},
 		updateShipInfo: function(timePoint){
@@ -11,7 +11,8 @@ var Utils = {
 				
 			}
 		},
-		drawPoint: function(params){
+		createGraphicPoint: function(params){
+			var point;
 			require(["esri/Color","esri/Graphic"], 
 					function (Color, Graphic) {
 						var geometry = {
@@ -29,7 +30,7 @@ var Utils = {
 						    }
 				  		  };
 
-				      var point = new Graphic({
+				      point = new Graphic({
 				    	  	geometry: geometry,
 						    symbol: symbol,
 						    attributes: params.attr,
@@ -39,17 +40,12 @@ var Utils = {
 				      if(params.template){
 				    	  point.popupTemplate = params.template;
 				      }
-				      
-				      var temp = Config.trailPoint[params.attr.mmsi];
-						if(!temp){
-							temp = [point];
-						}else{
-							temp.push(point);
-						}
-						Config.trailPoint[params.attr.mmsi] = temp;
-				      
-//				      ArGis.view.graphics.add(point);
 			});
+			return point;
+		},
+		drawPoint: function(params){
+			var point = this.createGraphicPoint(params);
+			ArGis.view.graphics.add(point);
 		},
 		drawLine: function(params){
 			require(["esri/Color","esri/Graphic"], 
@@ -104,13 +100,13 @@ var Utils = {
 				    	  point.popupTemplate = params.template;
 				      }
 				      
-				      var temp = Config.trailShape[params.attr.mmsi];
+				      var temp = Config.trackShape[params.attr.mmsi];
 						if(!temp){
 							temp = [point];
 						}else{
 							temp.push(point);
 						}
-						Config.trailShape[params.attr.mmsi] = temp;
+						Config.trackShape[params.attr.mmsi] = temp;
 			});
 		},
 		drawInfo: function(params){
@@ -138,13 +134,13 @@ var Utils = {
 				    	  point.popupTemplate = params.template;
 				      }
 				      
-				      var temp = Config.trailInfo[params.attr.mmsi];
+				      var temp = Config.trackInfo[params.attr.mmsi];
 						if(!temp){
 							temp = [point];
 						}else{
 							temp.push(point);
 						}
-						Config.trailInfo[params.attr.mmsi] = temp;
+						Config.trackInfo[params.attr.mmsi] = temp;
 			});
 		},
 		removeGraphicsByType: function(type) {

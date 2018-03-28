@@ -39,9 +39,10 @@
 <link rel="stylesheet" href="css/play.css" />
 <link rel="stylesheet" href="css/index.css" />
 
-<script src="js/shipInfoData.js"></script>
+<script src="js/shipInfoData.js" ></script>
 <script src="js/shipEventData.js"></script>
-<script src="js/shipTrailData.js"></script>
+<script src="js/shipTimeData.js"></script>
+<script src="js/shipTrackData.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/play.js"></script>
 <script src="js/index.js"></script>
@@ -54,6 +55,7 @@
 <div id="app">
 	<el-row>
 			<el-col :span="12">
+				<div id="fullMap"></div>
 				<div id="viewDiv"></div>
 				<div id="playDiv">
 					<play-controller ></play-controller>
@@ -73,13 +75,13 @@
 				<el-row>
 					<el-col :span="24">
 						
-						<div id="trailDiv">
-						 		<el-checkbox v-model="isTrailShow" @change="handlerTrail">显示轨迹</el-checkbox>
-						 		<el-checkbox v-model="isTrailShowPoint" @change="handlerTrailChange('point')">点</el-checkbox>
-						 		<el-checkbox v-model="isTrailShowLine" @change="handlerTrailChange('line')">线</el-checkbox>
-						 		<el-checkbox v-model="isTrailShowDashed" @change="handlerTrailChange('dashed')">虚线</el-checkbox>
-						 		<el-checkbox v-model="isTrailShowShape" @change="handlerTrailChange('shape')">形状</el-checkbox>
-						 		<el-checkbox v-model="isTrailShowInfo" @change="handlerTrailChange('info')">事件</el-checkbox>
+						<div id="trackDiv">
+						 		<el-checkbox v-model="isTrackShow" @change="handlerTrack">显示轨迹</el-checkbox>
+						 		<el-checkbox v-model="isTrackShowPoint" @change="handlerTrackChange('point')">点</el-checkbox>
+						 		<el-checkbox v-model="isTrackShowLine" @change="handlerTrackChange('line')">线</el-checkbox>
+						 		<el-checkbox v-model="isTrackShowDashed" @change="handlerTrackChange('dashed')">虚线</el-checkbox>
+						 		<el-checkbox v-model="isTrackShowShape" @change="handlerTrackChange('shape')">形状</el-checkbox>
+						 		<el-checkbox v-model="isTrackShowInfo" @change="handlerTrackChange('info')">事件</el-checkbox>
 						</div>
 					</el-col>
 				</el-row>
@@ -167,11 +169,9 @@
 	  
 			ArGis.view.then(function(){
 				ArGis.initMap();
-				ArGis.initTrail();
+				ArGis.initTrack();
 				ArGis.initShips();
 				ArGis.initTimeLine();
-				//ArGis.view.graphics[0].emit("click");
-				
 			}); 
 	});
 </script>
@@ -182,28 +182,28 @@ new Vue({
       return Config;
     },
     methods: {
-    	handlerTrail: function(evt) {
-    		Config.isTrailShowPoint = true;
-  	        ArGis.drawTrail();
+    	handlerTrack: function(evt) {
+    		Config.isTrackShowPoint = true;
+  	        ArGis.drawTrack();
   	    },
-    	handlerTrailChange: function(type) {
+    	handlerTrackChange: function(type) {
     		if(type == "point"){
     			//移除原来的点
-    			ArGis.clearTrailPoint();
+    			ArGis.clearTrackPoint();
     		}else if(type == "line"){
     			//移除原来的线
-    			ArGis.clearTrailLine();
+    			ArGis.clearTrackLine();
     		}else if(type == "dashed"){
     			//移除原来的虚线
-    			ArGis.clearTrailDash();
+    			ArGis.clearTrackDash();
     		}else if(type == "shape"){
     			//移除原来的虚线
-    			ArGis.clearTrailShape();
+    			ArGis.clearTrackShape();
     		}else if(type == "info"){
     			//移除原来的虚线
-    			ArGis.clearTrailInfo();
+    			ArGis.clearTrackInfo();
     		}
-    		ArGis.drawTrail();
+    		ArGis.drawTrack();
   	    }
     },
     mounted: function(){

@@ -16,7 +16,7 @@ var Config = {
 			callSign:'',
 			shipType:'',
 			left: 0,
-			trail: 0,
+			track: 0,
 			lat: 0, 
 			lon: 0, 
 			real: false, 
@@ -28,17 +28,17 @@ var Config = {
 		
 		msgEvent: "",
 		
-		isTrailShow: false,
-		isTrailShowPoint: false,
-		isTrailShowLine: false,
-		isTrailShowDashed: false,
-		isTrailShowShape: false,
-		isTrailShowInfo: false,
-		trailPoint: {},
-		trailLine: {},
-		trailDashed: {},
-		trailShape: {},
-		trailInfo: {}
+		isTrackShow: false,
+		isTrackShowPoint: false,
+		isTrackShowLine: false,
+		isTrackShowDashed: false,
+		isTrackShowShape: false,
+		isTrackShowInfo: false,
+		trackPoint: {},
+		trackLine: {},
+		trackDashed: {},
+		trackShape: {},
+		trackInfo: {}
 		
 };
 
@@ -46,8 +46,8 @@ var Ships=[{
 	mmsi: 0,
 	name: "1号船",
 	paths:[],
-	trailColor: "",
-	trailSize: "",
+	trackColor: "",
+	trackSize: "",
 	data: [{lat:30.1976, lon:124.9822, real:true, time: "2018-03-24 12:00:00", speed: 11, cos: 4, head:359,mmsi:0 },
 			{lat:30.1977, lon:124.9822, real:true, time: "2018-03-24 12:00:01", speed: 11, cos: 4, head:359,mmsi:0 },
 			{lat:30.1978, lon:124.9822, real:true, time: "2018-03-24 12:00:02", speed: 11, cos: 4, head:359,mmsi:0 },
@@ -88,17 +88,17 @@ ArGis={
 			}
 			//轨迹数据
 			var shipsTemp = {};
-			for (var i = 0; i < ShipTrailData.length; i++) {
-				var key = ShipTrailData[i].Mmsi;
+			for (var i = 0; i < ShipTrackData.length; i++) {
+				var key = ShipTrackData[i].Mmsi;
 				var change = {
-						mmsi: ShipTrailData[i].Mmsi,
-						lat: Number(ShipTrailData[i].Lat),
-						lon: Number(ShipTrailData[i].Long),
-						time: ShipTrailData[i].UpdateTime,
-						speed: Number(ShipTrailData[i].Speed),
-						cog: Number(ShipTrailData[i].Cog),
-						head: Number(ShipTrailData[i].Head),
-						unkonw: ShipTrailData[i].unkonw,
+						mmsi: ShipTrackData[i].Mmsi,
+						lat: Number(ShipTrackData[i].Lat),
+						lon: Number(ShipTrackData[i].Long),
+						time: ShipTrackData[i].UpdateTime,
+						speed: Number(ShipTrackData[i].Speed),
+						cog: Number(ShipTrackData[i].Cog),
+						head: Number(ShipTrackData[i].Head),
+						unkonw: ShipTrackData[i].unkonw,
 						real: true
 				};
 				var obj = shipsTemp[key];
@@ -152,7 +152,7 @@ ArGis={
 		},
 		initMap: function(){
 			//加载工具
-			
+
 			//绘制碰撞点
 			Utils.drawPoint({
 						lon: 124,
@@ -186,55 +186,101 @@ ArGis={
 						}
 					});
 		},
-		initTrail: function(){
-			for (var i = 0; i < Ships.length; i++) {
-				var ship = Ships[i];
-				for (var j = 0; j < ship.data.length; j++) {
-					var point = ship.data[j];
-					if(point.real){
-						//点
-						Utils.drawPoint({
-							lon: point.lon,
-							lat: point.lat,
-							color: point.color || ship.trailColor,
-							size: point.size,
-							attr: {mmsi: ship.mmsi, type: "trail_point"},
-							template:{}
-						});
-						//线
-						var tempLine = Config.trailLine[ship.mmsi];
-						if(!tempLine){
-							tempLine = [[point.lon, point.lat]];
-						}else{
-							tempLine.push([point.lon, point.lat]);
+		initTrack: function(){
+//			setTimeout(() => {
+				for (var i = 0; i < Ships.length; i++) {
+					var ship = Ships[i];
+					for (var j = 0; j < ship.data.length; j++) {
+						var point = ship.data[j];
+						if(point.real){
+							//点
+							var cgp = Utils.createGraphicPoint({
+								lon: point.lon,
+								lat: point.lat,
+								color: point.color || ship.trackColor,
+								size: point.size,
+								attr: {mmsi: ship.mmsi, type: "track_point"},
+								template:{}
+							});
+							var tempPoint = Config.trackPoint[ship.mmsi];
+							if(!tempPoint){
+								tempPoint = [cgp];
+							}else{
+								tempPoint.push(cgp);
+							}
+							Config.trackPoint[ship.mmsi] = tempPoint;
+							//线
+							var tempLine = Config.trackLine[ship.mmsi];
+							if(!tempLine){
+								tempLine = [[point.lon, point.lat]];
+							}else{
+								tempLine.push([point.lon, point.lat]);
+							}
+							Config.trackLine[ship.mmsi] = tempLine;
+							//形状
+							Utils.drawShape({
+								paths: [],
+								color: point.color,
+								width: "",
+								style: "",
+								attr: {mmsi: ship.mmsi, type: "track_shape"},
+								template:{}
+							});
+							//事件
+							Utils.drawInfo({
+								paths: [],
+								color: point.color,
+								width: "",
+								style: "",
+								attr: {mmsi: ship.mmsi, type: "track_info"},
+								template:{}
+							});
 						}
-						Config.trailLine[ship.mmsi] = tempLine;
-						//形状
-						Utils.drawShape({
-							paths: [],
-							color: point.color,
-							width: "",
-							style: "",
-							attr: {mmsi: ship.mmsi, type: "trail_shape"},
-							template:{}
-						});
-						//事件
-						Utils.drawInfo({
-							paths: [],
-							color: point.color,
-							width: "",
-							style: "",
-							attr: {mmsi: ship.mmsi, type: "trail_info"},
-							template:{}
-						});
 					}
 				}
-			}
+//			}, 10);
 		},
 		initShips: function(){
 			
 		},
 		initTimeLine: function(){
+			//处理时间线
+			// 1、创建实点
+			var shipTimeTemp = {};
+			for (var i = 0; i < ShipTimeData.length; i++) {
+				var key = ShipTimeData[i].Mmsi;
+				var timePoint = {
+						mmsi: ShipTimeData[i].Mmsi,
+						lat: Number(ShipTimeData[i].Lat),
+						lon: Number(ShipTimeData[i].Long),
+						time: ShipTimeData[i].UpdateTime,
+						speed: Number(ShipTimeData[i].Speed),
+						cog: Number(ShipTimeData[i].Cog),
+						head: Number(ShipTimeData[i].Head),
+						real: true
+				};
+				var obj = shipTimeTemp[key];
+				if(!obj){
+					obj = {
+						minTime: ShipTimeData[i].UpdateTime,
+						maxTime: ShipTimeData[i].UpdateTime,
+						timePoints: {}
+					};
+					obj.timePoints[ShipTimeData[i].UpdateTime] = timePoint;//对象方便查询，且去重
+					shipTimeTemp[key] = obj;
+				}else{
+					obj.timePoints[ShipTimeData[i].UpdateTime] = timePoint;
+					if(ShipTimeData[i].UpdateTime < obj.minTime){
+						obj.minTime = ShipTimeData[i].UpdateTime;
+					}
+					if(ShipTimeData[i].UpdateTime > obj.maxTime){
+						obj.maxTime = ShipTimeData[i].UpdateTime;
+					}
+					shipTimeTemp[key] = obj;
+				}
+			}
+			// 2、创建虚拟点
+			
 			//视频
 			var video = document.getElementById("video");
 			video.onplay = function(evt){
@@ -305,88 +351,88 @@ ArGis={
 				}
 			};
 		},
-		drawTrail: function(){
-			if(Config.isTrailShow){
+		drawTrack: function(){
+			if(Config.isTrackShow){
 				for (var i = 0; i < Ships.length; i++) {
 					var ship = Ships[i];
-					this.showTrailPoint(ship);
-					this.showTrailLine(ship);
-					this.showTrailDashed(ship);
-					this.showTrailShape(ship);
-					this.showTrailInfo(ship);
+					this.showTrackPoint(ship);
+					this.showTrackLine(ship);
+					this.showTrackDashed(ship);
+					this.showTrackShape(ship);
+					this.showTrackInfo(ship);
 				}
 			}else{
-				Config.isTrailShowPoint = false;
-				Config.isTrailShowLine = false;
-				Config.isTrailShowDashed = false;
-				Config.isTrailShowShape = false;
-				Config.isTrailShowInfo = false;
-				this.clearTrail();
+				Config.isTrackShowPoint = false;
+				Config.isTrackShowLine = false;
+				Config.isTrackShowDashed = false;
+				Config.isTrackShowShape = false;
+				Config.isTrackShowInfo = false;
+				this.clearTrack();
 			}
 		},
-		clearTrail: function(){
-			this.clearTrailPoint();
-			this.clearTrailLine();
-			this.clearTrailDash();
-			this.clearTrailShape();
-			this.clearTrailInfo();
+		clearTrack: function(){
+			this.clearTrackPoint();
+			this.clearTrackLine();
+			this.clearTrackDash();
+			this.clearTrackShape();
+			this.clearTrackInfo();
 		},
-		clearTrailPoint: function(){
-			Utils.removeGraphicsByType("trail_point");
+		clearTrackPoint: function(){
+			Utils.removeGraphicsByType("track_point");
 		},
-		clearTrailLine: function(){
-			Utils.removeGraphicsByType("trail_line");
+		clearTrackLine: function(){
+			Utils.removeGraphicsByType("track_line");
 		},
-		clearTrailDash: function(){
-			Utils.removeGraphicsByType("trail_dash");
+		clearTrackDash: function(){
+			Utils.removeGraphicsByType("track_dash");
 		},
-		clearTrailShape: function(){
-			Utils.removeGraphicsByType("trail_shape");
+		clearTrackShape: function(){
+			Utils.removeGraphicsByType("track_shape");
 		},
-		clearTrailInfo: function(){
-			Utils.removeGraphicsByType("trail_info");
+		clearTrackInfo: function(){
+			Utils.removeGraphicsByType("track_info");
 		},
-		showTrailPoint: function(ship){
-			if(Config.isTrailShowPoint){
-				ArGis.view.graphics.addMany(Config.trailPoint[ship.mmsi]);
+		showTrackPoint: function(ship){
+			if(Config.isTrackShowPoint){
+				ArGis.view.graphics.addMany(Config.trackPoint[ship.mmsi]);
 			}
 		},
-		showTrailLine: function(ship){
-			if(Config.isTrailShowLine){
+		showTrackLine: function(ship){
+			if(Config.isTrackShowLine){
 				var params = {
-						paths: Config.trailLine[ship.mmsi],
-						color: ship.trailColor,
-						width: ship.trailSize,
+						paths: Config.trackLine[ship.mmsi],
+						color: ship.trackColor,
+						width: ship.trackSize,
 						style: "",
-						attr: {mmsi: ship.mmsi, type: "trail_line"},
+						attr: {mmsi: ship.mmsi, type: "track_line"},
 						template: {}
 				};
 				Utils.drawLine(params);
 			}
 		},
-		showTrailDashed: function(ship){
-			if(Config.isTrailShowDashed){
+		showTrackDashed: function(ship){
+			if(Config.isTrackShowDashed){
 				var params = {
-						paths: Config.trailLine[ship.mmsi],
-						color: ship.trailColor,
-						width: ship.trailSize,
+						paths: Config.trackLine[ship.mmsi],
+						color: ship.trackColor,
+						width: ship.trackSize,
 						style: "short-dash",
-						attr: {mmsi: ship.mmsi, type: "trail_dash"},
+						attr: {mmsi: ship.mmsi, type: "track_dash"},
 						template: {}
 				};
 				Utils.drawLine(params);
 			}
 		},
-		showTrailShape: function(ship){
-			if(Config.isTrailShowShape){
+		showTrackShape: function(ship){
+			if(Config.isTrackShowShape){
 				//TODO 需要改为shape
-				ArGis.view.graphics.addMany(Config.trailPoint[ship.mmsi]);
+				ArGis.view.graphics.addMany(Config.trackPoint[ship.mmsi]);
 			}
 		},
-		showTrailInfo: function(ship){
-			if(Config.isTrailShowInfo){
+		showTrackInfo: function(ship){
+			if(Config.isTrackShowInfo){
 				//TODO 需要改为info
-				ArGis.view.graphics.addMany(Config.trailPoint[ship.mmsi]);
+				ArGis.view.graphics.addMany(Config.trackPoint[ship.mmsi]);
 			}
 		}
 };
