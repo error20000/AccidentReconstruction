@@ -59,17 +59,18 @@ ArGis={
 		center: [Center.lon, Center.lat],
 		initData: function(){
 			//加载数据
-			//基础数据
+			// 1、基础数据
 			for (var i = 0; i < ShipInfoData.length; i++) {
 				var info = ShipInfoData[i];
 				info.data = [];
 				Ships[i] = info;
 				
 			}
-			//轨迹数据
-			var shipsTemp = {};
+			// 2、轨迹数据
+			var shipsTemp = {}, shipsHash={};
 			for (var i = 0; i < ShipTrackData.length; i++) {
 				var key = ShipTrackData[i].Mmsi;
+				var keyHash = ShipTrackData[i].Mmsi+"_"+ShipTrackData[i].UpdateTime;
 				var change = {
 						mmsi: ShipTrackData[i].Mmsi,
 						lat: Number(ShipTrackData[i].Lat),
@@ -82,15 +83,22 @@ ArGis={
 						real: true
 				};
 				var obj = shipsTemp[key];
+				var objHash = shipsHash[keyHash];
 				if(!obj){
 					obj = {
 						mmsi: key,
 						data: []
 					};
-					obj.data.push(change);
+					var index = obj.data.push(change);
 					shipsTemp[key] = obj;
+					shipsHash[keyHash] = index;
 				}else{
-					obj.data.push(change);
+					if(!objHash){
+						var index = obj.data.push(change);
+						shipsHash[keyHash] = index;
+					}else{
+						obj.data[objHash-1] = change;
+					}
 					shipsTemp[key] = obj;
 				}
 			}
@@ -101,7 +109,26 @@ ArGis={
 			/*for (var k in shipsTemp) {
 				Ships.push(shipsTemp[k]);
 			}*/
-			
+			// 3、优化轨迹数据
+			for (var i = 0; i < Ships.length; i++) {
+				var ship = Ships[i];
+				var tempData = [];
+				for (var j = 0; j < ship.data.length; j++) {
+					if(j == 0){
+						tempData.push(ship.data[j]);
+					}else if(j == ship.data.length-1){
+						tempData.push(ship.data[j]);
+					}else{
+						var temp1 = ship.data[j-1];
+						var temp2 = ship.data[j];
+						if(temp1.lat != temp2.lat && temp1.lon != temp2.lon){
+							tempData.push(ship.data[j]);
+						}
+					}
+				}
+				ship.data = tempData;
+			}
+			console.log(Ships);
 			//ship
 			for (var i = 0; i < Ships.length && i < 4; i++) {
 				var ship = Ships[i];
