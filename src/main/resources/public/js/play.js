@@ -114,7 +114,7 @@ Vue.component('play-controller',{
           this.progress = Number((offsetX / targetWidth * 100).toFixed(2));
           var temp = parseInt((this.endTime * this.progress / 100).toFixed(2));
           var updateTime = temp - this.curPlayTime;
-          this.curPlayTime = temp;
+          this.curPlayTime = temp; console.log(this.curPlayTime);console.log(updateTime);
           PlayController.emitUpdateTime(updateTime);
       },
       // 切换状态 play or paused

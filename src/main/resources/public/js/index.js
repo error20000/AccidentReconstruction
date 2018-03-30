@@ -3,6 +3,7 @@
 var Config = {
 		defulatColor: [226, 119, 40],
 		defulatTimeFormat: "yyyy/M/d HH:mm:ss",
+		timeLength: 5*60, 
 		
 		select: 0,
 		shipsSelect: [],
@@ -106,7 +107,7 @@ ArGis={
 				Ships[i].data = shipsTemp[Ships[i].mmsi].data;
 				delete shipsTemp[Ships[i].mmsi];
 			}
-			/*for (var k in shipsTemp) {
+			/*for (var k in shipsTemp) { //添加所有船只
 				Ships.push(shipsTemp[k]);
 			}*/
 			// 3、优化轨迹数据
@@ -128,9 +129,9 @@ ArGis={
 				}
 				ship.data = tempData;
 			}
-			console.log(Ships);
-			//ship
-			for (var i = 0; i < Ships.length && i < 4; i++) {
+			
+			// 4、设置被观察船只
+			for (var i = 0; i < Ships.length && i < ShipInfoData.length; i++) {
 				var ship = Ships[i];
 				var select = {
 						value: i,
@@ -138,7 +139,7 @@ ArGis={
 				};
 				Config.shipsSelect.push(select);
 				//select
-				if(Config.select == i){
+				/*if(Config.select == i){
 					for (var j = 0; j < ship.data.length; j++) {
 						CurShipInfo[ship.data[j].time] = ship.data[j];
 					}
@@ -153,8 +154,88 @@ ArGis={
 						events.push(ship.data[j]);
 						TimeEvent[ship.data[j].time] = events;
 					}
+				}*/
+			}
+			//处理时间线
+			// 1、创建实点
+			var shipTimeTemp = {};
+			for (var i = 0; i < ShipTimeData.length; i++) {
+				var key = ShipTimeData[i].Mmsi;
+				var timePoint = {
+						mmsi: ShipTimeData[i].Mmsi,
+						lat: Number(ShipTimeData[i].Lat),
+						lon: Number(ShipTimeData[i].Long),
+						time: ShipTimeData[i].UpdateTime,
+						speed: Number(ShipTimeData[i].Speed),
+						cog: Number(ShipTimeData[i].Cog),
+						head: Number(ShipTimeData[i].Head),
+						real: true
+				};
+				var obj = shipTimeTemp[key];
+				if(!obj){
+					obj = {
+						timePoints: [timePoint]
+					};
+					shipTimeTemp[key] = obj;
+				}else{
+					obj.timePoints.push(timePoint);
+					shipTimeTemp[key] = obj;
 				}
 			}
+			// 2、创建虚拟点(只设置被观察船只)
+			for (var i = 0; i < Ships.length && i < ShipInfoData.length; i++) {
+				var ship = Ships[i];
+				if(shipTimeTemp[ship.mmsi]){
+					var timePoints = shipTimeTemp[ship.mmsi].timePoints;
+					for (var j = 0; j < timePoints.length - 1; j++) {
+						ship.timeLine = ship.timeLine || [];
+						var tmp1 = timePoints[j];
+						var tmp2 = timePoints[j+1];
+						var count = Math.floor(new Date(tmp2.time).getTime()/1000) - Math.floor(new Date(tmp1.time).getTime()/1000);
+						var latCount = tmp2.lat - tmp1.lat;
+						var lonCount = tmp2.lon - tmp1.lon;
+						var speedCount = tmp2.speed - tmp1.speed;
+						var cogCount = tmp2.cog - tmp1.cog;
+						var headCount = tmp2.head - tmp1.head;
+						ship.timeLine.push(tmp1);
+						for (var k = 1; k < count; k++) {
+							var timeLinePoint = {
+									mmsi: tmp1.mmsi,
+									lat: tmp1.lat + k*latCount/count,
+									lon: tmp1.lon + k*lonCount/count,
+									time: Utils.formatDate(new Date(tmp1.time).getTime() + k*1000, Config.defulatTimeFormat),
+									speed: tmp1.speed + k*speedCount/count,
+									cog: tmp1.cog + k*cogCount/count,
+									head: tmp1.head + k*headCount/count,
+									real: false
+							};
+							ship.timeLine.push(timeLinePoint);
+						}
+					}
+				}
+			}
+			console.log(Ships);
+			/*// 3、创建事件
+			var shipEventTemp = {};
+			for (var i = 0; i < Ships.length && i < Config.shipsSelect.length; i++) {
+				var ship = Ships[i];
+				if(ship.timeLine){
+					for (var j = 0; j < ship.timeLine.length; j++) {
+						var key = ship.mmsi+"_"+ship.timeLine[j].time;
+						shipEventTemp[key] = i+"_"+j;
+					}
+				}
+			}
+			for (var i = 0; i < ShipEventData.length; i++) {
+				var shipEvent = ShipEventData[i];
+				var key = shipEvent.Mmsi+"_"+shipEvent.UpdateTime;
+				if(shipEventTemp[key]){
+					var shipIndex = shipEventTemp[key].split("_")[0];
+					var timeLineIndex = shipEventTemp[key].split("_")[1];
+					Ships[shipIndex].timeLine[timeLineIndex].eventDesc = shipEvent.EventDesc;
+					Ships[shipIndex].timeLine[timeLineIndex].dcpaDesc = shipEvent.DcpaDesc;
+				}
+			}*/
 		},
 		initMap: function(){
 			//加载工具
@@ -266,114 +347,6 @@ ArGis={
 			}
 		},
 		initTimeLine: function(){
-			//处理时间线
-			// 1、创建实点
-			var shipTimeTemp = {};
-			for (var i = 0; i < ShipTimeData.length; i++) {
-				var key = ShipTimeData[i].Mmsi;
-				var timePoint = {
-						mmsi: ShipTimeData[i].Mmsi,
-						lat: Number(ShipTimeData[i].Lat),
-						lon: Number(ShipTimeData[i].Long),
-						time: ShipTimeData[i].UpdateTime,
-						speed: Number(ShipTimeData[i].Speed),
-						cog: Number(ShipTimeData[i].Cog),
-						head: Number(ShipTimeData[i].Head),
-						real: true
-				};
-				/*var obj = shipTimeTemp[key];
-				if(!obj){
-					obj = {
-						minTime: ShipTimeData[i].UpdateTime,
-						maxTime: ShipTimeData[i].UpdateTime,
-						timePoints: {}
-					};
-					obj.timePoints[ShipTimeData[i].UpdateTime] = timePoint;//对象方便查询，且去重
-					shipTimeTemp[key] = obj;
-				}else{
-					obj.timePoints[ShipTimeData[i].UpdateTime] = timePoint;
-					if(ShipTimeData[i].UpdateTime < obj.minTime){
-						obj.minTime = ShipTimeData[i].UpdateTime;
-					}
-					if(ShipTimeData[i].UpdateTime > obj.maxTime){
-						obj.maxTime = ShipTimeData[i].UpdateTime;
-					}
-					shipTimeTemp[key] = obj;
-				}*/
-				var obj = shipTimeTemp[key];
-				if(!obj){
-					obj = {
-//						minTime: ShipTimeData[i].UpdateTime,
-//						maxTime: ShipTimeData[i].UpdateTime,
-						timePoints: [timePoint]
-					};
-					shipTimeTemp[key] = obj;
-				}else{
-					obj.timePoints.push(timePoint);
-//					if(ShipTimeData[i].UpdateTime < obj.minTime){
-//						obj.minTime = ShipTimeData[i].UpdateTime;
-//					}
-//					if(ShipTimeData[i].UpdateTime > obj.maxTime){
-//						obj.maxTime = ShipTimeData[i].UpdateTime;
-//					}
-					shipTimeTemp[key] = obj;
-				}
-			}
-			// 2、创建虚拟点
-			console.log(shipTimeTemp);
-			for (var i = 0; i < Ships.length && i < Config.shipsSelect.length; i++) {
-				var ship = Ships[i];
-				if(shipTimeTemp[ship.mmsi]){
-					var timePoints = shipTimeTemp[ship.mmsi].timePoints;
-					for (var j = 0; j < timePoints.length - 1; j++) {
-						ship.timeLine = ship.timeLine || [];
-						var tmp1 = timePoints[j];
-						var tmp2 = timePoints[j+1];
-						var count = Math.floor(new Date(tmp2.time).getTime()/1000) - Math.floor(new Date(tmp1.time).getTime()/1000);
-						var latCount = tmp2.lat - tmp1.lat;
-						var lonCount = tmp2.lon - tmp1.lon;
-						var speedCount = tmp2.speed - tmp1.speed;
-						var cogCount = tmp2.cog - tmp1.cog;
-						var headCount = tmp2.head - tmp1.head;
-						ship.timeLine.push(tmp1);
-						for (var k = 1; k < count; k++) {
-							var timeLinePoint = {
-									mmsi: tmp1.mmsi,
-									lat: tmp1.lat + k*latCount/count,
-									lon: tmp1.lon + k*lonCount/count,
-									time: Utils.formatDate(new Date(tmp1.time).getTime() + k*1000, "yyyy/M/d HH:mm:ss"),
-									speed: tmp1.speed + k*speedCount/count,
-									cog: tmp1.cog + k*cogCount/count,
-									head: tmp1.head + k*headCount/count,
-									real: false
-							};
-							ship.timeLine.push(timeLinePoint);
-						}
-					}
-				}
-			}
-			console.log(Ships);
-			// 3、创建事件
-			var shipEventTemp = {};
-			for (var i = 0; i < Ships.length && i < Config.shipsSelect.length; i++) {
-				var ship = Ships[i];
-				if(ship.timeLine){
-					for (var j = 0; j < ship.timeLine.length; j++) {
-						var key = ship.mmsi+"_"+ship.timeLine[j].time;
-						shipEventTemp[key] = i+"_"+j;
-					}
-				}
-			}
-			for (var i = 0; i < ShipEventData.length; i++) {
-				var shipEvent = ShipEventData[i];
-				var key = shipEvent.Mmsi+"_"+shipEvent.UpdateTime;
-				if(shipEventTemp[key]){
-					var shipIndex = shipEventTemp[key].split("_")[0];
-					var timeLineIndex = shipEventTemp[key].split("_")[1];
-					Ships[shipIndex].timeLine[timeLineIndex].eventDesc = shipEvent.EventDesc;
-					Ships[shipIndex].timeLine[timeLineIndex].dcpaDesc = shipEvent.DcpaDesc;
-				}
-			}
 			//播放事件绑定
 			//视频
 			var video = document.getElementById("video");
@@ -394,11 +367,7 @@ ArGis={
 				console.log("onwaiting");
 			};
 			//插件
-			var minTime = "2018/1/6 19:00:00";
-			var maxTime = "2018/1/6 21:30:00";
-			var endTime = Math.floor(new Date(maxTime.replace("-","/")).getTime()/1000) - Math.floor(new Date(minTime.replace("-","/")).getTime()/1000);
-			
-			PlayController.endTime= endTime;
+			PlayController.endTime= Config.timeLength;
 			PlayController.paused= true;
 			PlayController.initPlay();
 			PlayController.emitPaused = function(){
