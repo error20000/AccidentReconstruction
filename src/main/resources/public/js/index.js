@@ -59,6 +59,8 @@ ArGis={
 		view: "",
 		center: [Center.lon, Center.lat],
 		initData: function(){
+			Ships = shipFinalData;
+			return;
 			//加载数据
 			// 1、基础数据
 			for (var i = 0; i < ShipInfoData.length; i++) {
@@ -188,7 +190,7 @@ ArGis={
 				if(shipTimeTemp[ship.mmsi]){
 					var timePoints = shipTimeTemp[ship.mmsi].timePoints;
 					for (var j = 0; j < timePoints.length - 1; j++) {
-						ship.timeLine = ship.timeLine || [];
+						ship.timeLine = ship.timeLine || {};
 						var tmp1 = timePoints[j];
 						var tmp2 = timePoints[j+1];
 						var count = Math.floor(new Date(tmp2.time).getTime()/1000) - Math.floor(new Date(tmp1.time).getTime()/1000);
@@ -197,24 +199,33 @@ ArGis={
 						var speedCount = tmp2.speed - tmp1.speed;
 						var cogCount = tmp2.cog - tmp1.cog;
 						var headCount = tmp2.head - tmp1.head;
-						ship.timeLine.push(tmp1);
+						ship.timeLine[tmp1.time] = tmp1;
 						for (var k = 1; k < count; k++) {
+							var time = Utils.formatDate(new Date(tmp1.time).getTime() + k*1000, Config.defulatTimeFormat);
 							var timeLinePoint = {
 									mmsi: tmp1.mmsi,
 									lat: tmp1.lat + k*latCount/count,
 									lon: tmp1.lon + k*lonCount/count,
-									time: Utils.formatDate(new Date(tmp1.time).getTime() + k*1000, Config.defulatTimeFormat),
+									time: time,
 									speed: tmp1.speed + k*speedCount/count,
 									cog: tmp1.cog + k*cogCount/count,
 									head: tmp1.head + k*headCount/count,
 									real: false
 							};
-							ship.timeLine.push(timeLinePoint);
+							ship.timeLine[time] = timeLinePoint;
 						}
 					}
 				}
 			}
 			console.log(Ships);
+			/*var blob = new Blob([JSON.stringify(Ships)],{type : 'application/json'});
+			var a = document.createElement('a');
+			var url = window.URL.createObjectURL(blob);
+			var filename = 'ship.txt';
+			a.href = url;
+			a.download = filename;
+			a.click();
+			window.URL.revokeObjectURL(url);*/
 			/*// 3、创建事件
 			var shipEventTemp = {};
 			for (var i = 0; i < Ships.length && i < Config.shipsSelect.length; i++) {
@@ -281,7 +292,7 @@ ArGis={
 						var point = ship.data[j];
 						if(point.real){
 							//点
-							var cgp = Utils.createGraphicPoint({
+							var createPoint = Utils.createPoint({
 								lon: point.lon,
 								lat: point.lat,
 								color: point.color || ship.trackColor,
@@ -291,9 +302,9 @@ ArGis={
 							});
 							var tempPoint = Config.trackPoint[ship.mmsi];
 							if(!tempPoint){
-								tempPoint = [cgp];
+								tempPoint = [createPoint];
 							}else{
-								tempPoint.push(cgp);
+								tempPoint.push(createPoint);
 							}
 							Config.trackPoint[ship.mmsi] = tempPoint;
 							//线
@@ -314,37 +325,44 @@ ArGis={
 								template:{}
 							});
 							//事件
-							Utils.drawInfo({
-								paths: [],
-								color: point.color,
-								width: "",
-								style: "",
+							var createInfo = Utils.createInfo({
+								lon: point.lon,
+								lat: point.lat,
+								color: point.color || ship.trackColor,
+								size: point.size,
+								text: point.time,
 								attr: {mmsi: ship.mmsi, type: "track_info"},
 								template:{}
 							});
+							var tempInfo = Config.trackInfo[ship.mmsi];
+							if(!tempInfo){
+								tempInfo = [createInfo];
+							}else{
+								tempInfo.push(createInfo);
+							}
+							Config.trackInfo[ship.mmsi] = tempInfo;
 						}
 					}
 				}
 //			}, 10);
 		},
 		initShips: function(){
-			var startTime = "2018/1/6 19:00:00"; 
+			/*var startTime = "2018/1/6 19:00:00"; 
 			for (var i = 0; i < Ships.length; i++) {
-				var lal = Utils.findShipTimePointLaL(Ships[i], startTime);
-				//绘制船型
-				var cgp = Utils.createGraphicPoint({
-					lon: lal.lon,
-					lat: lal.lat,
-					color: Ships[i].trackColor,
-					size: 4,
-					attr: {mmsi: Ships[i].mmsi, type: "ship_point"},
-					template:{}
-				});
-				//加入缓存
-				Config.shipsShape.push(cgp);console.log(cgp);
-				//加入地图
-				ArGis.view.graphics.add(cgp);
-			}
+				
+			}*/
+			//绘制船型
+			/*var cgp = Utils.createShip({
+				paths: "M150 0 L75 200 L225 200 Z",
+				color: Ships[i].trackColor,
+				width: 4,
+				attr: {mmsi: Ships[i].mmsi, type: "ship_"+Ships[i].mmsi},
+				template:{}
+			});
+			//加入缓存
+			Config.shipsShape.push(cgp);
+			//加入地图
+			ArGis.view.graphics.add(cgp);*/
 		},
 		initTimeLine: function(){
 			//播放事件绑定
@@ -381,18 +399,17 @@ ArGis={
 				video.play();
 			};
 			PlayController.emitUpdateTime = function(updateTime){
-				video.currentTime += updateTime;
+				video.currentTime = updateTime;
 			};
 			PlayController.timePointEvent = function(timePoint){
-				var temp = Utils.formatDate(Math.floor(new Date(minTime.replace("-","/")).getTime()/1000) + Math.floor(timePoint), Config.defulatTimeFormat);
-				Utils.updateShipInfo(temp);
-				if(TimeEvent[temp]){
-					for (var i = 0; i < TimeEvent[temp].length; i++) {
-						if(typeof TimeEvent[temp][i].event == "function"){
-							TimeEvent[temp][i].event();
-						}
+				/*var timeEvent = TimeLineData[timePoint];
+				if(timeEvent){
+					if(typeof timeEvent.event == "function"){
+						timeEvent.event();
 					}
-				}
+				}*/
+//				Utils.updateShipInfo(timePoint);
+				
 			};
 		},
 		drawTrack: function(){
@@ -422,23 +439,23 @@ ArGis={
 			this.clearTrackInfo();
 		},
 		clearTrackPoint: function(){
-			Utils.removeGraphicsByType("track_point");
+			Utils.removeTrackType("track_point", ArGis.trackLayer.graphics);
 		},
 		clearTrackLine: function(){
-			Utils.removeGraphicsByType("track_line");
+			Utils.removeTrackType("track_line", ArGis.trackLayer.graphics);
 		},
 		clearTrackDash: function(){
-			Utils.removeGraphicsByType("track_dash");
+			Utils.removeTrackType("track_dash", ArGis.trackLayer.graphics);
 		},
 		clearTrackShape: function(){
-			Utils.removeGraphicsByType("track_shape");
+			Utils.removeTrackType("track_shape", ArGis.trackLayer.graphics);
 		},
 		clearTrackInfo: function(){
-			Utils.removeGraphicsByType("track_info");
+//			Utils.removeTrackType("track_info", ArGis.map.findLayerById("infoFeatureLayer").source);
 		},
 		showTrackPoint: function(ship){
 			if(Config.isTrackShowPoint){
-				ArGis.view.graphics.addMany(Config.trackPoint[ship.mmsi]);
+				ArGis.trackLayer.addMany(Config.trackPoint[ship.mmsi]);
 			}
 		},
 		showTrackLine: function(ship){
@@ -470,13 +487,58 @@ ArGis={
 		showTrackShape: function(ship){
 			if(Config.isTrackShowShape){
 				//TODO 需要改为shape
-				ArGis.view.graphics.addMany(Config.trackPoint[ship.mmsi]);
+				ArGis.trackLayer.addMany(Config.trackPoint[ship.mmsi]);
 			}
 		},
 		showTrackInfo: function(ship){
 			if(Config.isTrackShowInfo){
-				//TODO 需要改为info
-				ArGis.view.graphics.addMany(Config.trackPoint[ship.mmsi]);
+				require(["esri/Color","esri/Graphic","esri/layers/FeatureLayer"], 
+						function (Color, Graphic, FeatureLayer) {
+					
+					var pointsRenderer = {
+							type: "unique-value", // autocasts as new UniqueValueRenderer()
+							field: "mmsi",
+							uniqueValueInfos: [{
+								value: "356137000",
+								symbol: {
+								    type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+								    color: "blue"
+								  }
+							}]
+					};
+					
+					var pointsLayer = new FeatureLayer({
+						id: "infoFeatureLayer",
+						title: "infoFeatureLayer",
+						fields: [
+						    {
+						     name: "ObjectID",
+						     alias: "ObjectID",
+						     type: "string"
+						   }],
+					   objectIdField: "ObjectID",
+					   geometryType: "point",
+
+						source: Config.trackInfo[ship.mmsi],
+						renderer: pointsRenderer,
+						labelingInfo:[{
+				            labelExpression: "12344",
+				            labelPlacement: "always-horizontal",
+				            symbol: {
+				              type: "text", // autocasts as new TextSymbol()
+				              color: [255, 255, 255, 0.7],
+				              haloColor: [0, 0, 0, 0.7],
+				              haloSize: 1,
+				              font: {
+				                size: 11
+				              }
+				            }
+				          }],
+						labelsVisible: true
+					});
+					ArGis.map.add(pointsLayer);
+				});
+//				ArGis.trackLayer.addMany(Config.trackInfo[ship.mmsi]);
 			}
 		}
 };

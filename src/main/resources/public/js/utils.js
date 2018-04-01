@@ -3,9 +3,53 @@ var Utils = {
 		createGraphicShip: function(ship){
 			
 		},
-		updateShipInfo: function(timePoint){
-			console.log(timePoint);
-			for (var i = 0; i < Ships.length; i++) {
+		updateShipInfo: function(time){
+			var curShip = Ships[Config.select];
+			if(curShip){
+				//基本信息
+				Config.shipsForm.mmsi = curShip.mmsi;
+				Config.shipsForm.shipLength = curShip.shipLength;
+				Config.shipsForm.shipWidth = curShip.shipWidth;
+				Config.shipsForm.name = curShip.name;
+				Config.shipsForm.showName = curShip.showName;
+				Config.shipsForm.callSign = curShip.callSign;
+				Config.shipsForm.shipType = curShip.shipType;
+				Config.shipsForm.left = curShip.left;
+				Config.shipsForm.trail = curShip.trail;
+				//时间线信息
+				var curPoint = curShip.timeLine[time];
+				if(curPoint){
+					Config.shipsForm.lat = curPoint.lat;
+					Config.shipsForm.lon = curPoint.lon;
+					Config.shipsForm.time = curPoint.time;
+					Config.shipsForm.speed = curPoint.speed;
+					Config.shipsForm.cog = curPoint.cog;
+					Config.shipsForm.head = curPoint.head;
+					Config.shipsForm.unkonw = curPoint.unkonw;
+				}
+			}
+			
+			/*for (var i = 0; i < curShip.data.length; i++) {
+				if(){
+					Config.shipsForm = {
+						mmsi: curShip.mmsi,
+						shipLength: curShip.shipLength,
+						shipWidth: curShip.shipLength,
+						name: '',
+						showName: '',
+						callSign:'',
+						shipType:'',
+						left: 0,
+						track: 0,
+						lat: 0, 
+						lon: 0, 
+						real: false, 
+						time: '', 
+						speed: 0, 
+						cos: 0, 
+						head: 0
+					}
+				}
 				(function(h){
 					var oldLal = Config.shipsShape[h];
 					var lal = Utils.findShipTimePointLaL(Ships[h], timePoint);
@@ -13,9 +57,9 @@ var Utils = {
 					var latCount = lal.lat - oldLal.geometry.latitude;
 					setTimeout(() => {
 						ArGis.view.graphics.removeMany(Config.shipsShape);
-						/*var tmp = oldLal.clone();
+						var tmp = oldLal.clone();
 						tmp.geometry.longitude = tmp.geometry.longitude + lonCount;
-						tmp.geometry.latitude = tmp.geometry.latitude + latCount;*/
+						tmp.geometry.latitude = tmp.geometry.latitude + latCount;
 						var cgp = Utils.createGraphicPoint({
 							lon: oldLal.geometry.longitude + lonCount,
 							lat: oldLal.geometry.latitude + latCount,
@@ -30,13 +74,35 @@ var Utils = {
 						ArGis.view.graphics.add(cgp);
 					}, 1*1000);
 				})(i);
-			}
+			}*/
 			/*if(CurShipInfo[timePoint]){
 				//绘制ship
 				console.log(CurShipInfo[timePoint].time);
 				//绘制shipInfo
 				
 			}*/
+		},
+		updateShip: function(time){
+			for (var i = 0; i < Ships.length; i++) {
+				var ship = Ships[i];
+				var timePoint = ship.timeLine[time];
+				if(timePoint){
+					var oldTimePoint = "";
+					this.animateShip(oldTimePoint, timePoint);
+				}
+			}
+			
+		},
+		animateShip: function(fromPoint, toPoint){
+			if(!toPoint){
+				return;
+			}
+			if(!fromPoint){ //加入
+				var mmsi = toPoint.mmsi;
+				
+			}else{ //运动
+				
+			}
 		},
 		findShipTimePointLaL: function(ship, time){
 			var timePoint = {};
@@ -51,7 +117,35 @@ var Utils = {
 				lat: timePoint.lat
 			}
 		},
-		createGraphicPoint: function(params){
+		createShip: function(params){
+			var ship;
+			require(["esri/Color","esri/Graphic"], 
+					function (Color, Graphic) {
+				 	  var geometry = {
+					        type: "polyline", 
+					        paths: params.paths
+					      };
+						
+				      var symbol  = {
+				  		    type: "simple-line",  
+				  		    color: params.color ? new Color(params.color) : [226, 119, 40],
+				  		    width: params.width ? params.width : "4px",
+				  		    style: params.style ? params.style : "solid"
+				  		  };
+				      
+				      ship = new Graphic({
+				    	  	geometry: geometry,
+						    symbol: symbol,
+						    attributes: params.attr
+				      	});
+				      
+				      if(params.template){
+				    	  line.popupTemplate = params.template;
+				      }
+			});
+			return ship;
+		},
+		createPoint: function(params){
 			var point;
 			require(["esri/Color","esri/Graphic"], 
 					function (Color, Graphic) {
@@ -64,7 +158,7 @@ var Utils = {
 				      var symbol  = {
 				  		    type: "simple-marker",  
 				  		    color: params.color ? new Color(params.color) : [226, 119, 40],
-				  		     size: (params.size ? params.size : 8) + "px",
+				  		     size: params.size ? params.size : "8px",
 						    outline: {
 						    	style:"none"
 						    }
@@ -82,11 +176,8 @@ var Utils = {
 			});
 			return point;
 		},
-		drawPoint: function(params){
-			var point = this.createGraphicPoint(params);
-			ArGis.view.graphics.add(point);
-		},
-		drawLine: function(params){
+		createLine: function(params){
+			var line;
 			require(["esri/Color","esri/Graphic"], 
 					function (Color, Graphic) {
 				 	  var geometry = {
@@ -97,11 +188,11 @@ var Utils = {
 				      var symbol  = {
 				  		    type: "simple-line",  
 				  		    color: params.color ? new Color(params.color) : [226, 119, 40],
-				  		    width: (params.width ? params.width : 4) + "px",
+				  		    width: params.width ? params.width : "4px",
 				  		    style: params.style ? params.style : "solid"
 				  		  };
 				      
-				      var line = new Graphic({
+				      line = new Graphic({
 				    	  	geometry: geometry,
 						    symbol: symbol,
 						    attributes: params.attr
@@ -110,80 +201,85 @@ var Utils = {
 				      if(params.template){
 				    	  line.popupTemplate = params.template;
 				      }
-				      
-				      ArGis.view.graphics.add(line);
 			});
+			return line;
+		},
+		createShap: function(params){
+			var point;
+			require(["esri/Color","esri/Graphic"], 
+					function (Color, Graphic) {
+						var geometry = {
+							type: "point",
+						    longitude: params.lon,
+						    latitude: params.lat
+						  };
+							
+						var symbol  = {
+							type: "picture-marker",  // autocasts as new PictureMarkerSymbol()
+							  url: "/images/onerun.png",
+							  width: "8px",
+							  height: "8px"
+
+				  		  };
+				      
+				      point = new Graphic({
+				    	  	geometry: geometry,
+						    symbol: symbol,
+						    attributes: params.attr
+				      	});
+				      
+				      if(params.template){
+				    	  point.popupTemplate = params.template;
+				      }
+			});
+			return point;
+		},
+		createInfo: function(params){
+			var point;
+			require(["esri/Color","esri/Graphic"], 
+					function (Color, Graphic) {
+						var geometry = {
+							type: "point",
+						    longitude: params.lon,
+						    latitude: params.lat
+						  };
+							
+						var symbol  = {
+				  		    type: "simple-marker",  
+				  		    color: params.color ? new Color(params.color) : [226, 119, 40],
+				  		     size: params.size ? params.size : "8px",
+						    outline: {
+						    	style:"none"
+						    }
+				  		  };
+				      
+				      point = new Graphic({
+				    	  	geometry: geometry,
+						    symbol: symbol,
+						    attributes: params.attr
+				      	});
+				      
+				      if(params.template){
+				    	  point.popupTemplate = params.template;
+				      }
+			});
+			return point;
+		},
+		drawPoint: function(params){
+			var point = this.createPoint(params);
+			ArGis.trackLayer.add(point);
+		},
+		drawLine: function(params){
+			var line = this.createLine(params);
+			ArGis.trackLayer.add(line);
 		},
 		drawShape: function(params){
-			require(["esri/Color","esri/Graphic"], 
-					function (Color, Graphic) {
-				 		var geometry = {
-					        type: "polyline", 
-					        paths: params.paths
-					      };
-						
-				      var symbol  = {
-				  		    type: "simple-line",  
-				  		    color: params.color ? new Color(params.color) : [226, 119, 40],
-				  		    width: (params.width ? params.width : 1) + "px",
-				  		    style: params.style ? params.style : "solid"
-				  		  };
-
-				      var point = new Graphic({
-				    	  	geometry: geometry,
-						    symbol: symbol,
-						    attributes: params.attr
-				      	});
-				      
-				      if(params.template){
-				    	  point.popupTemplate = params.template;
-				      }
-				      
-				      var temp = Config.trackShape[params.attr.mmsi];
-						if(!temp){
-							temp = [point];
-						}else{
-							temp.push(point);
-						}
-						Config.trackShape[params.attr.mmsi] = temp;
-			});
+			
 		},
 		drawInfo: function(params){
-			require(["esri/Color","esri/Graphic"], 
-					function (Color, Graphic) {
-				 		var geometry = {
-					        type: "polyline", 
-					        paths: params.paths
-					      };
-						
-				      var symbol  = {
-				  		    type: "simple-line",  
-				  		    color: params.color ? new Color(params.color) : [226, 119, 40],
-				  		    width: (params.width ? params.width : 1) + "px",
-				  		    style: params.style ? params.style : "solid"
-				  		  };
-
-				      var point = new Graphic({
-				    	  	geometry: geometry,
-						    symbol: symbol,
-						    attributes: params.attr
-				      	});
-				      
-				      if(params.template){
-				    	  point.popupTemplate = params.template;
-				      }
-				      
-				      var temp = Config.trackInfo[params.attr.mmsi];
-						if(!temp){
-							temp = [point];
-						}else{
-							temp.push(point);
-						}
-						Config.trackInfo[params.attr.mmsi] = temp;
-			});
+			
 		},
-		removeGraphicsByType: function(type) {
-			var graphics = ArGis.view.graphics;
+		removeTrackType: function(type, graphics) {
 			var delArray = [];
 			graphics.forEach(function(item, i){
 			  if(item.attributes && item.attributes.type == type){
@@ -193,7 +289,6 @@ var Utils = {
 			graphics.removeMany(delArray);
 		},
 		formatDate: function(d, s){
-
 		    var date = new Date();
 		    if(d){
 		        if(typeof d == 'object'){

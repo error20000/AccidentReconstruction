@@ -40,10 +40,12 @@
 <link rel="stylesheet" href="css/play.css" />
 <link rel="stylesheet" href="css/index.css" />
 
-<script src="js/shipInfoData.js" ></script>
+<!-- <script src="js/shipInfoData.js" ></script>
 <script src="js/shipEventData.js"></script>
 <script src="js/shipTimeData.js"></script>
-<script src="js/shipTrackData.js"></script>
+<script src="js/shipTrackData.js"></script> -->
+
+<script src="js/ship.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/play.js"></script>
 <script src="js/index.js"></script>
@@ -133,9 +135,10 @@
 	  "esri/views/MapView",
 	  "esri/widgets/ScaleBar",  
 	  "esri/widgets/BasemapToggle",
+	  "esri/layers/GraphicsLayer",
 //      "esri/widgets/Fullscreen",
 	  "dojo/domReady!"
-	], function(Map, MapView, ScaleBar, BasemapToggle, Fullscreen){
+	], function(Map, MapView, ScaleBar, BasemapToggle, GraphicsLayer, Fullscreen){
 		
 		ArGis.map = new Map({
 		    basemap: "streets"
@@ -165,6 +168,15 @@
 			ArGis.view.ui.add(scaleBar, {
 			  position: "bottom-left"
 			}); 
+			
+			ArGis.trackLayer = new GraphicsLayer({id:"trackGraphicsLayer"});
+			ArGis.shipLayer = new GraphicsLayer({id:"shipGraphicsLayer"});
+			ArGis.labelLayer = new GraphicsLayer({id:"labelGraphicsLayer"});
+			
+			ArGis.map.add(ArGis.trackLayer);
+			ArGis.map.add(ArGis.shipLayer);
+			ArGis.map.add(ArGis.labelLayer);
+			
 			
 			console.log(ArGis.view);
 	  

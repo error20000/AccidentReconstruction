@@ -37,7 +37,7 @@ var PlayController = {
                 	  this.curPlayTime += this.timeSpeed;
                 	  this.progress += this.progressSpeed * this.timeSpeed;
                 	  this.timeCount++;
-                	  if(this.timeCount > 1/this.timeSpeed){
+                	  if(this.timeCount > 1/this.timeSpeed){ //每秒执行一次事件（timePointEvent）
                 		  this.timePointEvent(this.curPlayTime);
                 		  this.timeCount = 0;
                 	  }
@@ -112,10 +112,8 @@ Vue.component('play-controller',{
           const offsetX = evt.offsetX;
           const targetWidth = this.$refs.progressBar.offsetWidth;
           this.progress = Number((offsetX / targetWidth * 100).toFixed(2));
-          var temp = parseInt((this.endTime * this.progress / 100).toFixed(2));
-          var updateTime = temp - this.curPlayTime;
-          this.curPlayTime = temp; console.log(this.curPlayTime);console.log(updateTime);
-          PlayController.emitUpdateTime(updateTime);
+          this.curPlayTime = parseInt((this.endTime * this.progress / 100).toFixed(2));
+          PlayController.emitUpdateTime(this.curPlayTime);
       },
       // 切换状态 play or paused
       changePlayState() {
@@ -137,19 +135,20 @@ Vue.component('play-controller',{
       changePlay(operate) {
           if(operate === "next"){
         	  this.progress += this.progressSpeed * 5;
-        	  this.curPlayTime +=  this.timeSpeed * 5;
+        	  this.curPlayTime += 5;
         	  if(this.curPlayTime >= this.endTime) {
         		  this.progress = 100;
         		  this.curPlayTime = this.endTime;
         	  }
           }else{
         	  this.progress -= this.progressSpeed * 5;
-        	  this.curPlayTime -=  this.timeSpeed * 5;
+        	  this.curPlayTime -=  5;
         	  if(this.curPlayTime <= 0) {
         		  this.progress = 0;
         		  this.curPlayTime = 0;
         	  }
-          }            
+          }     
+          //PlayController.emitUpdateTime(this.curPlayTime);
       }
   },
   filters: {
