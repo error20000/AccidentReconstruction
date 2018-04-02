@@ -256,7 +256,7 @@ ArGis={
 						lon: Center.lon,
 						lat: Center.lat,
 						color: [226, 119, 40],
-						size: 10,
+						width: 10,
 						attr: {
 							time: "2018/1/6 19:50:00",
 							lon: Center.lon,
@@ -297,7 +297,7 @@ ArGis={
 								lon: point.lon,
 								lat: point.lat,
 								color: point.color || ship.trackColor,
-								size: point.size,
+								width: point.width,
 								attr: {mmsi: ship.mmsi, type: "track_point"},
 								template:{}
 							});
@@ -330,7 +330,7 @@ ArGis={
 								lon: point.lon,
 								lat: point.lat,
 								color: point.color || ship.trackColor,
-								size: point.size,
+								width: point.width,
 								text: point.time,
 								attr: {mmsi: ship.mmsi, type: "track_info"},
 								template:{}

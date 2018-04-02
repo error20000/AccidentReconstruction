@@ -221,124 +221,87 @@ var Utils = {
 			return ship;
 		},
 		createPoint: function(params){
-			var point;
-			require(["esri/Color","esri/Graphic"], 
-					function (Color, Graphic) {
-						var geometry = {
-							type: "point",
-						    longitude: params.lon,
-						    latitude: params.lat
-						  };
-						
-				      var symbol  = {
-				  		    type: "simple-marker",  
-				  		    color: params.color ? new Color(params.color) : [226, 119, 40],
-				  		     size: params.size ? params.size : "8px",
-						    outline: {
-						    	style:"none"
-						    }
-				  		  };
-
-				      point = new Graphic({
-				    	  	geometry: geometry,
-						    symbol: symbol,
-						    attributes: params.attr
-				      	});
-
-				      if(params.template){
-				    	  point.popupTemplate = params.template;
-				      }
-			});
-			return point;
+			var geometry = {
+					type: "point",
+				    longitude: params.lon ? params.lon : params.paths[0],
+				    latitude: params.lat ? params.lat : params.paths[1]
+				  };
+				
+		      var symbol  = {
+		  		    type: "simple-marker",  
+		  		    color: params.color ? params.color : [226, 119, 40],
+		  		     size: params.width ? params.width : "8px",
+				    outline: {
+				    	style:"none"
+				    }
+		  		  };
+			return this.createGraphic(geometry, symbol, params.attr, params.template);
 		},
 		createLine: function(params){
-			var line;
-			require(["esri/Color","esri/Graphic"], 
-					function (Color, Graphic) {
-				 	  var geometry = {
-					        type: "polyline", 
-					        paths: params.paths
-					      };
-						
-				      var symbol  = {
-				  		    type: "simple-line",  
-				  		    color: params.color ? new Color(params.color) : [226, 119, 40],
-				  		    width: params.width ? params.width : "4px",
-				  		    style: params.style ? params.style : "solid"
-				  		  };
-				      
-				      line = new Graphic({
-				    	  	geometry: geometry,
-						    symbol: symbol,
-						    attributes: params.attr
-				      	});
-				      
-				      if(params.template){
-				    	  line.popupTemplate = params.template;
-				      }
-			});
-			return line;
+			var geometry = {
+			        type: "polyline", 
+			        paths: params.paths
+			      };
+				
+		      var symbol  = {
+		  		    type: "simple-line",  
+		  		    color: params.color ? params.color : [226, 119, 40],
+		  		    width: params.width ? params.width : "4px",
+		  		    style: params.style ? params.style : "solid"
+		  		  };
+			return this.createGraphic(geometry, symbol, params.attr, params.template);
 		},
 		createShap: function(params){
-			var point;
-			require(["esri/Color","esri/Graphic"], 
-					function (Color, Graphic) {
-						var geometry = {
-							type: "point",
-						    longitude: params.lon,
-						    latitude: params.lat
-						  };
-							
-						var symbol  = {
-							type: "picture-marker",  // autocasts as new PictureMarkerSymbol()
-							  url: "http://www.shipxy.com/Content/Monitor/images/Screenshots/yellowShip.gif",//"/images/onerun.png",
-							  width: params.width ? params.width : 8,
-							  height: params.height ? params.height : 8
+		    var geometry = {
+				type: "point",
+			    longitude: params.lon ? params.lon : params.paths[0],
+				latitude: params.lat ? params.lat : params.paths[1]
+			  };
+				
+			var symbol  = {
+				type: "picture-marker", 
+				  url: params.url,
+				  width: params.width ? params.width : "8px",
+				  height: params.height ? params.height : "8px"
 
-				  		  };
-				      
-				      point = new Graphic({
-				    	  	geometry: geometry,
-						    symbol: symbol,
-						    attributes: params.attr
-				      	});
-				      
-				      if(params.template){
-				    	  point.popupTemplate = params.template;
-				      }
-			});
-			return point;
+	  		  };
+			return this.createGraphic(geometry, symbol, params.attr, params.template);
 		},
 		createInfo: function(params){
-			var point;
-			require(["esri/Color","esri/Graphic"], 
-					function (Color, Graphic) {
-						var geometry = {
-							type: "point",
-						    longitude: params.lon,
-						    latitude: params.lat
-						  };
-							
-						var symbol  = {
-				  		    type: "simple-marker",  
-				  		    color: params.color ? new Color(params.color) : [226, 119, 40],
-				  		     size: params.size ? params.size : "8px",
-						    outline: {
-						    	style:"none"
-						    }
-				  		  };
+			var geometry = {
+					type: "point",
+				    longitude: params.lon ? params.lon : params.paths[0],
+					latitude: params.lat ? params.lat : params.paths[1]
+				  };
+					
+			var symbol  = {
+	  		    type: "simple-marker",  
+	  		    color: params.color ? params.color : [226, 119, 40],
+	  		     size: params.width ? params.width : "8px",
+			    outline: {
+			    	style:"none"
+			    }
+	  		  };
+			return this.createGraphic(geometry, symbol, params.attr, params.template);
+		},
+		createGraphic: function(geometry, symbol, attr, template){
+			var graphic;
+			require(["esri/Graphic"], 
+					function (Graphic) {
 				      
-				      point = new Graphic({
-				    	  	geometry: geometry,
-						    symbol: symbol,
-						    attributes: params.attr
-				      	});
-				      
-				      if(params.template){
-				    	  point.popupTemplate = params.template;
-				      }
+					graphic = new Graphic({
+			    	  	geometry: geometry,
+					    symbol: symbol
+			      	});
+					
+			      if(attr){
+			    	  graphic.attributes = attr;
+			      }
+			      if(template){
+			    	  graphic.popupTemplate = template;
+			      }
 			});
-			return point;
+			return graphic;
 		},
 		drawPoint: function(params){
 			var point = this.createPoint(params);
