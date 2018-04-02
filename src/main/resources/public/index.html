@@ -46,6 +46,8 @@
 <script src="js/shipTrackData.js"></script> -->
 
 <script src="js/ship.js"></script>
+<script src="js/data.js"></script>
+
 <script src="js/utils.js"></script>
 <script src="js/play.js"></script>
 <script src="js/index.js"></script>
@@ -171,17 +173,19 @@
 			
 			ArGis.trackLayer = new GraphicsLayer({id:"trackGraphicsLayer"});
 			ArGis.shipLayer = new GraphicsLayer({id:"shipGraphicsLayer"});
+			ArGis.shipCogLayer = new GraphicsLayer({id:"shipCogGraphicsLayer"});
 			ArGis.labelLayer = new GraphicsLayer({id:"labelGraphicsLayer"});
 			
 			ArGis.map.add(ArGis.trackLayer);
 			ArGis.map.add(ArGis.shipLayer);
+			ArGis.map.add(ArGis.shipCogLayer);
 			ArGis.map.add(ArGis.labelLayer);
 			
 			
 			console.log(ArGis.view);
 	  
 			ArGis.view.then(function(){
-				ArGis.initMap();
+				//ArGis.initMap();
 				ArGis.initTimeLine();
 				ArGis.initShips();
 				ArGis.initTrack();

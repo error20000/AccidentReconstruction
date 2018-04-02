@@ -3,7 +3,7 @@
 var Config = {
 		defulatColor: [226, 119, 40],
 		defulatTimeFormat: "yyyy/M/d HH:mm:ss",
-		timeLength: 5*60, 
+		timeLength: 19*60+20, //19分20秒
 		
 		select: 0,
 		shipsSelect: [],
@@ -283,6 +283,7 @@ ArGis={
 							      }]
 						}
 					});
+			
 		},
 		initTrack: function(){
 //			setTimeout(() => {
@@ -363,6 +364,30 @@ ArGis={
 			Config.shipsShape.push(cgp);
 			//加入地图
 			ArGis.view.graphics.add(cgp);*/
+			/*var shipGf = Utils.createShap({
+				lon: Center.lon,
+				lat: Center.lat
+			});
+			ArGis.shipLayer.add(shipGf);*/
+			require(["esri/Color","esri/Graphic"], 
+					function (Color, Graphic) {
+				var geometry = {
+						type: "point",
+					    longitude: 124.9823,
+					    latitude: 30.199
+					  };
+					
+			      var symbol  = {
+			  		    type: "simple-marker",  
+			  		    path: "M14.5,29 23.5,0 14.5,9 5.5,0z"
+			  		  };
+
+			     var point = new Graphic({
+			    	  	geometry: geometry,
+					    symbol: symbol
+			      	});
+			     ArGis.shipLayer.graphics.add(point);
+			});
 		},
 		initTimeLine: function(){
 			//播放事件绑定
@@ -388,11 +413,13 @@ ArGis={
 			PlayController.endTime= Config.timeLength;
 			PlayController.paused= true;
 			PlayController.initPlay();
-			PlayController.emitPaused = function(){
-				video.pause();
-			};
 			PlayController.emitPlay = function(){
-				video.play();
+//				video.play();
+				PlayController.handlePlay();
+			};
+			PlayController.emitPaused = function(){
+//				video.pause();
+				PlayController.handlePaused();
 			};
 			PlayController.emitRePlay = function(){
 				video.currentTime = 0;
@@ -409,7 +436,7 @@ ArGis={
 					}
 				}*/
 //				Utils.updateShipInfo(timePoint);
-				
+				Utils.updateShip(timePoint);
 			};
 		},
 		drawTrack: function(){
