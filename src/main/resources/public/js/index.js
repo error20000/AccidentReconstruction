@@ -297,7 +297,7 @@ ArGis={
 								lon: point.lon,
 								lat: point.lat,
 								color: point.color || ship.trackColor,
-								width: point.width,
+								width: point.width || ship.trackSize,
 								attr: {mmsi: ship.mmsi, type: "track_point"},
 								template:{}
 							});
@@ -307,6 +307,7 @@ ArGis={
 							}else{
 								tempPoint.push(createPoint);
 							}
+							
 							Config.trackPoint[ship.mmsi] = tempPoint;
 							//线
 							var tempLine = Config.trackLine[ship.mmsi];
@@ -348,10 +349,16 @@ ArGis={
 //			}, 10);
 		},
 		initShips: function(){
-			/*var startTime = "2018/1/6 19:00:00"; 
-			for (var i = 0; i < Ships.length; i++) {
-				
-			}*/
+			require([
+				  "esri/layers/GraphicsLayer",
+				], function(GraphicsLayer){
+				for (var i = 0; i < Ships.length; i++) {
+					ArGis["shipLayer_"+Ships[i].mmsi] = new GraphicsLayer({id:"shipGraphicsLayer_"+Ships[i].mmsi});
+					ArGis["shipCogLayer_"+Ships[i].mmsi] = new GraphicsLayer({id:"shipCogGraphicsLayer_"+Ships[i].mmsi});
+					ArGis.map.add(ArGis["shipLayer_"+Ships[i].mmsi]);
+					ArGis.map.add(ArGis["shipCogLayer_"+Ships[i].mmsi]);
+				}
+			});
 			//绘制船型
 			/*var cgp = Utils.createShip({
 				paths: "M150 0 L75 200 L225 200 Z",
@@ -376,7 +383,7 @@ ArGis={
 				shipPath: "M23.5,29 14.5,0 5.5,29z"
 			})
 			ArGis.shipLayer.graphics.add(shipGraphic);*/
-			var geometry = {
+			/*var geometry = {
 			        type: "polygon", 
 			        centroid:{
 			        	type: "point", 
@@ -387,11 +394,11 @@ ArGis={
 				        }
 			        },
 			        rings: [
-			            [13910460.708464786, 3613339.776019942],
-			            [13910460.708464786+300, 3613339.776019942],
-			            [13910460.708464786+300,3613339.776019942+300],
-			            [13910460.708464786, 3613339.776019942+300],
-			            [13910460.708464786, 3613339.776019942]
+			            [13910460.708464786-150, 3613339.776019942-150],
+			            [13910460.708464786+150, 3613339.776019942-150],
+			            [13910460.708464786+150,3613339.776019942+150],
+			            [13910460.708464786-150, 3613339.776019942+150],
+			            [13910460.708464786-150, 3613339.776019942-150]
 			          ],
 			          spatialReference:{
 				        	wkid:102100
@@ -399,15 +406,15 @@ ArGis={
 			      };
 				
 		      var symbol  = {
-		    		  type: "simple-fill", // autocasts as new SimpleFillSymbol()
+		    		  type: "simple-fill", 
 		    	        color: [227, 139, 79, 0.8],
-		    	        outline: { // autocasts as new SimpleLineSymbol()
+		    	        outline: { 
 		    	          color: [255, 255, 255],
 		    	          width: 1
 		    	        }
 		  		  };
 			var shipGraphic = Utils.createGraphic(geometry, symbol);
-			ArGis.shipLayer.graphics.add(shipGraphic);
+			ArGis.shipLayer.graphics.add(shipGraphic);*/
 		},
 		initTimeLine: function(){
 			//播放事件绑定

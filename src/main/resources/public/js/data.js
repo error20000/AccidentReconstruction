@@ -1,5 +1,6 @@
 var TimeLineEventData = [
-	{"index":[0,10],"time":["2018/1/6 19:30:00","2018/1/6 19:32:00"],event: function(timePoint, timeEvent){
-			Utils.updateShip(timePoint, timeEvent);
+	{"index":[0,10],"time":["2018/1/6 19:40:00","2018/1/6 19:58:00"],event: function(timePoint, timeEvent){
+			Utils.updateShip(timePoint, timeEvent, 0);
+			Utils.updateShip(timePoint, timeEvent, 1);
 	}},
 ];
