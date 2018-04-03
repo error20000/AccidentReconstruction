@@ -369,25 +369,45 @@ ArGis={
 				lat: Center.lat
 			});
 			ArGis.shipLayer.add(shipGf);*/
-			require(["esri/Color","esri/Graphic"], 
-					function (Color, Graphic) {
-				var geometry = {
-						type: "point",
-					    longitude: 124.9823,
-					    latitude: 30.199
-					  };
-					
-			      var symbol  = {
-			  		    type: "simple-marker",  
-			  		    path: "M14.5,29 23.5,0 14.5,9 5.5,0z"
-			  		  };
-
-			     var point = new Graphic({
-			    	  	geometry: geometry,
-					    symbol: symbol
-			      	});
-			     ArGis.shipLayer.graphics.add(point);
-			});
+			/*var shipGraphic = Utils.createShip({
+				lon: 124.9823,
+				lat: 30.199,
+				angle: 0,
+				shipPath: "M23.5,29 14.5,0 5.5,29z"
+			})
+			ArGis.shipLayer.graphics.add(shipGraphic);*/
+			var geometry = {
+			        type: "polygon", 
+			        centroid:{
+			        	type: "point", 
+			        	x: 13910460.708464786, 
+				        y: 3613339.776019942,
+				        spatialReference:{
+				        	wkid:102100
+				        }
+			        },
+			        rings: [
+			            [13910460.708464786, 3613339.776019942],
+			            [13910460.708464786+300, 3613339.776019942],
+			            [13910460.708464786+300,3613339.776019942+300],
+			            [13910460.708464786, 3613339.776019942+300],
+			            [13910460.708464786, 3613339.776019942]
+			          ],
+			          spatialReference:{
+				        	wkid:102100
+				        }
+			      };
+				
+		      var symbol  = {
+		    		  type: "simple-fill", // autocasts as new SimpleFillSymbol()
+		    	        color: [227, 139, 79, 0.8],
+		    	        outline: { // autocasts as new SimpleLineSymbol()
+		    	          color: [255, 255, 255],
+		    	          width: 1
+		    	        }
+		  		  };
+			var shipGraphic = Utils.createGraphic(geometry, symbol);
+			ArGis.shipLayer.graphics.add(shipGraphic);
 		},
 		initTimeLine: function(){
 			//播放事件绑定
@@ -429,14 +449,16 @@ ArGis={
 				video.currentTime = updateTime;
 			};
 			PlayController.timePointEvent = function(timePoint){
-				/*var timeEvent = TimeLineData[timePoint];
-				if(timeEvent){
-					if(typeof timeEvent.event == "function"){
-						timeEvent.event();
+				var timeEvent;
+				for (var i = 0; i < TimeLineEventData.length; i++) {
+					if(timePoint>=TimeLineEventData[i].index[0] && timePoint <=TimeLineEventData[i].index[1]){
+						timeEvent = TimeLineEventData[i];
+						break;
 					}
-				}*/
-//				Utils.updateShipInfo(timePoint);
-				Utils.updateShip(timePoint);
+				}
+				if(timeEvent && typeof timeEvent.event == "function"){
+					timeEvent.event(timePoint, timeEvent);
+				}
 			};
 		},
 		drawTrack: function(){

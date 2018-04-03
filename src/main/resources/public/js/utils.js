@@ -81,91 +81,74 @@ var Utils = {
 				
 			}*/
 		},
-		updateShip: function(timePoint){
+		updateShip: function(timePoint, timeEvent){
 			for (var i = 0; i < Ships.length && i < 1; i++) {
-				var timeEvent;
-				for (var i = 0; i < TimeLineEventData.length; i++) {
-					if(timePoint>=TimeLineEventData[i].index[0] && timePoint <=TimeLineEventData[i].index[1]){
-						timeEvent = TimeLineEventData[i];
-						break;
-					}
-				}
-				if(timeEvent){
-					var temp1 = Ships[i].timeLine[timeEvent.time[0]];
-					var temp2 = Ships[i].timeLine[timeEvent.time[1]];
-					//总差距
-					var count = timeEvent.index[1] - timeEvent.index[0];
-					var lonCount = temp2.lon - temp1.lon;
-					var latCount = temp2.lat - temp1.lat;
-					var speedCount = temp2.speed - temp1.speed;
-					var cogCount = temp2.cog - temp1.cog;
-					var headCount = temp2.head - temp1.head;
-					//每秒差距
-					var lonSecond = lonCount/count;
-					var latSecond = latCount/count;
-					var speedSecond = speedCount/count;
-					var cogSecond = cogCount/count;
-					var headSecond = headCount/count;
-					//动画
-					var startTime = timePoint-1 <= 0 ? 0 : timePoint-1;
-					var startPoint = {
-							lon: temp1.lon + startTime*lonSecond,
-							lat: temp1.lat + startTime*latSecond,
-							speed: temp1.speed + startTime*speedSecond,
-							cog: temp1.cog + startTime*cogSecond,
-							head: temp1.head + startTime*headSecond
-					};
-					var interval = 1/60;
-					var intervalCount = 0;
-					var tempInterval = setInterval(() => {
-						//ship
-						ArGis.shipLayer.graphics.removeAll();
-						require(["esri/Color","esri/Graphic"], 
-								function (Color, Graphic) {
-							var geometry = {
-									type: "point",
-								    longitude: startPoint.lon,
-								    latitude: startPoint.lat
-								  };
-								
-						      var symbol  = {
-						  		    type: "simple-marker",  
-						  		    angle: startPoint.head * Math.PI/180,
-						  		    path: "M14.5,29 23.5,0 14.5,9 5.5,0z"
-						  		  };
-
-						     var  point = new Graphic({
-						    	  	geometry: geometry,
-								    symbol: symbol
-						      	});
-						     ArGis.shipLayer.graphics.add(point);
-						});
-						//cog
-						ArGis.shipCogLayer.graphics.removeAll();
-						var cogLon = startPoint.cog * Math.PI/180;
-						var lon = 0.1;
-						var lat = lon/Math.tan(cogLon);
-						console.log(cogLon);
-						console.log(lat);
-						var cogLine = Utils.createLine({
-							paths:[[startPoint.lon, startPoint.lat],[startPoint.lon+lon, startPoint.lat+lat]],
-							width: "1px",
-						});
-						ArGis.shipCogLayer.add(cogLine);
-
-						startPoint = {
-								lon: startPoint.lon + lonSecond*interval,
-								lat: startPoint.lat + latSecond*interval,
-								speed: startPoint.speed + speedSecond*interval,
-								cog: startPoint.cog + cogSecond*interval,
-								head: startPoint.head + headSecond*interval
+				(function(h){
+					var ship = Ships[h];
+					if(timeEvent){
+						var temp1 = ship.timeLine[timeEvent.time[0]];
+						var temp2 = ship.timeLine[timeEvent.time[1]];
+						//总差距
+						var count = timeEvent.index[1] - timeEvent.index[0];
+						var lonCount = temp2.lon - temp1.lon;
+						var latCount = temp2.lat - temp1.lat;
+						var speedCount = temp2.speed - temp1.speed;
+						var cogCount = temp2.cog - temp1.cog;
+						var headCount = temp2.head - temp1.head;
+						//每秒差距
+						var lonSecond = lonCount/count;
+						var latSecond = latCount/count;
+						var speedSecond = speedCount/count;
+						var cogSecond = cogCount/count;
+						var headSecond = headCount/count;
+						//动画
+						var startTime = timePoint-1 <= 0 ? 0 : timePoint-1;
+						var startPoint = {
+								lon: temp1.lon + startTime*lonSecond,
+								lat: temp1.lat + startTime*latSecond,
+								speed: temp1.speed + startTime*speedSecond,
+								cog: temp1.cog + startTime*cogSecond,
+								head: temp1.head + startTime*headSecond
 						};
-						intervalCount = intervalCount+1;
-						if(intervalCount >= 1/interval - 2){
-							clearInterval(tempInterval);
-						}
-					}, interval*1000);
-				}
+						var interval = 1/60;
+						var intervalCount = 0;
+						var tempInterval = setInterval(() => {
+							//ship
+							ArGis.shipLayer.graphics.removeAll();
+							var shipGraphic = Utils.createShip({
+								lon: startPoint.lon,
+								lat: startPoint.lat,
+								angle: startPoint.head * Math.PI/180,
+								shipPath: "M23.5,29 14.5,0 5.5,29z" //ship.paths
+							})
+							ArGis.shipLayer.graphics.add(shipGraphic);
+							//cog
+							ArGis.shipCogLayer.graphics.removeAll();
+							var cogLon = startPoint.cog * Math.PI/180;
+							var lon = ship.shipLength/ArGis.view.scale;
+							var lat = lon/Math.atan(cogLon);
+							console.log(cogLon);
+							console.log(lat);
+							var cogLine = Utils.createLine({
+								paths:[[startPoint.lon, startPoint.lat],[startPoint.lon+lon, startPoint.lat+lat]],
+								width: "1px"
+							});
+							ArGis.shipCogLayer.graphics.add(cogLine);
+							
+							startPoint = {
+									lon: startPoint.lon + lonSecond*interval,
+									lat: startPoint.lat + latSecond*interval,
+									speed: startPoint.speed + speedSecond*interval,
+									cog: startPoint.cog + cogSecond*interval,
+									head: startPoint.head + headSecond*interval
+							};
+							intervalCount = intervalCount+1;
+							if(intervalCount >= 1/interval - 2){
+								clearInterval(tempInterval);
+							}
+						}, interval*1000);
+					}
+				})(i);
 			}
 		},
 		animateShip: function(fromPoint, toPoint){
@@ -193,32 +176,18 @@ var Utils = {
 			}
 		},
 		createShip: function(params){
-			var ship;
-			require(["esri/Color","esri/Graphic"], 
-					function (Color, Graphic) {
-				 	  var geometry = {
-					        type: "polyline", 
-					        paths: params.paths
-					      };
-						
-				      var symbol  = {
-				  		    type: "simple-line",  
-				  		    color: params.color ? new Color(params.color) : [226, 119, 40],
-				  		    width: params.width ? params.width : "4px",
-				  		    style: params.style ? params.style : "solid"
-				  		  };
-				      
-				      ship = new Graphic({
-				    	  	geometry: geometry,
-						    symbol: symbol,
-						    attributes: params.attr
-				      	});
-				      
-				      if(params.template){
-				    	  line.popupTemplate = params.template;
-				      }
-			});
-			return ship;
+			var geometry = {
+					type: "point",
+				    longitude: params.lon ? params.lon : params.paths[0],
+					latitude: params.lat ? params.lat : params.paths[1]
+				  };
+				
+		      var symbol  = {
+		  		    type: "simple-marker",  
+		  		    angle:  params.angle,
+		  		    path: params.shipPath
+		  		  };
+			return this.createGraphic(geometry, symbol, params.attr, params.template);
 		},
 		createPoint: function(params){
 			var geometry = {
@@ -230,7 +199,7 @@ var Utils = {
 		      var symbol  = {
 		  		    type: "simple-marker",  
 		  		    color: params.color ? params.color : [226, 119, 40],
-		  		     size: params.width ? params.width : "8px",
+		  		     size: params.width ? params.width : "4px",
 				    outline: {
 				    	style:"none"
 				    }
@@ -246,7 +215,7 @@ var Utils = {
 		      var symbol  = {
 		  		    type: "simple-line",  
 		  		    color: params.color ? params.color : [226, 119, 40],
-		  		    width: params.width ? params.width : "4px",
+		  		    width: params.width ? params.width : "1px",
 		  		    style: params.style ? params.style : "solid"
 		  		  };
 			return this.createGraphic(geometry, symbol, params.attr, params.template);
@@ -277,7 +246,7 @@ var Utils = {
 			var symbol  = {
 	  		    type: "simple-marker",  
 	  		    color: params.color ? params.color : [226, 119, 40],
-	  		     size: params.width ? params.width : "8px",
+	  		     size: params.width ? params.width : "1px",
 			    outline: {
 			    	style:"none"
 			    }

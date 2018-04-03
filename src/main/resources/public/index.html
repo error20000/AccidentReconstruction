@@ -148,7 +148,7 @@
 		ArGis.view = new MapView({
 		    container: "viewDiv",  
 		    map: ArGis.map,  
-		    zoom: 4,  
+		    zoom: 16,  
 		    center: ArGis.center
 		  });
 		
@@ -190,6 +190,10 @@
 				ArGis.initShips();
 				ArGis.initTrack();
 			}); 
+			
+			ArGis.view.on("click", function(evt){
+				console.log(evt);
+			});
 	});
 </script>
 <script>
