@@ -148,7 +148,7 @@
 		ArGis.view = new MapView({
 		    container: "viewDiv",  
 		    map: ArGis.map,  
-		    zoom: 8,  
+		    zoom: 16,  
 		    center: ArGis.center
 		  });
 		
@@ -172,11 +172,12 @@
 			}); 
 			
 			ArGis.trackLayer = new GraphicsLayer({id:"trackGraphicsLayer"});
+			ArGis.shipLayer = new GraphicsLayer({id:"testGraphicsLayer"});
 			ArGis.labelLayer = new GraphicsLayer({id:"labelGraphicsLayer"});
 			
 			ArGis.map.add(ArGis.trackLayer);
+			ArGis.map.add(ArGis.shipLayer);
 			ArGis.map.add(ArGis.labelLayer);
-			
 			
 			console.log(ArGis.view);
 	  
@@ -189,6 +190,8 @@
 			
 			ArGis.view.on("click", function(evt){
 				console.log(evt);
+				console.log(Utils.mercatorToLonLat(evt.mapPoint.x, evt.mapPoint.y));
+				console.log(Utils.lonLatToMercator(evt.mapPoint.longitude, evt.mapPoint.latitude));
 			});
 	});
 </script>

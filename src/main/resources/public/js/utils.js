@@ -423,5 +423,61 @@ var Utils = {
 		    t = t.replace('ww', weekday[date.getDay()]);
 		    t = t.replace('w', weekdayS[date.getDay()]);
 		    return t;
+		},
+		mercatorToLonLat: function(x, y){ //20037508.342789244 = (Math.PI * 6378137)
+			var toX = x/ 20037508.342789244 * 180;
+            var toY = y/ 20037508.342789244 * 180;
+            toY = 180 / Math.PI * (2 * Math.atan(Math.exp(toY * Math.PI / 180)) - Math.PI / 2);
+            return {
+            	lon: toX,
+            	lat: toY
+            };
+		},
+		lonLatToMercator: function(lon, lat){
+			var toX = lon * 20037508.342789244 / 180;
+            var toY = Math.log(Math.tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
+            toY = toY * 20037508.342789244 / 180;
+            return {
+            	x: toX,
+            	y: toY
+            };
+		},
+		xToLon: function(x){ 
+			var toX = x/ 20037508.342789244 * 180;
+            return toX;
+		},
+		yToLon: function(y){ 
+            var toY = y/ 20037508.342789244 * 180;
+            toY = 180 / Math.PI * (2 * Math.atan(Math.exp(toY * Math.PI / 180)) - Math.PI / 2);
+            return toY;
+		},
+		lonTox: function(lon){
+			var toX = lon * 20037508.342789244 / 180;
+            return toX;
+		},
+		latToy: function(lat){
+			var toY = Math.log(Math.tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
+            toY = toY * 20037508.342789244 / 180;
+            return toY;
+		},
+		dfmTolonlat: function(str){
+			var d = Number(str.split("°")[0]);
+			var f = Number(str.split("°")[1].split("′")[0]);
+			var m = Number(str.split("°")[1].split("′")[1].split("″")[0]);
+			return d + f/60 + m/3600 
+		},
+		lonlatTodfm: function(lonlat){
+			var d = String(lonlat).split(".")[0];
+			var deg = String(lonlat).split(".").length < 2 ? 0 : Number("0."+String(lonlat).split(".")[1]);
+			var f = String(deg*60).split(".")[0];
+			deg = String(deg*60).split(".").length < 2 ? 0 : Number("0."+String(deg*60).split(".")[1]);
+			var m = Number(deg*60).toFixed(1);
+			return d + "°" + f + "′" + m;
+		},
+		lonTodfm: function(lon){
+			return this.lonlatTodfm(lon).replace("-","") + (lon < 0 ? "W" : "E");
+		},
+		latTodfm: function(lat){
+			return this.lonlatTodfm(lat).replace("-","") + (lat < 0 ? "S" : "N");
 		}
 };
