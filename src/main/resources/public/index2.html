@@ -5,13 +5,53 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Accident Reconstruction</title>
 
+<link rel="stylesheet" href="arcgis_js_api/library/4.5/dijit/themes/claro/claro.css" />
+<link rel="stylesheet" href="arcgis_js_api/library/4.5/esri/css/main.css" />
+
 <link rel="stylesheet" href="css/public.css" />
 <link rel="stylesheet" href="css/index2.css" />
 
+<script src="https://cdn.bootcss.com/vue/2.5.16/vue.js" type="text/javascript"></script>
+<script src="https://cdn.bootcss.com/element-ui/2.2.2/index.js" type="text/javascript"></script>
+<script>
+  	var Center = {lat:30.8506,lon:124.9598};
+    var ArGis={
+    		baseUrl: "arcgis_js_api/library/4.5"
+    };
+    
+    !function() {
+    	document.write('<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" >');
+    	resize();
+
+    	window.onresize = function(){
+    		resize();
+    	}
+    }();
+    function resize(){
+    	var TARGET_WIDTH = 1366;
+    	var scale = (screen.width)  / TARGET_WIDTH;
+    	document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=' + TARGET_WIDTH + ', initial-scale=' + scale + ', minimum-scale=' + scale + ', maximum-scale=' + scale + ', user-scalable=0, minimal-ui' );
+    }
+  </script>
+<script src="arcgis_js_api/library/4.5/init.js"></script> 
+
+<link rel="stylesheet" href="css/play.css" />
+
+<!-- <script src="js/shipInfoData.js" ></script>
+<script src="js/shipEventData.js"></script>
+<script src="js/shipTimeData.js"></script>
+<script src="js/shipTrackData.js"></script> -->
+
+<script src="js/ship.js"></script>
+<script src="js/data.js"></script>
+
+<script src="js/utils.js"></script>
+<script src="js/play.js"></script>
+<script src="js/index.js"></script>
 </head>
 <body>
 
-<div class="main">
+<div class="main" id="app">
 	<div class="header test">
 		
 	</div>
@@ -19,7 +59,9 @@
 		<div class="content_1">
 			<div class="content_left">
 				<div id="mapDiv" style="height: 290px;"></div>
-				<div id="playDiv" style="height: 62px;"></div>
+				<div id="playDiv" style="height: 62px;">
+					<play-controller ></play-controller>
+				</div>
 			</div>
 			<div class="content_right">
 				<div id="videoDiv">
@@ -34,6 +76,13 @@
 			<div class="content_left">
 				<div class="content_2_1">
 					<div class="track_label">显示轨迹</div>
+					<div id="trackDiv">
+				 		<el-checkbox v-model="isTrackShowPoint" @change="handlerTrackChange('point')">点</el-checkbox>
+				 		<el-checkbox v-model="isTrackShowLine" @change="handlerTrackChange('line')">线</el-checkbox>
+				 		<el-checkbox v-model="isTrackShowDashed" @change="handlerTrackChange('dashed')">虚线</el-checkbox>
+				 		<el-checkbox v-model="isTrackShowShape" @change="handlerTrackChange('shape')">形状</el-checkbox>
+				 		<el-checkbox v-model="isTrackShowInfo" @change="handlerTrackChange('info')">事件</el-checkbox>
+					</div>
 				</div>
 				<div class="content_2_2">
 					<div class="content_2_2_1">
@@ -172,6 +221,105 @@
 		</div>
 	</div>
 </div>
-
+<script type="text/javascript">
+	
+	require([
+	  "esri/Map",
+	  "esri/views/MapView",
+	  "esri/widgets/ScaleBar",  
+	  "esri/widgets/BasemapToggle",
+	  "esri/layers/GraphicsLayer",
+//      "esri/widgets/Fullscreen",
+	  "dojo/domReady!"
+	], function(Map, MapView, ScaleBar, BasemapToggle, GraphicsLayer, Fullscreen){
+		
+		ArGis.map = new Map({
+		    basemap: "streets"
+		  });
+		ArGis.view = new MapView({
+		    container: "mapDiv",  
+		    map: ArGis.map,  
+		    zoom: 16,  
+		    center: ArGis.center
+		  });
+		
+		  var toggle = new BasemapToggle({
+		    view: ArGis.view, 
+		    nextBasemap: "hybrid"
+		  });
+	
+		  ArGis.view.ui.add(toggle, "top-right");
+		  /* ArGis.view.ui.add(new Fullscreen({
+		        view: ArGis.view
+		  }), "top-right"); */
+		
+			var scaleBar = new ScaleBar({
+				  view: ArGis.view,
+				  unit: "dual"
+				});
+				
+			ArGis.view.ui.add(scaleBar, {
+			  position: "bottom-left"
+			}); 
+			
+			ArGis.trackLayer = new GraphicsLayer({id:"trackGraphicsLayer"});
+			ArGis.shipLayer = new GraphicsLayer({id:"testGraphicsLayer"});
+			ArGis.labelLayer = new GraphicsLayer({id:"labelGraphicsLayer"});
+			
+			ArGis.map.add(ArGis.trackLayer);
+			ArGis.map.add(ArGis.shipLayer);
+			ArGis.map.add(ArGis.labelLayer);
+			
+			console.log(ArGis.view);
+	  
+			ArGis.view.then(function(){
+				ArGis.initMap();
+				ArGis.initTimeLine();
+				ArGis.initShips();
+				ArGis.initTrack();
+			}); 
+			
+			ArGis.view.on("click", function(evt){
+				console.log(evt);
+				console.log(Utils.mercatorToLonLat(evt.mapPoint.x, evt.mapPoint.y));
+				console.log(Utils.lonLatToMercator(evt.mapPoint.longitude, evt.mapPoint.latitude));
+			});
+	});
+	
+new Vue({
+    el: '#app',
+    data: function() {
+      return Config;
+    },
+    methods: {
+    	handlerTrack: function(evt) {
+    		Config.isTrackShowPoint = true;
+  	        ArGis.drawTrack();
+  	    },
+    	handlerTrackChange: function(type) {
+    		if(type == "point"){
+    			//移除原来的点
+    			ArGis.clearTrackPoint();
+    		}else if(type == "line"){
+    			//移除原来的线
+    			ArGis.clearTrackLine();
+    		}else if(type == "dashed"){
+    			//移除原来的虚线
+    			ArGis.clearTrackDash();
+    		}else if(type == "shape"){
+    			//移除原来的虚线
+    			ArGis.clearTrackShape();
+    		}else if(type == "info"){
+    			//移除原来的虚线
+    			ArGis.clearTrackInfo();
+    		}
+    		ArGis.drawTrack();
+  	    }
+    },
+    mounted: function(){
+		ArGis.initData();
+    },
+  });
+  </script>
 </body>
 </html>

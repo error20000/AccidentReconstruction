@@ -28,7 +28,6 @@ var Config = {
 		shipsShape: [],
 		msgEvent: "",
 		
-		isTrackShow: false,
 		isTrackShowPoint: false,
 		isTrackShowLine: false,
 		isTrackShowDashed: false,
@@ -473,22 +472,13 @@ ArGis={
 			};
 		},
 		drawTrack: function(){
-			if(Config.isTrackShow){
-				for (var i = 0; i < Ships.length; i++) {
-					var ship = Ships[i];
-					this.showTrackPoint(ship);
-					this.showTrackLine(ship);
-					this.showTrackDashed(ship);
-					this.showTrackShape(ship);
-					this.showTrackInfo(ship);
-				}
-			}else{
-				Config.isTrackShowPoint = false;
-				Config.isTrackShowLine = false;
-				Config.isTrackShowDashed = false;
-				Config.isTrackShowShape = false;
-				Config.isTrackShowInfo = false;
-				this.clearTrack();
+			for (var i = 0; i < Ships.length; i++) {
+				var ship = Ships[i];
+				this.showTrackPoint(ship);
+				this.showTrackLine(ship);
+				this.showTrackDashed(ship);
+				this.showTrackShape(ship);
+				this.showTrackInfo(ship);
 			}
 		},
 		clearTrack: function(){

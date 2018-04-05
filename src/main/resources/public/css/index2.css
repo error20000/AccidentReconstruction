@@ -60,12 +60,15 @@
 .content_left .content_2_1{
 	width: 100%;
 	height: 47px;
-	display: flex;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .track_label{
 	font-size: 14px;
     font-family: "宋体";
+    margin-right: 18px;
 }
 
 .content_right .content_2_1{
