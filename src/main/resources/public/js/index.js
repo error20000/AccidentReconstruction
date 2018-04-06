@@ -3,31 +3,79 @@
 var Config = {
 		defulatColor: [226, 119, 40],
 		defulatTimeFormat: "yyyy/M/d HH:mm:ss",
-		timeLength: 19*60+20, //19分20秒
+		timeLength: 0,
 		
 		select: 0,
 		shipsSelect: [],
-		shipsForm:{
+		shipsForm:[{
 			mmsi:'',
-			shipLength: 0,
-			shipWidth: 0,
+			shipLength: '',
+			shipWidth: '',
 			name: '',
 			showName: '',
 			callSign:'',
 			shipType:'',
-			left: 0,
-			track: 0,
-			lat: 0, 
-			lon: 0, 
+			left: '',
+			track: '',
+			lon: '', 
+			lat: '', 
 			real: false, 
 			time: '', 
-			speed: 0, 
-			cos: 0, 
-			head: 0
-		},
+			speed: '', 
+			cog: '', 
+			head: '', 
+			
+			lonlat: '', 
+			car: '',
+			cc: '', 
+			tc: '', 
+			driver: '',
+			sailor: '',
+			ro: '',
+			time: '',
+			carl: '',
+			man: '',
+			distance: '',
+			position: '',
+			cpa: '', 
+			tcpa: ''
+		},{
+			mmsi:'',
+			shipLength: '',
+			shipWidth: '',
+			name: '',
+			showName: '',
+			callSign:'',
+			shipType:'',
+			left: '',
+			track: '',
+			lon: '', 
+			lat: '', 
+			real: false, 
+			time: '', 
+			speed: '', 
+			cog: '', 
+			head: '', 
+			
+			lonlat: '', 
+			car: '',
+			cc: '', 
+			tc: '', 
+			driver: '',
+			sailor: '',
+			ro: '',
+			time: '',
+			carl: '',
+			man: '',
+			distance: '',
+			position: '',
+			cpa: '', 
+			tcpa: ''
+		}],
 		shipsShape: [],
-		msgEvent: "",
-		
+		timeEvent: [],
+		msgDesc: [],
+
 		isTrackShowPoint: false,
 		isTrackShowLine: false,
 		isTrackShowDashed: false,
@@ -58,8 +106,8 @@ ArGis={
 		view: "",
 		center: [Center.lon, Center.lat],
 		initData: function(){
-			Ships = shipFinalData;
-			return;
+//			Ships = shipFinalData;
+//			return;
 			//加载数据
 			// 1、基础数据
 			for (var i = 0; i < ShipInfoData.length; i++) {
@@ -71,17 +119,18 @@ ArGis={
 			// 2、轨迹数据
 			var shipsTemp = {}, shipsHash={};
 			for (var i = 0; i < ShipTrackData.length; i++) {
-				var key = ShipTrackData[i].Mmsi;
-				var keyHash = ShipTrackData[i].Mmsi+"_"+ShipTrackData[i].UpdateTime;
+				var shipData = ShipTrackData[i];
+				var key = shipData.Mmsi;
+				var keyHash = shipData.Mmsi+"_"+shipData.UpdateTime;
 				var change = {
-						mmsi: ShipTrackData[i].Mmsi,
-						lat: Number(ShipTrackData[i].Lat),
-						lon: Number(ShipTrackData[i].Long),
-						time: ShipTrackData[i].UpdateTime,
-						speed: Number(ShipTrackData[i].Speed),
-						cog: Number(ShipTrackData[i].Cog),
-						head: Number(ShipTrackData[i].Head),
-						unkonw: ShipTrackData[i].unkonw,
+						mmsi: shipData.Mmsi,
+						lat: Number(shipData.Lat),
+						lon: Number(shipData.Long),
+						time: shipData.UpdateTime,
+						speed: Number(shipData.Speed),
+						cog: Number(shipData.Cog),
+						head: Number(shipData.Head),
+						unkonw: shipData.unkonw,
 						real: true
 				};
 				var obj = shipsTemp[key];
@@ -161,15 +210,16 @@ ArGis={
 			// 1、创建实点
 			var shipTimeTemp = {};
 			for (var i = 0; i < ShipTimeData.length; i++) {
-				var key = ShipTimeData[i].Mmsi;
+				var shipData = ShipTimeData[i];
+				var key = shipData.Mmsi;
 				var timePoint = {
-						mmsi: ShipTimeData[i].Mmsi,
-						lat: Number(ShipTimeData[i].Lat),
-						lon: Number(ShipTimeData[i].Long),
-						time: ShipTimeData[i].UpdateTime,
-						speed: Number(ShipTimeData[i].Speed),
-						cog: Number(ShipTimeData[i].Cog),
-						head: Number(ShipTimeData[i].Head),
+						mmsi: shipData.Mmsi,
+						lat: Number(shipData.Lat),
+						lon: Number(shipData.Long),
+						time: shipData.UpdateTime,
+						speed: Number(shipData.Speed),
+						cog: Number(shipData.Cog),
+						head: Number(shipData.Head),
 						real: true
 				};
 				var obj = shipTimeTemp[key];
@@ -246,6 +296,14 @@ ArGis={
 					Ships[shipIndex].timeLine[timeLineIndex].dcpaDesc = shipEvent.DcpaDesc;
 				}
 			}*/
+			//处理事件
+			for (var i = 0; i < TimeLineEventData.length; i++) {
+				TimeLineEventData[i].timeStart = Config.timeLength;
+				Config.timeEvent.push({name:TimeLineEventData[i].name,timeStart:TimeLineEventData[i].timeStart});
+				TimeLineEventData[i].index.push(Config.timeLength);
+				Config.timeLength += TimeLineEventData[i].timeLength;
+				TimeLineEventData[i].index.push(Config.timeLength);
+			}
 		},
 		initMap: function(){
 			//加载工具
@@ -385,7 +443,7 @@ ArGis={
 				shipPath: "M23.5,29 14.5,0 5.5,29z"
 			})
 			ArGis.shipLayer.graphics.add(shipGraphic);*/
-			var geometry = {
+			/*var geometry = {
 			        type: "polygon", 
 			        centroid:{
 			        	type: "point", 
@@ -415,8 +473,21 @@ ArGis={
 		    	          width: 1
 		    	        },
 		    	        style:'square'
+		  		  };*/
+			var geometry = {
+			        type: "point", 
+			        longitude: 124.9823,
+					latitude: 30.199,
+			  };
+		      var symbol  = {
+		    		  type: "picture-marker",  // autocasts as new PictureMarkerSymbol()
+				      url: "/images/11.png",
+				      width: "50px",
+				      height: "275px",
+				      angle: 90
 		  		  };
-			var shipGraphic = Utils.createGraphic(geometry, symbol);console.log(shipGraphic);
+		      
+			var shipGraphic = Utils.createGraphic(geometry, symbol);
 			ArGis.shipLayer.graphics.add(shipGraphic);
 		},
 		initTimeLine: function(){
@@ -461,13 +532,13 @@ ArGis={
 			PlayController.timePointEvent = function(timePoint){
 				var timeEvent;
 				for (var i = 0; i < TimeLineEventData.length; i++) {
-					if(timePoint>=TimeLineEventData[i].index[0] && timePoint <=TimeLineEventData[i].index[1]){
+					if(timePoint >= TimeLineEventData[i].index[0] && timePoint < TimeLineEventData[i].index[1]){
 						timeEvent = TimeLineEventData[i];
 						break;
 					}
 				}
 				if(timeEvent && typeof timeEvent.event == "function"){
-					timeEvent.event(timePoint, timeEvent);
+					timeEvent.event(Math.floor(timePoint), timeEvent);
 				}
 			};
 		},

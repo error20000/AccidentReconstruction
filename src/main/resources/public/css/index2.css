@@ -143,7 +143,7 @@
 	width: 210px;
 	height: 22px;
 	margin: 5px 16px 5px 11px;
-	font-family: "黑体";
+	/* font-family: "黑体"; */
 	font-size: 14px;
 	display: flex;
 	justify-content: flex-start;
@@ -170,6 +170,17 @@
 
 .content_2_2 .info{
 	height: 283px;
+	overflow: hidden;
 }
 
+.info_container{
+    overflow-y: auto;
+    margin: 10px 0px 10px 10px;
+    font-size: 12px;
+	height: 263px;
+}
+.info_container .info_item{
+	margin: 5px 0px 5px 0px;
+	writing-mode: lr-tb;
+}
 
