@@ -30,26 +30,43 @@ var Utils = {
 					Config.shipsForm[shipIndex].lat = curPoint.lat;
 					Config.shipsForm[shipIndex].lon = curPoint.lon;
 					Config.shipsForm[shipIndex].time = curPoint.time;
-					Config.shipsForm[shipIndex].speed = curPoint.speed;
-					Config.shipsForm[shipIndex].cog = curPoint.cog;
-					Config.shipsForm[shipIndex].head = curPoint.head;
+					Config.shipsForm[shipIndex].speed = Number(Number(curPoint.speed).toFixed(1));
+					Config.shipsForm[shipIndex].cog = Number(Number(curPoint.cog).toFixed(1));
+					Config.shipsForm[shipIndex].head = Number(Number(curPoint.head).toFixed(1));
 					Config.shipsForm[shipIndex].unkonw = curPoint.unkonw;
 				}
 				//其他信息
-				Config.shipsForm[shipIndex].lonlat = curPoint ? Utils.lonTodfm(curPoint.lon)+"/"+Utils.latTodfm(curPoint.lat) : ""; //文本经纬度 
-				Config.shipsForm[shipIndex].car = params.car; //车
-				Config.shipsForm[shipIndex].cc = params.cc; //罗航向
-				Config.shipsForm[shipIndex].tc = params.tc; //真航向
-				Config.shipsForm[shipIndex].driver = params.driver; //值班驾驶员
-				Config.shipsForm[shipIndex].sailor = params.sailor; //值班水手
-				Config.shipsForm[shipIndex].ro = params.ro; //舵令
-				Config.shipsForm[shipIndex].time = params.time; //时间
-				Config.shipsForm[shipIndex].carl = params.carl; //车令
-				Config.shipsForm[shipIndex].man = params.man; //下达人
-				Config.shipsForm[shipIndex].distance = params.distance; //距离
-				Config.shipsForm[shipIndex].position = params.position; //方位
-				Config.shipsForm[shipIndex].cpa = params.cpa; //cpa
-				Config.shipsForm[shipIndex].tcpa = params.tcpa; //tcpa
+				this.appendShipInfo(shipIndex, {
+					lonlat: Utils.lonTodfm(curPoint.lon)+"/"+Utils.latTodfm(curPoint.lat),
+					time: Utils.formatDate(curPoint.time, "HH:mm"),
+					cc: Config.shipsForm[shipIndex].head+"°",
+					tc: Config.shipsForm[shipIndex].cog+"°",
+				});
+				//日期
+				Config.timeDesc = Utils.formatDate(curPoint.time, "HH:mm:ss DATE JAN/dd/18"); 
+				var date = new Date(curPoint.time);
+				Config.timeUTCDesc = date.getUTCHours()+":"+(date.getUTCMinutes() < 10 ? "0"+date.getUTCMinutes() : date.getUTCMinutes())+" UTC"; 
+			}
+		},
+		appendShipInfo: function(shipIndex, params){
+			var curShip = Ships[shipIndex];
+			if(curShip){
+				//其他信息
+				Config.shipsForm[shipIndex].lonlat = params.lonlat || Config.shipsForm[shipIndex].lonlat; //文本经纬度
+				Config.shipsForm[shipIndex].car = params.car || Config.shipsForm[shipIndex].car; //车
+				Config.shipsForm[shipIndex].cc = params.cc || Config.shipsForm[shipIndex].cc; //罗航向
+				Config.shipsForm[shipIndex].tc = params.tc || Config.shipsForm[shipIndex].tc; //真航向
+				Config.shipsForm[shipIndex].driver = params.driver || Config.shipsForm[shipIndex].driver; //值班驾驶员
+				Config.shipsForm[shipIndex].sailor = params.sailor || Config.shipsForm[shipIndex].sailor; //值班水手
+				Config.shipsForm[shipIndex].ro = params.ro || Config.shipsForm[shipIndex].ro; //舵令
+				Config.shipsForm[shipIndex].time = params.time || Config.shipsForm[shipIndex].time; //时间
+				Config.shipsForm[shipIndex].carl = params.carl || Config.shipsForm[shipIndex].carl; //车令
+				Config.shipsForm[shipIndex].man = params.man || Config.shipsForm[shipIndex].man; //下达人
+				Config.shipsForm[shipIndex].distance = params.distance || Config.shipsForm[shipIndex].distance; //距离
+				Config.shipsForm[shipIndex].position = params.position || Config.shipsForm[shipIndex].position; //方位
+				Config.shipsForm[shipIndex].cpa = params.cpa || Config.shipsForm[shipIndex].cpa; //cpa
+				Config.shipsForm[shipIndex].tcpa = params.tcpa || Config.shipsForm[shipIndex].tcpa; //tcpa
+				Config.weatherDesc = params.weather || Config.weatherDesc; //天气
 			}
 		},
 		updateShip: function(timePoint, timeEvent, shipIndex){
@@ -57,8 +74,9 @@ var Utils = {
 			if(timeEvent){
 				var temp1 = ship.timeLine[timeEvent.time[0]];
 				var temp2 = ship.timeLine[timeEvent.time[1]];
-				console.log(temp2);
-				console.log(temp1);
+				console.log(temp1.lon +"---"+temp1.lat);
+				console.log(temp2.lon +"---"+temp2.lat);
+				console.log("=====================================");
 				//总差距
 				var count = timeEvent.index[1] - timeEvent.index[0];
 				var lonCount = temp2.lon - temp1.lon;
@@ -73,7 +91,7 @@ var Utils = {
 				var cogSecond = cogCount/count;
 				var headSecond = headCount/count;
 				//动画
-				var startTime = timePoint-1 <= 0 ? 0 : timePoint-1;
+				var startTime = timePoint-timeEvent.timeStart-1 <= 0 ? 0 : timePoint-timeEvent.timeStart-1;
 				var startPoint = {
 						lon: temp1.lon + startTime*lonSecond,
 						lat: temp1.lat + startTime*latSecond,
@@ -86,23 +104,31 @@ var Utils = {
 				var tempInterval = setInterval(() => {
 					//ship
 					ArGis["shipLayer_"+ship.mmsi].graphics.removeAll();
-					var shipGraphic = Utils.createShip({
-						lon: startPoint.lon,
-						lat: startPoint.lat,
-						angle: startPoint.head,
-						url: "images/11.png", //ship.url
-						width: ship.shipWidth/ArGis.view.state.resolution + "px",
-						height: ship.shipLength/ArGis.view.state.resolution + "px"
-					});
+					var shipGraphic = "";
+					if(ArGis.view.zoom >= 0 && ArGis.view.zoom <= 14){
+						shipGraphic = Utils.createShipSign({
+							lon: startPoint.lon,
+							lat: startPoint.lat,
+							angle: startPoint.head,
+							color: ship.color
+						});
+					}else{
+						shipGraphic = Utils.createShip({
+							lon: startPoint.lon,
+							lat: startPoint.lat,
+							angle: startPoint.head,
+							url: ship.url,
+							width: ship.shipWidth/ArGis.view.state.resolution + "px",
+							height: ship.shipLength/ArGis.view.state.resolution + "px"
+						});
+					}
+					
 					ArGis["shipLayer_"+ship.mmsi].graphics.add(shipGraphic);
 					//cog
 					ArGis["shipCogLayer_"+ship.mmsi].graphics.removeAll();
-					var cogLon = startPoint.cog * Math.PI/180;
+					var cogLon = startPoint.cog;
 					var lon = ship.shipLength/ArGis.view.scale;
 					var lat = lon/Math.atan(cogLon);
-					console.log(startPoint.head);
-					console.log(cogLon);
-					console.log(lat);
 					var cogLine = Utils.createLine({
 						paths:[[startPoint.lon, startPoint.lat],[startPoint.lon+lon, startPoint.lat+lat]],
 						width: "1px"
@@ -121,122 +147,80 @@ var Utils = {
 						clearInterval(tempInterval);
 					}
 				}, interval*1000);
+				
 			}
 		},
-		/*updateShip: function(timePoint, timeEvent){
-			var shipsTemp = {};
-			for (var i = 0; i < Ships.length; i++) {
-				var ship = Ships[i];
-				if(timeEvent){
-					var temp1 = ship.timeLine[timeEvent.time[0]];
-					var temp2 = ship.timeLine[timeEvent.time[1]];
-					//总差距
-					var count = timeEvent.index[1] - timeEvent.index[0];
-					var lonCount = temp2.lon - temp1.lon;
-					var latCount = temp2.lat - temp1.lat;
-					var speedCount = temp2.speed - temp1.speed;
-					var cogCount = temp2.cog - temp1.cog;
-					var headCount = temp2.head - temp1.head;
-					//每秒差距
-					var lonSecond = lonCount/count;
-					var latSecond = latCount/count;
-					var speedSecond = speedCount/count;
-					var cogSecond = cogCount/count;
-					var headSecond = headCount/count;
-					//动画
-					var startTime = timePoint-1 <= 0 ? 0 : timePoint-1;
+		animateShip: function(shipIndex, formTime, toTime, timeEvent){
+			var ship = Ships[shipIndex];
+			if(timeEvent){
+				var temp1 = ship.timeLine[formTime];
+				var temp2 = ship.timeLine[toTime];
+				console.log(temp1.lon +"---"+temp1.lat);
+				console.log(temp2.lon +"---"+temp2.lat);
+				console.log("================******=====================");
+				var count = 60;
+				var interval = 1/count;
+				var intervalCount = 0;
+				//总差距
+				var lonCount = temp2.lon - temp1.lon;
+				var latCount = temp2.lat - temp1.lat;
+				var speedCount = temp2.speed - temp1.speed;
+				var cogCount = temp2.cog - temp1.cog;
+				var headCount = temp2.head - temp1.head;
+				//每秒差距
+				var lonSecond = lonCount/count;
+				var latSecond = latCount/count;
+				var speedSecond = speedCount/count;
+				var cogSecond = cogCount/count;
+				var headSecond = headCount/count;
+				//动画
+				var tempInterval = setInterval(() => {
 					var startPoint = {
-							lon: temp1.lon + startTime*lonSecond,
-							lat: temp1.lat + startTime*latSecond,
-							speed: temp1.speed + startTime*speedSecond,
-							cog: temp1.cog + startTime*cogSecond,
-							head: temp1.head + startTime*headSecond
+							lon: temp1.lon + intervalCount*lonSecond,
+							lat: temp1.lat + intervalCount*latSecond,
+							speed: temp1.speed + intervalCount*speedSecond,
+							cog: temp1.cog + intervalCount*cogSecond,
+							head: temp1.head + intervalCount*headSecond
 					};
-					shipsTemp[ship.mmsi] = {
-							startPoint: startPoint,
-							lonSecond: lonSecond,
-							latSecond: latSecond,
-							speedSecond: speedSecond,
-							cogSecond: cogSecond,
-							headSecond: headSecond,
-					};
-				}
-			}
-			//动画
-			var interval = 1/60;
-			var intervalCount = 0;
-			var tempInterval = setInterval(() => {
-				ArGis.shipLayer.graphics.removeAll();
-				ArGis.shipCogLayer.graphics.removeAll();
-				for (var i = 0; i < Ships.length; i++) {
-					var ship = Ships[i];
-					var shipsTemp = shipsTemp[ship.mmsi];
-					if(shipsTemp){
-						var startPoint = shipsTemp.startPoint;
-						var lonSecond = shipsTemp.lonSecond;
-						var latSecond = shipsTemp.latSecond;
-						var speedSecond = shipsTemp.speedSecond;
-						var cogSecond = shipsTemp.cogSecond;
-						var headSecond = shipsTemp.headSecond;
-						
-						//ship
-						var shipGraphic = Utils.createShip({
+					//ship
+					ArGis["shipLayer_"+ship.mmsi].graphics.removeAll();
+					var shipGraphic = "";
+					if(ArGis.view.zoom >= 0 && ArGis.view.zoom <= 14){
+						shipGraphic = Utils.createShipSign({
 							lon: startPoint.lon,
 							lat: startPoint.lat,
-							angle: startPoint.head * Math.PI/180,
-							shipPath: "M23.5,29 14.5,0 5.5,29z" //ship.paths
-						})
-						ArGis.shipLayer.graphics.add(shipGraphic);
-						//cog
-						var cogLon = startPoint.cog * Math.PI/180;
-						var lon = ship.shipLength/ArGis.view.scale;
-						var lat = lon/Math.atan(cogLon);
-						console.log(ship.shipLength);
-						console.log(cogLon);
-						console.log(lat);
-						var cogLine = Utils.createLine({
-							paths:[[startPoint.lon, startPoint.lat],[startPoint.lon+lon, startPoint.lat+lat]],
-							width: "1px"
+							angle: startPoint.head,
+							color: ship.color
 						});
-						ArGis.shipCogLayer.graphics.add(cogLine);
-						
-						startPoint = {
-								lon: startPoint.lon + lonSecond*interval,
-								lat: startPoint.lat + latSecond*interval,
-								speed: startPoint.speed + speedSecond*interval,
-								cog: startPoint.cog + cogSecond*interval,
-								head: startPoint.head + headSecond*interval
-						};
-						intervalCount = intervalCount+1;
-						if(intervalCount >= 1/interval - 2){
-							clearInterval(tempInterval);
-						}
+					}else{
+						shipGraphic = Utils.createShip({
+							lon: startPoint.lon,
+							lat: startPoint.lat,
+							angle: startPoint.head,
+							url: ship.url,
+							width: ship.shipWidth/ArGis.view.state.resolution + "px",
+							height: ship.shipLength/ArGis.view.state.resolution + "px"
+						});
 					}
-				}
-			}, interval*1000);
-		},*/
-		animateShip: function(fromPoint, toPoint){
-			if(!toPoint){
-				return;
-			}
-			if(!fromPoint){ //加入
-				var mmsi = toPoint.mmsi;
+					
+					ArGis["shipLayer_"+ship.mmsi].graphics.add(shipGraphic);
+					//cog
+					ArGis["shipCogLayer_"+ship.mmsi].graphics.removeAll();
+					var cogLon = startPoint.cog;
+					var lon = ship.shipLength/ArGis.view.scale;
+					var lat = lon/Math.atan(cogLon);
+					var cogLine = Utils.createLine({
+						paths:[[startPoint.lon, startPoint.lat],[startPoint.lon+lon, startPoint.lat+lat]],
+						width: "1px"
+					});
+					ArGis["shipCogLayer_"+ship.mmsi].graphics.add(cogLine);
+					
+					intervalCount = intervalCount+1;
+					if(intervalCount >= 1/interval ){
+						clearInterval(tempInterval);
+					}
+				}, interval*1000);
 				
-			}else{ //运动
-				
-			}
-		},
-		findShipTimePointLaL: function(ship, time){
-			var timePoint = {};
-			for (var i = 0; i < ship.timeLine.length; i++) {
-				if(time == ship.timeLine[i].time){
-					timePoint = ship.timeLine[i];
-					break;
-				}
-			}
-			return {
-				lon: timePoint.lon,
-				lat: timePoint.lat
 			}
 		},
 		createShip: function(params){
@@ -252,6 +236,21 @@ var Utils = {
 		  		    url: params.url,
 		  		    width: params.width,
 				    height: params.height
+		  		  };
+			return this.createGraphic(geometry, symbol, params.attr, params.template);
+		},
+		createShipSign: function(params){
+			var geometry = {
+					type: "point",
+				    longitude: params.lon ? params.lon : params.paths[0],
+					latitude: params.lat ? params.lat : params.paths[1]
+				  };
+				
+		      var symbol  = {
+		  		    type: "simple-marker", 
+		  		    color: params.color,
+		  		    angle: params.angle,
+		  		    path: "M23.5,29 14.5,0 5.5,29z"
 		  		  };
 			return this.createGraphic(geometry, symbol, params.attr, params.template);
 		},
@@ -381,7 +380,7 @@ var Utils = {
 		    var weekdayEnS = ["Sun.","Mon.","Tues.","Wed.","Thurs. ","Fri.","Sat."];
 		    var t = String(s);
 		    t = t.replace('yyyy', date.getFullYear());
-		    t = t.replace('yy', date.getYear);
+		    t = t.replace('yy', date.getYear());
 		    t = t.replace('MM', (date.getMonth()+1) < 10 ? "0"+(date.getMonth()+1) : (date.getMonth()+1));
 		    t = t.replace('M', (date.getMonth()+1));
 		    t = t.replace('dd', date.getDate() < 10 ? "0"+date.getDate() : date.getDate());

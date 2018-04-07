@@ -74,7 +74,11 @@ var Config = {
 		}],
 		shipsShape: [],
 		timeEvent: [],
+		timeSelect: 0,
 		msgDesc: [],
+		weatherDesc: "",
+		timeDesc: "",
+		timeUTCDesc: "",
 
 		isTrackShowPoint: false,
 		isTrackShowLine: false,
@@ -233,6 +237,7 @@ ArGis={
 					shipTimeTemp[key] = obj;
 				}
 			}
+			
 			// 2、创建虚拟点(只设置被观察船只)
 			for (var i = 0; i < Ships.length && i < ShipInfoData.length; i++) {
 				var ship = Ships[i];
@@ -248,7 +253,9 @@ ArGis={
 						var speedCount = tmp2.speed - tmp1.speed;
 						var cogCount = tmp2.cog - tmp1.cog;
 						var headCount = tmp2.head - tmp1.head;
-						ship.timeLine[tmp1.time] = tmp1;
+						if(tmp1.time >= "2018/1/6 19:00:00" && tmp1.time <= "2018/1/6 20:00:00"){
+							ship.timeLine[tmp1.time] = tmp1;
+						}
 						for (var k = 1; k < count; k++) {
 							var time = Utils.formatDate(new Date(tmp1.time).getTime() + k*1000, Config.defulatTimeFormat);
 							var timeLinePoint = {
@@ -261,7 +268,9 @@ ArGis={
 									head: tmp1.head + k*headCount/count,
 									real: false
 							};
-							ship.timeLine[time] = timeLinePoint;
+							if(time >= "2018/1/6 19:00:00" && time <= "2018/1/6 20:00:00"){
+								ship.timeLine[time] = timeLinePoint;
+							}
 						}
 					}
 				}
@@ -310,14 +319,14 @@ ArGis={
 
 			//绘制碰撞点
 			Utils.drawPoint({
-						lon: Center.lon,
-						lat: Center.lat,
+						lon: 124.9598,
+						lat: 30.8506,
 						color: [226, 119, 40],
 						width: 10,
 						attr: {
 							time: "2018/1/6 19:50:00",
-							lon: Center.lon,
-							lat: Center.lat,
+							lon: 124.9598,
+							lat: 30.8506,
 							content: "test"
 						},
 						template: {
@@ -436,11 +445,11 @@ ArGis={
 				lat: Center.lat
 			});
 			ArGis.shipLayer.add(shipGf);*/
-			/*var shipGraphic = Utils.createShip({
-				lon: 124.9823,
-				lat: 30.199,
+			/*var shipGraphic = Utils.createShipSign({
+				lon: 124.9727,
+				lat: 30.7071,
 				angle: 0,
-				shipPath: "M23.5,29 14.5,0 5.5,29z"
+				color: "gray"
 			})
 			ArGis.shipLayer.graphics.add(shipGraphic);*/
 			/*var geometry = {
@@ -474,7 +483,7 @@ ArGis={
 		    	        },
 		    	        style:'square'
 		  		  };*/
-			var geometry = {
+			/*var geometry = {
 			        type: "point", 
 			        longitude: 124.9823,
 					latitude: 30.199,
@@ -488,7 +497,7 @@ ArGis={
 		  		  };
 		      
 			var shipGraphic = Utils.createGraphic(geometry, symbol);
-			ArGis.shipLayer.graphics.add(shipGraphic);
+			ArGis.shipLayer.graphics.add(shipGraphic);*/
 		},
 		initTimeLine: function(){
 			//播放事件绑定

@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="css/index2.css" />
 
 <script src="https://cdn.bootcss.com/vue/2.5.16/vue.js" type="text/javascript"></script>
+<link href="https://cdn.bootcss.com/element-ui/2.2.2/theme-chalk/index.css" rel="stylesheet">
 <script src="https://cdn.bootcss.com/element-ui/2.2.2/index.js" type="text/javascript"></script>
 <script>
   	var Center = {lon: 52.60495876771754, lat: 27.468084992891264};
@@ -52,8 +53,17 @@
 <body>
 
 <div class="main" id="app">
-	<div class="header test">
-		
+	<div class="header">
+		<div class="select">
+			<el-select v-model="timeSelect" @change="handlerSelectChange">
+			    <el-option
+			      v-for="item in timeEvent"
+			      :label="item.name"
+			      :value="item.timeStart">
+			    </el-option>
+  			</el-select>
+		</div>
+		<div class="lang">中文 / ENGLISH</div>
 	</div>
 	<div class="content">
 		<div class="content_1">
@@ -150,10 +160,10 @@
 			</div>
 			<div class="content_right">
 				<div class="content_2_1">
-					<div class="weather">能见度良好、风向东北偏北、风力4-5级、轻浪</div>
+					<div class="weather">{{weatherDesc}}</div>
 					<div style="width: 187px;height: 34px;">
-						<div class="time_gtc">19:00:00  DATE JAN/06/18</div>
-						<div class="time_utc">11:00 UTC</div>
+						<div class="time_gtc">{{timeDesc}}</div>
+						<div class="time_utc">{{timeUTCDesc}}</div>
 					</div>
 				</div>
 				<div class="content_2_2">
@@ -216,8 +226,7 @@
 						<div class="title">重要描述</div>
 						<div class="info">
 							<div class="info_container" id="info_container">
-								<div class="info_item" v-for="item in msgDesc">
-								    {{ item }}
+								<div class="info_item" v-for="item in msgDesc" v-html='item'>
 								</div>
 							</div>
 						</div>
@@ -299,6 +308,11 @@ new Vue({
       return Config;
     },
     methods: {
+    	handlerSelectChange: function(value) {
+    		PlayController.curPlayTime = value;
+    		PlayController.progress = Number(PlayController.curPlayTime/PlayController.endTime*100);
+    		this.msgDesc = [];
+  	    },
     	handlerTrack: function(evt) {
     		Config.isTrackShowPoint = true;
   	        ArGis.drawTrack();
@@ -325,18 +339,22 @@ new Vue({
     },
     watch: {
     	msgDesc: function () {
-	   		var div = document.getElementById('info_container');
-	        var start = true;
+   			var div = document.getElementById('info_container');
+	       /*  var start = true;
 	        function animate () {
 	        	if (start) {
-	            	div.scrollTop = div.scrollHeight;
-	            	/* if(div.scrollTop+div.scrollHeight == div.scrollHeight){
+	        		div.scrollTop = div.scrollHeight;
+	            	if(div.scrollTop == div.scrollHeight){
 	            		start = false;
-	            	} */
+	            	} 
 	            	requestAnimationFrame(animate)
 	        	}
 	        } 
-	        animate();
+	        animate(); */
+	        setTimeout(() => {
+	        	div.scrollTop = div.scrollHeight;
+	        }, 20);
+	        
       	}
     },
     mounted: function(){
