@@ -1,14 +1,24 @@
 var Utils = {
-		setShip: function(shipIndex, lon, lat){
+		setShip: function(shipIndex, params){
 			var ship = Ships[shipIndex];
-			var shipGraphic = Utils.createShip({
-				lon: lon,
-				lat: lat,
-				angle: 0,
-				url: ship.url,
-				width: ship.shipWidth/ArGis.view.state.resolution + "px",
-				height: ship.shipLength/ArGis.view.state.resolution + "px"
-			});
+			var shipGraphic = "";
+			if(ArGis.view.zoom >= 0 && ArGis.view.zoom <= 14){
+				shipGraphic = Utils.createShipSign({
+					lon: params.lon,
+					lat: params.lat,
+					angle: params.head || 0,
+					color: ship.color
+				});
+			}else{
+				shipGraphic = Utils.createShip({
+					lon: params.lon,
+					lat: params.lat,
+					angle: params.head,
+					url: ship.url,
+					width: ship.shipWidth/ArGis.view.state.resolution + "px",
+					height: ship.shipLength/ArGis.view.state.resolution + "px"
+				});
+			}
 			ArGis["shipLayer_"+ship.mmsi].graphics.add(shipGraphic);
 		},
 		updateShipInfo: function(shipIndex, time, params){
@@ -69,95 +79,12 @@ var Utils = {
 				Config.weatherDesc = params.weather || Config.weatherDesc; //天气
 			}
 		},
-		updateShip: function(timePoint, timeEvent, shipIndex){
-			var ship = Ships[shipIndex];
-			if(timeEvent){
-				var temp1 = ship.timeLine[timeEvent.time[0]];
-				var temp2 = ship.timeLine[timeEvent.time[1]];
-				console.log(temp1.lon +"---"+temp1.lat);
-				console.log(temp2.lon +"---"+temp2.lat);
-				console.log("=====================================");
-				//总差距
-				var count = timeEvent.index[1] - timeEvent.index[0];
-				var lonCount = temp2.lon - temp1.lon;
-				var latCount = temp2.lat - temp1.lat;
-				var speedCount = temp2.speed - temp1.speed;
-				var cogCount = temp2.cog - temp1.cog;
-				var headCount = temp2.head - temp1.head;
-				//每秒差距
-				var lonSecond = lonCount/count;
-				var latSecond = latCount/count;
-				var speedSecond = speedCount/count;
-				var cogSecond = cogCount/count;
-				var headSecond = headCount/count;
-				//动画
-				var startTime = timePoint-timeEvent.timeStart-1 <= 0 ? 0 : timePoint-timeEvent.timeStart-1;
-				var startPoint = {
-						lon: temp1.lon + startTime*lonSecond,
-						lat: temp1.lat + startTime*latSecond,
-						speed: temp1.speed + startTime*speedSecond,
-						cog: temp1.cog + startTime*cogSecond,
-						head: temp1.head //+ startTime*headSecond
-				};
-				var interval = 1/60;
-				var intervalCount = 0;
-				var tempInterval = setInterval(() => {
-					//ship
-					ArGis["shipLayer_"+ship.mmsi].graphics.removeAll();
-					var shipGraphic = "";
-					if(ArGis.view.zoom >= 0 && ArGis.view.zoom <= 14){
-						shipGraphic = Utils.createShipSign({
-							lon: startPoint.lon,
-							lat: startPoint.lat,
-							angle: startPoint.head,
-							color: ship.color
-						});
-					}else{
-						shipGraphic = Utils.createShip({
-							lon: startPoint.lon,
-							lat: startPoint.lat,
-							angle: startPoint.head,
-							url: ship.url,
-							width: ship.shipWidth/ArGis.view.state.resolution + "px",
-							height: ship.shipLength/ArGis.view.state.resolution + "px"
-						});
-					}
-					
-					ArGis["shipLayer_"+ship.mmsi].graphics.add(shipGraphic);
-					//cog
-					ArGis["shipCogLayer_"+ship.mmsi].graphics.removeAll();
-					var cogLon = startPoint.cog;
-					var lon = ship.shipLength/ArGis.view.scale;
-					var lat = lon/Math.atan(cogLon);
-					var cogLine = Utils.createLine({
-						paths:[[startPoint.lon, startPoint.lat],[startPoint.lon+lon, startPoint.lat+lat]],
-						width: "1px"
-					});
-					ArGis["shipCogLayer_"+ship.mmsi].graphics.add(cogLine);
-					
-					startPoint = {
-							lon: startPoint.lon + lonSecond*interval,
-							lat: startPoint.lat + latSecond*interval,
-							speed: startPoint.speed + speedSecond*interval,
-							cog: startPoint.cog + cogSecond*interval,
-							head: startPoint.head //+ headSecond*interval
-					};
-					intervalCount = intervalCount+1;
-					if(intervalCount >= 1/interval - 2){
-						clearInterval(tempInterval);
-					}
-				}, interval*1000);
-				
-			}
-		},
 		animateShip: function(shipIndex, formTime, toTime, timeEvent){
 			var ship = Ships[shipIndex];
 			if(timeEvent){
 				var temp1 = ship.timeLine[formTime];
 				var temp2 = ship.timeLine[toTime];
-				console.log(temp1.lon +"---"+temp1.lat);
-				console.log(temp2.lon +"---"+temp2.lat);
-				console.log("================******=====================");
+				
 				var count = 60;
 				var interval = 1/count;
 				var intervalCount = 0;
@@ -184,7 +111,7 @@ var Utils = {
 					};
 					//ship
 					ArGis["shipLayer_"+ship.mmsi].graphics.removeAll();
-					var shipGraphic = "";
+					/*var shipGraphic = "";
 					if(ArGis.view.zoom >= 0 && ArGis.view.zoom <= 14){
 						shipGraphic = Utils.createShipSign({
 							lon: startPoint.lon,
@@ -203,7 +130,8 @@ var Utils = {
 						});
 					}
 					
-					ArGis["shipLayer_"+ship.mmsi].graphics.add(shipGraphic);
+					ArGis["shipLayer_"+ship.mmsi].graphics.add(shipGraphic);*/
+					this.setShip(shipIndex, startPoint);
 					//cog
 					ArGis["shipCogLayer_"+ship.mmsi].graphics.removeAll();
 					var cogLon = startPoint.cog;

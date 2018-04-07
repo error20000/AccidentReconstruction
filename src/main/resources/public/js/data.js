@@ -1,7 +1,7 @@
 var TimeLineEventData = [
 	{"name":"事故背景介绍","timeStart":0,"index":[],"timeLength":60,"time":["",""],event: function(timePoint, timeEvent){
 		if(timePoint == timeEvent.timeStart + 1){
-			Utils.setShip(0, 52.60495876771754, 27.468084992891264);
+			Utils.setShip(0, {lon:52.60495876771754, lat:27.468084992891264});
 			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 8}, {duration: 5000});
 		}
 		if(timePoint == timeEvent.timeStart + 6){
