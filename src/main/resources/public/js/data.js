@@ -10,9 +10,7 @@ var TimeLineEventData = [
 		if(timePoint == timeEvent.timeStart + 20){
 			Config.msgDesc.push("<b>2017年12月15日</b>，“2”轮装载63997.817吨散装高梁从美国卡拉马港开航，目的港中国东莞，离港时艏吃水13.02米，艉吃水13.02米。2018年1月5日0106时许，该轮抵达韩国釜山港外锚地，在锚地完成加油（加重油1050吨、轻油90吨和润滑油17.43吨）后于当日1430时起锚续航，开航时航行灯开启，主机转速为87RPM。1月6日1200时许，船长指令将主机转速加到100RPM（实际97 RPM），此后该轮定速航行。");
 		}
-		if(timePoint == timeEvent.timeStart + 58){
-			ArGis.view.goTo({center:[124.9598,30.8506],zoom: 10}, {duration: 5000});
-		}
+		
 	}},
 	{"name":"开始靠近（19001号交接班）","timeStart":0,"index":[],"timeLength":15,"time":["2018/1/6 19:00:00","2018/1/6 19:30:00"],event: function(timePoint, timeEvent){
 		var interval = 2 * 60;
@@ -25,8 +23,11 @@ var TimeLineEventData = [
 		var toTime = Utils.formatDate(time, Config.defulatTimeFormat);
 		Utils.animateShip(0, forTime, toTime, timeEvent);
 		Utils.animateShip(1, forTime, toTime, timeEvent);
-		
+
 		if(timePoint == timeEvent.timeStart + 1){
+			ArGis.view.goTo({center:[124.9598,30.8506],zoom: 10}, {duration: 5000});
+		}
+		if(timePoint == timeEvent.timeStart + 2){
 			Config.msgDesc.push("<b>1900时许</b> “1”轮航向340度，航速10.3节。三副上驾驶台接班。该轮VHF在16频道值守，两部雷达开启， 其中X波段雷达设置了6海里量程、北向上相对运动、偏心显示，物标真矢量、真尾迹显示，并设置了0.9海里、15分钟的物标报警。");
 			Utils.appendShipInfo(0, {driver: '三副'});
 		}
