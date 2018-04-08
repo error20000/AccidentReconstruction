@@ -2,6 +2,31 @@ var Utils = {
 		setShip: function(shipIndex, params){
 			var ship = Ships[shipIndex];
 			var shipGraphic = "";
+			
+			var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
+			var shipGisPoint = {x: shipCenterPoint.x - ship.left, y: shipCenterPoint.y - ship.trail}; //以天线为原点
+			var distance = Math.sqrt(Math.pow(shipGisPoint.x, 2) + Math.pow(shipGisPoint.y, 2));
+			var sina = (shipGisPoint.y)/distance < 0 ? 1 - (shipGisPoint.y)/distance : (shipGisPoint.y)/distance;
+			var cos = (shipGisPoint.x)/distance < 0 ? 1 - (shipGisPoint.x)/distance : (shipGisPoint.x)/distance;
+
+			if(params.head >= 0 && params.head < 90){
+				params.xoffset = cos * distance/ArGis.view.state.resolution + "px";
+				params.yoffset = sina * distance/ArGis.view.state.resolution + "px";
+			}else if(params.head >= 90 && params.head < 180){
+				params.xoffset =  cos * distance/ArGis.view.state.resolution + "px";
+				params.yoffset = - sina * distance/ArGis.view.state.resolution + "px";
+			}else if(params.head >= 180 && params.head < 270){
+				params.xoffset = - cos * distance/ArGis.view.state.resolution + "px";
+				params.yoffset = - sina * distance/ArGis.view.state.resolution + "px";
+			}else{
+				params.xoffset = - cos * distance/ArGis.view.state.resolution + "px";
+				params.yoffset = sina * distance/ArGis.view.state.resolution + "px";
+			}
+			/*var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
+			var shipGisPoint = {x: shipCenterPoint.x - ship.left, y: shipCenterPoint.y - ship.trail}; //以船中心为原点
+			var distance = Math.sqrt(Math.pow(shipCenterPoint.x - shipGisPoint.x, 2) + Math.pow(shipCenterPoint.y - shipGisPoint.y, 2));
+			var distance2 = Math.sqrt(Math.pow(shipGisPoint.x, 2) + Math.pow(shipGisPoint.y, 2));
+console.log(distance+"----"+distance2);*/
 			if(ArGis.view.zoom >= 0 && ArGis.view.zoom <= 14){
 				shipGraphic = Utils.createShipSign({
 					lon: params.lon,
@@ -16,7 +41,9 @@ var Utils = {
 					angle: params.head,
 					url: ship.url,
 					width: ship.shipWidth/ArGis.view.state.resolution + "px",
-					height: ship.shipLength/ArGis.view.state.resolution + "px"
+					height: ship.shipLength/ArGis.view.state.resolution + "px",
+				    xoffset: params.xoffset,
+				    yoffset: params.yoffset
 				});
 			}
 			ArGis["shipLayer_"+ship.mmsi].graphics.add(shipGraphic);
