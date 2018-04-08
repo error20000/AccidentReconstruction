@@ -135,12 +135,26 @@ var Utils = {
 					//cog
 					ArGis["shipCogLayer_"+ship.mmsi].graphics.removeAll();
 					var cogLon = startPoint.cog;
-					var lon = ship.shipLength/ArGis.view.scale;
+					var lon = ship.shipLength/ArGis.view.state.resolution;
 					var lat = lon/Math.atan(cogLon);
-					var cogLine = Utils.createLine({
-						paths:[[startPoint.lon, startPoint.lat],[startPoint.lon+lon, startPoint.lat+lat]],
-						width: "1px"
-					});
+					var cogLine = "";
+					if(ArGis.view.zoom >= 0 && ArGis.view.zoom <= 14){
+						cogLine = Utils.createLine({
+							paths:[[startPoint.lon, startPoint.lat],[startPoint.lon+lon, startPoint.lat+lat]],
+							spatialReference: {
+								wkid:102100
+							},
+							width: "1px"
+						});
+					}else{
+						cogLine = Utils.createLine({
+							paths:[[startPoint.lon, startPoint.lat],[startPoint.lon+lon, startPoint.lat+lat]],
+							spatialReference: {
+								wkid:102100
+							},
+							width: "1px"
+						});
+					}
 					ArGis["shipCogLayer_"+ship.mmsi].graphics.add(cogLine);
 					
 					intervalCount = intervalCount+1;
@@ -163,7 +177,9 @@ var Utils = {
 		  		    angle:  params.angle,
 		  		    url: params.url,
 		  		    width: params.width,
-				    height: params.height
+				    height: params.height,
+				    xoffset: params.xoffset,
+				    yoffset: params.yoffset
 		  		  };
 			return this.createGraphic(geometry, symbol, params.attr, params.template);
 		},
@@ -213,7 +229,7 @@ var Utils = {
 		  		  };
 			return this.createGraphic(geometry, symbol, params.attr, params.template);
 		},
-		createShap: function(params){
+		createShape: function(params){
 		    var geometry = {
 				type: "point",
 			    longitude: params.lon ? params.lon : params.paths[0],
@@ -221,7 +237,8 @@ var Utils = {
 			  };
 				
 			var symbol  = {
-				type: "picture-marker", 
+				type: "picture-marker",   
+	  		    angle:  params.angle,
 				  url: params.url,
 				  width: params.width ? params.width : "8px",
 				  height: params.height ? params.height : "8px"
@@ -350,7 +367,7 @@ var Utils = {
 			var toX = x/ 20037508.342789244 * 180;
             return toX;
 		},
-		yToLon: function(y){ 
+		yToLat: function(y){ 
             var toY = y/ 20037508.342789244 * 180;
             toY = 180 / Math.PI * (2 * Math.atan(Math.exp(toY * Math.PI / 180)) - Math.PI / 2);
             return toY;

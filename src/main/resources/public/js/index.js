@@ -4,6 +4,7 @@ var Config = {
 		defulatColor: [226, 119, 40],
 		defulatTimeFormat: "yyyy/M/d HH:mm:ss",
 		timeLength: 0,
+		detailTime: ["2018/1/6 19:50:00", "2018/1/6 20:00:00"],
 		
 		select: 0,
 		shipsSelect: [],
@@ -169,6 +170,10 @@ ArGis={
 				var ship = Ships[i];
 				var tempData = [];
 				for (var j = 0; j < ship.data.length; j++) {
+					if(ship.data[j].time >= Config.detailTime[0] && ship.data[j].time <= Config.detailTime[1]){ //这个时间段内点不优化
+						tempData.push(ship.data[j]);
+						continue;
+					}
 					if(j == 0){
 						tempData.push(ship.data[j]);
 					}else if(j == ship.data.length-1){
@@ -253,7 +258,7 @@ ArGis={
 						var speedCount = tmp2.speed - tmp1.speed;
 						var cogCount = tmp2.cog - tmp1.cog;
 						var headCount = tmp2.head - tmp1.head;
-						if(tmp1.time >= "2018/1/6 19:00:00" && tmp1.time <= "2018/1/6 20:00:00"){
+						if(tmp1.time >= Config.detailTime[0] && tmp1.time <= Config.detailTime[1]){
 							ship.timeLine[tmp1.time] = tmp1;
 						}
 						for (var k = 1; k < count; k++) {
@@ -268,7 +273,7 @@ ArGis={
 									head: tmp1.head + k*headCount/count,
 									real: false
 							};
-							if(time >= "2018/1/6 19:00:00" && time <= "2018/1/6 20:00:00"){
+							if(time >= Config.detailTime[0] && time <= Config.detailTime[1]){
 								ship.timeLine[time] = timeLinePoint;
 							}
 						}
@@ -373,7 +378,6 @@ ArGis={
 							}else{
 								tempPoint.push(createPoint);
 							}
-							
 							Config.trackPoint[ship.mmsi] = tempPoint;
 							//线
 							var tempLine = Config.trackLine[ship.mmsi];
@@ -384,14 +388,84 @@ ArGis={
 							}
 							Config.trackLine[ship.mmsi] = tempLine;
 							//形状
-							Utils.drawShape({
-								paths: [],
-								color: point.color,
-								width: "",
-								style: "",
-								attr: {mmsi: ship.mmsi, type: "track_shape"},
-								template:{}
+							/*var ship={
+									shipWidth: 100,
+									shipLength: 100,
+									left:20,
+									trail: 20,
+									head: 45
+							};
+							var point = {
+									lon: 20,
+									lat: 20
+							}*/
+							var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2};
+							console.log(shipCenterPoint);
+							var shipGisPoint = {x: ship.left, y: ship.trail};
+							console.log(shipGisPoint);
+							var distance = Math.sqrt(Math.pow(shipCenterPoint.x - shipGisPoint.x, 2) + Math.pow(shipCenterPoint.y - shipGisPoint.y, 2));
+							console.log(distance);
+							var sina = (shipCenterPoint.y - shipGisPoint.y)/distance - Math.sin(point.head*Math.PI/180);
+							console.log(sina);
+							var lonlatPoint = {x:point.lon,y:point.lat};//Utils.lonLatToMercator(point.lon, point.lat);
+							var centerPoint = {
+									x: (sina > 1 ? sina : Math.sqrt(1-Math.pow(sina, 2))) * distance + lonlatPoint.x,
+									y: sina * distance + lonlatPoint.y,
+							};
+							console.log(centerPoint);
+							
+							var createShape = Utils.createShape({
+								lon: Utils.xToLon(centerPoint.x),
+								lat: Utils.yToLat(centerPoint.y),
+								angle: point.head,
+								url: ship.url,
+								width: ship.shipWidth/ArGis.view.state.resolution+"px" ,
+								height: ship.shipLength/ArGis.view.state.resolution+"px",
+								attr: {mmsi: ship.mmsi, type: "track_shape",
+									lon: point.lon,
+									lat: point.lat,
+									time: point.time,
+									speed: point.speed,
+									head: point.head,
+									cog: point.cog,
+									showName: ship.showName
+								},
+								template:{
+									title:"详细信息",
+									content:[{
+									        type: "fields",
+									        fieldInfos: [{
+										          fieldName: "showName",
+										          label: "名称"
+										    },{
+									          fieldName: "time",
+									          label: "时间"
+									        }, {
+									          fieldName: "lon",
+									          label: "经度"
+									        }, {
+										          fieldName: "lat",
+										          label: "纬度"
+									        }, {
+										          fieldName: "speed",
+										          label: "船速"
+									        }, {
+										          fieldName: "head",
+										          label: "船首向"
+									        }, {
+										          fieldName: "cog",
+										          label: "COG"
+									        }]
+									      }]
+								}
 							});
+							var tempShape = Config.trackShape[ship.mmsi];
+							if(!tempShape){
+								tempShape = [createShape];
+							}else{
+								tempShape.push(createShape);
+							}
+							Config.trackShape[ship.mmsi] = tempShape;
 							//事件
 							var createInfo = Utils.createInfo({
 								lon: point.lon,
@@ -616,8 +690,7 @@ ArGis={
 		},
 		showTrackShape: function(ship){
 			if(Config.isTrackShowShape){
-				//TODO 需要改为shape
-				ArGis.trackLayer.addMany(Config.trackPoint[ship.mmsi]);
+				ArGis.trackLayer.addMany(Config.trackShape[ship.mmsi]);
 			}
 		},
 		showTrackInfo: function(ship){

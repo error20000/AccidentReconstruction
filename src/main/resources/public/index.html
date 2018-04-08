@@ -40,12 +40,12 @@
 <link rel="stylesheet" href="css/play.css" />
 <link rel="stylesheet" href="css/index.css" />
 
-<!-- <script src="js/shipInfoData.js" ></script>
+<script src="js/shipInfoData.js" ></script>
 <script src="js/shipEventData.js"></script>
 <script src="js/shipTimeData.js"></script>
-<script src="js/shipTrackData.js"></script> -->
+<script src="js/shipTrackData.js"></script>
 
-<script src="js/ship.js"></script>
+<!-- <script src="js/ship.js"></script> -->
 <script src="js/data.js"></script>
 
 <script src="js/utils.js"></script>
@@ -81,7 +81,7 @@
 					<el-col :span="24">
 						
 						<div id="trackDiv">
-						 		<el-checkbox v-model="isTrackShow" @change="handlerTrack">显示轨迹</el-checkbox>
+						 		<!-- <el-checkbox v-model="isTrackShow" @change="handlerTrack">显示轨迹</el-checkbox> -->
 						 		<el-checkbox v-model="isTrackShowPoint" @change="handlerTrackChange('point')">点</el-checkbox>
 						 		<el-checkbox v-model="isTrackShowLine" @change="handlerTrackChange('line')">线</el-checkbox>
 						 		<el-checkbox v-model="isTrackShowDashed" @change="handlerTrackChange('dashed')">虚线</el-checkbox>
@@ -102,7 +102,7 @@
 					</el-col>
 					<el-col :span="16">
 						<div id="shipInfo">
-							<el-form ref="shipsForm" :model="shipsForm">
+							<!-- <el-form ref="shipsForm" :model="shipsForm">
 							  <el-form-item label="活动名称">
 							    <el-input v-model="shipsForm.name" readonly="readonly"></el-input>
 							  </el-form-item>
@@ -112,7 +112,7 @@
 							  <el-form-item label="活动名称">
 							    <el-input v-model="shipsForm.name" readonly="readonly"></el-input>
 							  </el-form-item>
-							</el-form>
+							</el-form> -->
 						</div>
 					</el-col>
 				</el-row>
@@ -192,6 +192,9 @@
 				console.log(evt);
 				console.log(Utils.mercatorToLonLat(evt.mapPoint.x, evt.mapPoint.y));
 				console.log(Utils.lonLatToMercator(evt.mapPoint.longitude, evt.mapPoint.latitude));
+			});
+			ArGis.view.on("click", function(evt){
+				console.log(evt);
 			});
 	});
 </script>
