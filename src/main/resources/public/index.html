@@ -119,12 +119,6 @@
 			</el-col>
 			<el-col :span="12">
 				<div id="msgDiv">
-					<div type="info">1号船从伊朗哈尔克岛装载凝析油开航</div>
-					<div type="info">1号船从伊朗哈尔克岛装载凝析油开航</div>
-					<div type="info">1号船从伊朗哈尔克岛装载凝析油开航</div>
-					<div type="info">1号船从伊朗哈尔克岛装载凝析油开航</div>
-					<div type="info">1号船从伊朗哈尔克岛装载凝析油开航</div>
-					<div type="info">1号船从伊朗哈尔克岛装载凝析油开航</div>
 				</div>
 			</el-col>
 	</el-row>
@@ -193,8 +187,11 @@
 				console.log(Utils.mercatorToLonLat(evt.mapPoint.x, evt.mapPoint.y));
 				console.log(Utils.lonLatToMercator(evt.mapPoint.longitude, evt.mapPoint.latitude));
 			});
-			ArGis.view.on("click", function(evt){
+			ArGis.view.on("layerview-create", function(evt){
 				console.log(evt);
+				/* ArGis.initTrack();
+				ArGis.clearTrack();
+	  	        ArGis.drawTrack(); */
 			});
 	});
 </script>

@@ -323,7 +323,7 @@ ArGis={
 			//加载工具
 
 			//绘制碰撞点
-			Utils.drawPoint({
+			/*Utils.drawPoint({
 						lon: 124.9598,
 						lat: 30.8506,
 						color: [226, 119, 40],
@@ -353,20 +353,96 @@ ArGis={
 							        }]
 							      }]
 						}
-					});
+					});*/
+			Utils.drawPoint({
+				lon: 124.9597,
+				lat: 30.851,
+				color: "green",
+				width: 10,
+				attr: {
+					time: "2018/1/6 19:50:00",
+					lon: 124.9598,
+					lat: 30.8506,
+					content: "test"
+				},
+				template: {
+					title:"碰撞点",
+					content:[{
+					        type: "fields",
+					        fieldInfos: [{
+					          fieldName: "time",
+					          label: "碰撞时间"
+					        }, {
+					          fieldName: "lon",
+					          label: "碰撞经度"
+					        }, {
+						          fieldName: "lat",
+						          label: "碰撞纬度"
+					        }, {
+						          fieldName: "content",
+						          label: "碰撞描述"
+					        }]
+					      }]
+				}
+			});
+			Utils.drawPoint({
+				lon: 124.9616,
+				lat: 30.8531,
+				color: "red",
+				width: 10,
+				attr: {
+					time: "2018/1/6 19:50:00",
+					lon: 124.9598,
+					lat: 30.8506,
+					content: "test"
+				},
+				template: {
+					title:"碰撞点",
+					content:[{
+					        type: "fields",
+					        fieldInfos: [{
+					          fieldName: "time",
+					          label: "碰撞时间"
+					        }, {
+					          fieldName: "lon",
+					          label: "碰撞经度"
+					        }, {
+						          fieldName: "lat",
+						          label: "碰撞纬度"
+					        }, {
+						          fieldName: "content",
+						          label: "碰撞描述"
+					        }]
+					      }]
+				}
+			});
 			
 		},
 		initTrack: function(){
 //			setTimeout(() => {
+			Config.trackPoint = {};
+			Config.trackLine = {};
+			Config.trackDashed = {};
+			Config.trackShape = {};
+			Config.trackInfo = {};
 				for (var i = 0; i < Ships.length; i++) {
 					var ship = Ships[i];
+					
 					var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
 					var shipGisPoint = {x: ship.left - shipCenterPoint.x, y: ship.trail - shipCenterPoint.y}; //以天线为原点
 					var distance = Math.sqrt(Math.pow(shipGisPoint.x, 2) + Math.pow(shipGisPoint.y, 2));
-					var sina = Math.asin((shipGisPoint.y)/distance);
+					/*var sina = Math.abs(Math.acos(shipGisPoint.y/distance));
+					var cos = Math.abs(Math.asin(shipGisPoint.x/distance));*/
+					
 					for (var j = 0; j < ship.data.length; j++) {
 						var point = ship.data[j];
-						if(point.real){
+						if(point.real && (point.time == "2018/1/6 19:50:23"||point.time == "2018/1/6 19:50:10")){
+							Utils.drawPoint({
+								lon: point.lon,
+								lat: point.lat,
+								color: point.mmsi == "477550800" ? "red" : "green",
+								width: 10
+							});
 							//点
 							var createPoint = Utils.createPoint({
 								lon: point.lon,
@@ -397,7 +473,7 @@ ArGis={
 									shipLength: 274,
 									left:13,
 									trail: 43,
-									head: 45
+									head: 350
 							};
 							var point = {
 									lon: 20,
@@ -405,15 +481,62 @@ ArGis={
 							}
 							var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
 							console.log(shipCenterPoint);
-							var shipGisPoint = {x: ship.left - shipCenterPoint.x, y: ship.trail - shipCenterPoint.y}; //以船中心为原点
+							var shipGisPoint = {x: shipCenterPoint.x - ship.left, y: shipCenterPoint.y - ship.trail}; //以船中心为原点
 							console.log(shipGisPoint);
 							var distance = Math.sqrt(Math.pow(shipGisPoint.x, 2) + Math.pow(shipGisPoint.y, 2));
 							console.log(distance);
-							var sina = Math.asin(shipGisPoint.y/distance) + Math.sin(ship.head*Math.PI/180);
+							var sina = Math.asin(shipGisPoint.y/distance) - (360-ship.head)*Math.PI/180;
+							var cos = Math.PI/180 - Math.acos(shipGisPoint.x/distance) - (360-ship.head)*Math.PI/180;
 							console.log(sina);
-							var lonlatPoint = {x:point.lon,y:point.lat};//Utils.lonLatToMercator(point.lon, point.lat);*/
-//							sina = sina + point.head*Math.PI/180;
+							console.log(cos);
+							var lonlatPoint = {x:point.lon,y:point.lat};//Utils.lonLatToMercator(point.lon, point.lat);
+							var centerPoint = {
+									x: lonlatPoint.x - Math.cos(cos) * distance,
+									y: lonlatPoint.y - Math.sin(sina) * distance
+							};
+							console.log(centerPoint);*/
+							
+							/*console.log(shipCenterPoint);
+							console.log(shipGisPoint);
+							console.log(distance);
+							console.log(deg);*/
+							
 							var lonlatPoint = Utils.lonLatToMercator(point.lon, point.lat);
+							var centerPoint = {};
+							var deg = Math.atan(shipGisPoint.x/shipGisPoint.y)*180/Math.PI+180;
+							deg = deg + point.head > 360 ? deg + point.head - 360 : deg + point.head;
+							var angle = deg*Math.PI/180;
+							centerPoint = {
+									x: lonlatPoint.x - Math.sin(angle) * distance,
+									y: lonlatPoint.y - Math.cos(angle) * distance
+							};
+							/*var x = Math.abs(Math.sin(angle) * distance);
+							var y = Math.abs(Math.cos(angle) * distance);
+							var degLimit = deg;
+							if(degLimit >= 0 && degLimit < 90){
+								centerPoint = {
+										x: lonlatPoint.x - x,
+										y: lonlatPoint.y - y
+								};
+							}else if(degLimit >= 90 && degLimit < 180){
+								centerPoint = {
+										x: lonlatPoint.x - x,
+										y: lonlatPoint.y + y
+								};
+							}else if(degLimit >= 180 && degLimit < 270){
+								centerPoint = {
+										x: lonlatPoint.x + x,
+										y: lonlatPoint.y + y
+								};
+							}else{
+								centerPoint = {
+										x: lonlatPoint.x + x,
+										y: lonlatPoint.y - y
+								};
+							}*/
+							
+							
+							/*var lonlatPoint = Utils.lonLatToMercator(point.lon, point.lat);
 							var centerPoint = {};
 							if(ship.head >= 0 && ship.head < 90){
 								centerPoint = {
@@ -435,14 +558,15 @@ ArGis={
 										x: lonlatPoint.x - Math.sqrt(1-Math.pow(Math.sin(sina), 2)) * distance,
 										y: lonlatPoint.y + Math.sin(sina) * distance
 								};
-							}
+							}*/
 							
 //							console.log(centerPoint);
 							
 							if(point.time == "2018/1/6 19:51:35"){
-								console.log(Math.sin(sina));
+								console.log(point.mmsi);
 								console.log(point);
-								console.log(Utils.lonLatToMercator(point.lon, point.lat));
+								console.log(Utils.lonTox(point.lon));
+								console.log(Utils.latToy(point.lat));
 								console.log(centerPoint);
 								console.log(Utils.xToLon(centerPoint.x));
 								console.log(Utils.yToLat(centerPoint.y));
@@ -453,8 +577,8 @@ ArGis={
 								lat: Utils.yToLat(centerPoint.y),/*point.lat,*/
 								angle: point.head,
 								url: ship.url,
-								width: /*ship.shipWidth/10,*/ship.shipWidth/ArGis.view.state.resolution+"px" ,
-								height: /*ship.shipLength/10,*/ship.shipLength/ArGis.view.state.resolution+"px",
+								width: ship.shipWidth/ArGis.view.zoom,/*ship.shipWidth/ArGis.view.state.resolution+"px" ,*/
+								height: ship.shipLength/ArGis.view.zoom,/*ship.shipLength/ArGis.view.state.resolution+"px",*/
 								attr: {mmsi: ship.mmsi, type: "track_shape",
 									lon: point.lon,
 									lat: point.lat,

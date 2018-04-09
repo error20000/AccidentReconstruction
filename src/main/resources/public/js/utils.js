@@ -22,6 +22,7 @@ var Utils = {
 				params.xoffset = - cos * distance/ArGis.view.state.resolution + "px";
 				params.yoffset = sina * distance/ArGis.view.state.resolution + "px";
 			}
+			
 			/*var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
 			var shipGisPoint = {x: shipCenterPoint.x - ship.left, y: shipCenterPoint.y - ship.trail}; //以船中心为原点
 			var distance = Math.sqrt(Math.pow(shipCenterPoint.x - shipGisPoint.x, 2) + Math.pow(shipCenterPoint.y - shipGisPoint.y, 2));
