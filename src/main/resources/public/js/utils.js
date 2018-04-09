@@ -3,7 +3,7 @@ var Utils = {
 			var ship = Ships[shipIndex];
 			var shipGraphic = "";
 			
-			var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
+			/*var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
 			var shipGisPoint = {x: shipCenterPoint.x - ship.left, y: shipCenterPoint.y - ship.trail}; //以天线为原点
 			var distance = Math.sqrt(Math.pow(shipGisPoint.x, 2) + Math.pow(shipGisPoint.y, 2));
 			var sina = (shipGisPoint.y)/distance < 0 ? 1 - (shipGisPoint.y)/distance : (shipGisPoint.y)/distance;
@@ -21,13 +21,21 @@ var Utils = {
 			}else{
 				params.xoffset = - cos * distance/ArGis.view.state.resolution + "px";
 				params.yoffset = sina * distance/ArGis.view.state.resolution + "px";
-			}
+			}*/
 			
-			/*var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
-			var shipGisPoint = {x: shipCenterPoint.x - ship.left, y: shipCenterPoint.y - ship.trail}; //以船中心为原点
-			var distance = Math.sqrt(Math.pow(shipCenterPoint.x - shipGisPoint.x, 2) + Math.pow(shipCenterPoint.y - shipGisPoint.y, 2));
-			var distance2 = Math.sqrt(Math.pow(shipGisPoint.x, 2) + Math.pow(shipGisPoint.y, 2));
-console.log(distance+"----"+distance2);*/
+			var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
+			var shipGisPoint = {x: ship.left - shipCenterPoint.x, y: ship.trail - shipCenterPoint.y}; //以船中心为原点
+			var distance = Math.sqrt(Math.pow(shipGisPoint.x, 2) + Math.pow(shipGisPoint.y, 2));
+			
+			var deg = Math.atan(shipGisPoint.x/shipGisPoint.y)*180/Math.PI+180;
+			deg = deg + params.head > 360 ? deg + params.head - 360 : deg + params.head;
+			var angle = deg*Math.PI/180;
+			var lonlatPoint = Utils.lonLatToMercator(params.lon, params.lat);
+			var centerPoint = {
+					x: lonlatPoint.x - Math.sin(angle) * distance,
+					y: lonlatPoint.y - Math.cos(angle) * distance
+			};
+			
 			if(ArGis.view.zoom >= 0 && ArGis.view.zoom <= 14){
 				shipGraphic = Utils.createShipSign({
 					lon: params.lon,
@@ -37,17 +45,39 @@ console.log(distance+"----"+distance2);*/
 				});
 			}else{
 				shipGraphic = Utils.createShip({
-					lon: params.lon,
-					lat: params.lat,
+//					lon: params.lon,
+//					lat: params.lat,
+					lon: Utils.xToLon(centerPoint.x),
+					lat: Utils.yToLat(centerPoint.y),
 					angle: params.head,
 					url: ship.url,
 					width: ship.shipWidth/ArGis.view.state.resolution + "px",
 					height: ship.shipLength/ArGis.view.state.resolution + "px",
-				    xoffset: params.xoffset,
-				    yoffset: params.yoffset
+//				    xoffset: params.xoffset,
+//				    yoffset: params.yoffset
 				});
 			}
+			//画船首线
+			var headLine = Utils.createLine({
+				paths:[
+					[Utils.xToLon(centerPoint.x), Utils.yToLat(centerPoint.y)],
+					[Utils.xToLon(centerPoint.x)+Math.sin(params.head*Math.PI/180) * 0.005, Utils.yToLat(centerPoint.y)+Math.cos(params.head*Math.PI/180) * 0.005]
+				],
+				width: "1px",
+				color: ship.color
+			});
+			//画cog
+			var cogLine = Utils.createLine({
+				paths:[
+					[params.lon, params.lat],
+					[params.lon+Math.sin(params.cog*Math.PI/180) * 0.005*(params.speed), params.lat+Math.cos(params.cog*Math.PI/180) * 0.005*(params.speed)]
+				],
+				width: "1px",
+				style: "short-dash"
+			});
 			ArGis["shipLayer_"+ship.mmsi].graphics.add(shipGraphic);
+			ArGis["shipLayer_"+ship.mmsi].graphics.add(headLine);
+			ArGis["shipLayer_"+ship.mmsi].graphics.add(cogLine);
 		},
 		updateShipInfo: function(shipIndex, time, params){
 			var curShip = Ships[shipIndex];

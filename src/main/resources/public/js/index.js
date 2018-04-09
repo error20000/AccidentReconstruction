@@ -4,7 +4,8 @@ var Config = {
 		defulatColor: [226, 119, 40],
 		defulatTimeFormat: "yyyy/M/d HH:mm:ss",
 		timeLength: 0,
-		detailTime: ["2018/1/6 19:50:00", "2018/1/6 20:00:00"],
+		accidentTime: ["2018/1/6 19:45:00", "2018/1/6 19:55:00"],
+		detailTime: ["2018/1/6 19:00:00", "2018/1/6 20:00:00"],
 		
 		select: 0,
 		shipsSelect: [],
@@ -170,7 +171,7 @@ ArGis={
 				var ship = Ships[i];
 				var tempData = [];
 				for (var j = 0; j < ship.data.length; j++) {
-					if(ship.data[j].time >= Config.detailTime[0] && ship.data[j].time <= Config.detailTime[1]){ //这个时间段内点不优化
+					if(ship.data[j].time >= Config.accidentTime[0] && ship.data[j].time <= Config.accidentTime[1]){ //这个时间段内点不优化
 						tempData.push(ship.data[j]);
 						continue;
 					}
@@ -431,12 +432,10 @@ ArGis={
 					var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
 					var shipGisPoint = {x: ship.left - shipCenterPoint.x, y: ship.trail - shipCenterPoint.y}; //以天线为原点
 					var distance = Math.sqrt(Math.pow(shipGisPoint.x, 2) + Math.pow(shipGisPoint.y, 2));
-					/*var sina = Math.abs(Math.acos(shipGisPoint.y/distance));
-					var cos = Math.abs(Math.asin(shipGisPoint.x/distance));*/
 					
 					for (var j = 0; j < ship.data.length; j++) {
 						var point = ship.data[j];
-						if(point.real && (point.time == "2018/1/6 19:50:23"||point.time == "2018/1/6 19:50:10")){
+						if(point.real && (point.time == "2018/1/6 19:50:10" || point.time == "2018/1/6 19:50:23")){
 							Utils.drawPoint({
 								lon: point.lon,
 								lat: point.lat,
@@ -562,23 +561,34 @@ ArGis={
 							
 //							console.log(centerPoint);
 							
-							if(point.time == "2018/1/6 19:51:35"){
-								console.log(point.mmsi);
-								console.log(point);
-								console.log(Utils.lonTox(point.lon));
-								console.log(Utils.latToy(point.lat));
-								console.log(centerPoint);
-								console.log(Utils.xToLon(centerPoint.x));
-								console.log(Utils.yToLat(centerPoint.y));
-							}
+							//画船首线
+							var headLine = Utils.createLine({
+								paths:[
+									[Utils.xToLon(centerPoint.x), Utils.yToLat(centerPoint.y)],
+									[Utils.xToLon(centerPoint.x)+Math.sin(point.head*Math.PI/180) * 0.005, Utils.yToLat(centerPoint.y)+Math.cos(point.head*Math.PI/180) * 0.005]
+								],
+								width: "1px",
+								color: ship.color
+							});
+							//画cog
+							var cogLine = Utils.createLine({
+								paths:[
+									[point.lon, point.lat],
+									[point.lon+Math.sin(point.cog*Math.PI/180) * 0.005*(point.speed), point.lat+Math.cos(point.cog*Math.PI/180) * 0.005*(point.speed)]
+								],
+								width: "1px",
+								style: "short-dash"
+							});
+							ArGis.shipLayer.graphics.add(headLine);
+							ArGis.shipLayer.graphics.add(cogLine);
 							
 							var createShape = Utils.createShape({
 								lon: Utils.xToLon(centerPoint.x),/*point.lon,*/
 								lat: Utils.yToLat(centerPoint.y),/*point.lat,*/
 								angle: point.head,
 								url: ship.url,
-								width: ship.shipWidth/ArGis.view.zoom,/*ship.shipWidth/ArGis.view.state.resolution+"px" ,*/
-								height: ship.shipLength/ArGis.view.zoom,/*ship.shipLength/ArGis.view.state.resolution+"px",*/
+								width: /*ship.shipWidth/ArGis.view.zoom,*/ship.shipWidth/ArGis.view.state.resolution+"px" ,
+								height: /*ship.shipLength/ArGis.view.zoom,*/ship.shipLength/ArGis.view.state.resolution+"px",
 								attr: {mmsi: ship.mmsi, type: "track_shape",
 									lon: point.lon,
 									lat: point.lat,

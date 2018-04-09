@@ -4,3 +4,17 @@ var ShipInfoData = [
 	{mmsi:'249023000',shipLength: 129,shipWidth: 20,name: 'CCL NINGBO',showName: '3号船',callSign:'9HA4081',shipType:'集装箱船',left: 10,trail: 12,paths: "",color: "",trackColor: "",trackSize: "",url:""},
 	{mmsi:'412420292',shipLength: 50,shipWidth: 6,name: '浙岱渔03187',showName: '4号船',callSign:'',shipType:'捕捞',left: 3,trail: 35,paths: "",color: "",trackColor: "",trackSize: "",url:""}
 	];
+
+/*getShipCenterPoint : (function(){
+	return {x: this.shipWidth/2, y: this.shipLength/2};
+}),
+getCenterToGisPoint : (function(){
+	return {x: this.getShipCenterPoint().x - this.left, y: this.getShipCenterPoint().y - this.trail};//以船中心为原点
+}),
+getCenterToGisDistance : (function(){
+	return Math.sqrt(Math.pow(this.getCenterToGisPoint().x, 2) + Math.pow(this.getCenterToGisPoint().y, 2));
+}),
+getCenterToGisDeg : (function(){
+	return Math.atan(this.getCenterToGisPoint().x/this.getCenterToGisPoint().y)*180/Math.PI+180;
+}) */
+
