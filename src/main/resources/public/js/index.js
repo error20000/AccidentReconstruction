@@ -561,21 +561,60 @@ ArGis={
 							
 //							console.log(centerPoint);
 							
+//							x2= (x1 - x0)*cos(a) - (y1 - y0)*sin(a) + x0 ; //x0,y0为原点，a逆时针旋转角度
+//							y2= (x1 - x0)*cos(a) + (y1 - y0)*sin(a) + y0 ;
 							//画船首线
+							var headD = (360-point.head)*Math.PI/180;
+							var headA = {
+									x: 0,
+									y: 600
+							};
+							var headB = {
+									x: headA.x*Math.cos(headD) - headA.y*Math.sin(headD) + centerPoint.x,
+									y: headA.y*Math.cos(headD) + headA.x*Math.sin(headD) + centerPoint.y
+							};
 							var headLine = Utils.createLine({
 								paths:[
 									[Utils.xToLon(centerPoint.x), Utils.yToLat(centerPoint.y)],
-									[Utils.xToLon(centerPoint.x)+Math.sin(point.head*Math.PI/180) * 0.005, Utils.yToLat(centerPoint.y)+Math.cos(point.head*Math.PI/180) * 0.005]
+									[Utils.xToLon(headB.x), Utils.yToLat(headB.y)]
 								],
 								width: "1px",
 								color: ship.color
 							});
 							//画cog
+							var cogD = (360-point.cog)*Math.PI/180;
+							var pathPoint = [];
+							pathPoint.push([Utils.xToLon(lonlatPoint.x), Utils.yToLat(lonlatPoint.y)]);
+							for (var k = 1; k <= Math.ceil(point.speed); k++) {
+								var cogA={
+										x: 0,
+										y: (k == Math.ceil(point.speed) ? 1-k+point.speed : k) * 300
+								};
+								var cogB = {
+										x: cogA.x*Math.cos(cogD) - cogA.y*Math.sin(cogD) + lonlatPoint.x,
+										y: cogA.y*Math.cos(cogD) + cogA.x*Math.sin(cogD) + lonlatPoint.y
+								};
+								pathPoint.push([Utils.xToLon(cogB.x), Utils.yToLat(cogB.y)]);
+								if(k != Math.ceil(point.speed)){
+									//加入刻度
+									var cogKD = (360-point.cog+90)*Math.PI/180;
+									var cogKA = {
+											x: 300,
+											y: 0
+									};
+									var cogKB = {
+											x: cogKA.x*Math.cos(cogKD) - cogKA.y*Math.sin(cogKD) + cogB.x,
+											y: cogKA.y*Math.cos(cogKD) + cogKA.x*Math.sin(cogKD) + cogB.y
+									};
+									pathPoint.push([Utils.xToLon(cogKB.x), Utils.yToLat(cogKB.y)]);
+									pathPoint.push([Utils.xToLon(cogB.x), Utils.yToLat(cogB.y)]);
+								}
+							}
+							console.log(point.speed);
+							console.log(point.cog);
+							console.log(pathPoint);
 							var cogLine = Utils.createLine({
-								paths:[
-									[point.lon, point.lat],
-									[point.lon+Math.sin(point.cog*Math.PI/180) * 0.005*(point.speed), point.lat+Math.cos(point.cog*Math.PI/180) * 0.005*(point.speed)]
-								],
+								paths: pathPoint,
 								width: "1px",
 								style: "short-dash"
 							});
