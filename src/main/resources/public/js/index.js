@@ -588,7 +588,7 @@ ArGis={
 							for (var k = 1; k <= Math.ceil(point.speed); k++) {
 								var cogA={
 										x: 0,
-										y: (k == Math.ceil(point.speed) ? 1-k+point.speed : k) * 300
+										y: k == Math.ceil(point.speed) ? point.speed * 300 : k * 300
 								};
 								var cogB = {
 										x: cogA.x*Math.cos(cogD) - cogA.y*Math.sin(cogD) + lonlatPoint.x,
@@ -599,8 +599,8 @@ ArGis={
 									//加入刻度
 									var cogKD = (360-point.cog+90)*Math.PI/180;
 									var cogKA = {
-											x: 300,
-											y: 0
+											x: 0,
+											y: 30
 									};
 									var cogKB = {
 											x: cogKA.x*Math.cos(cogKD) - cogKA.y*Math.sin(cogKD) + cogB.x,
