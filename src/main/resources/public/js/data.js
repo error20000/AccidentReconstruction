@@ -246,12 +246,11 @@ var TimeLineEventData = [
 		}
 	}},
 	{"name":"碰撞过程（1950-1952）","timeStart":0,"index":[],"timeLength":60,"time":["2018/1/6 19:50:00","2018/1/6 19:52:00"],event: function(timePoint, timeEvent){
-		var interval = 0.5;
+		var interval = 1;
 		var time = new Date("2018/1/6 19:50:00").getTime();
 		time += (timePoint-timeEvent.timeStart) * interval * 1000;
 		Utils.updateShipInfo(0, Utils.formatDate(time, Config.defulatTimeFormat), {});
 		Utils.updateShipInfo(1, Utils.formatDate(time, Config.defulatTimeFormat), {});
-		
 		var forTime = Utils.formatDate(time - ((timePoint-timeEvent.timeStart) == 0 ? 0 : interval * 1000), Config.defulatTimeFormat);
 		var toTime = Utils.formatDate(time, Config.defulatTimeFormat);
 		Utils.animateShip(0, forTime, toTime, timeEvent);

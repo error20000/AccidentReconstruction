@@ -51,27 +51,61 @@ var Utils = {
 					lat: Utils.yToLat(centerPoint.y),
 					angle: params.head,
 					url: ship.url,
-					width: ship.shipWidth/ArGis.view.state.resolution + "px",
-					height: ship.shipLength/ArGis.view.state.resolution + "px",
+					width: ship.shipWidth/Number(Number(ArGis.view.state.resolution).toFixed(1)) + "px",
+					height: ship.shipLength/Number(Number(ArGis.view.state.resolution).toFixed(1)) + "px",
 //				    xoffset: params.xoffset,
 //				    yoffset: params.yoffset
 				});
 			}
 			//画船首线
+			var headD = (360-params.head)*Math.PI/180;
+			var headA = {
+					x: 0,
+					y: 600
+			};
+			var headB = {
+					x: headA.x*Math.cos(headD) - headA.y*Math.sin(headD) + centerPoint.x,
+					y: headA.y*Math.cos(headD) + headA.x*Math.sin(headD) + centerPoint.y
+			};
 			var headLine = Utils.createLine({
 				paths:[
 					[Utils.xToLon(centerPoint.x), Utils.yToLat(centerPoint.y)],
-					[Utils.xToLon(centerPoint.x)+Math.sin(params.head*Math.PI/180) * 0.005, Utils.yToLat(centerPoint.y)+Math.cos(params.head*Math.PI/180) * 0.005]
+					[Utils.xToLon(headB.x), Utils.yToLat(headB.y)]
 				],
 				width: "1px",
 				color: ship.color
 			});
 			//画cog
+			var cogD = (360-params.cog)*Math.PI/180;
+			var pathPoint = [];
+			pathPoint.push([Utils.xToLon(lonlatPoint.x), Utils.yToLat(lonlatPoint.y)]);
+			for (var k = 1; k <= Math.ceil(params.speed); k++) {
+				var cogA={
+						x: 0,
+						y: k == Math.ceil(params.speed) ? params.speed * 300 : k * 300
+				};
+				var cogB = {
+						x: cogA.x*Math.cos(cogD) - cogA.y*Math.sin(cogD) + lonlatPoint.x,
+						y: cogA.y*Math.cos(cogD) + cogA.x*Math.sin(cogD) + lonlatPoint.y
+				};
+				pathPoint.push([Utils.xToLon(cogB.x), Utils.yToLat(cogB.y)]);
+				if(k != Math.ceil(params.speed)){
+					//加入刻度
+					var cogKD = (360-params.cog+90)*Math.PI/180;
+					var cogKA = {
+							x: 0,
+							y: 30
+					};
+					var cogKB = {
+							x: cogKA.x*Math.cos(cogKD) - cogKA.y*Math.sin(cogKD) + cogB.x,
+							y: cogKA.y*Math.cos(cogKD) + cogKA.x*Math.sin(cogKD) + cogB.y
+					};
+					pathPoint.push([Utils.xToLon(cogKB.x), Utils.yToLat(cogKB.y)]);
+					pathPoint.push([Utils.xToLon(cogB.x), Utils.yToLat(cogB.y)]);
+				}
+			}
 			var cogLine = Utils.createLine({
-				paths:[
-					[params.lon, params.lat],
-					[params.lon+Math.sin(params.cog*Math.PI/180) * 0.005*(params.speed), params.lat+Math.cos(params.cog*Math.PI/180) * 0.005*(params.speed)]
-				],
+				paths: pathPoint,
 				width: "1px",
 				style: "short-dash"
 			});

@@ -219,8 +219,8 @@ ArGis={
 			//处理时间线
 			// 1、创建实点
 			var shipTimeTemp = {};
-			for (var i = 0; i < ShipTimeData.length; i++) {
-				var shipData = ShipTimeData[i];
+			for (var i = 0; i < ShipTrackData.length; i++) {
+				var shipData = ShipTrackData[i];
 				var key = shipData.Mmsi;
 				var timePoint = {
 						mmsi: shipData.Mmsi,
@@ -241,6 +241,10 @@ ArGis={
 				}else{
 					obj.timePoints.push(timePoint);
 					shipTimeTemp[key] = obj;
+				}
+				
+				if(key=="477550800" && timePoint.time>="2018/1/6 19:50:12" && timePoint.time<="2018/1/6 19:50:18"){
+					console.log(timePoint);
 				}
 			}
 			
@@ -276,6 +280,9 @@ ArGis={
 							};
 							if(time >= Config.detailTime[0] && time <= Config.detailTime[1]){
 								ship.timeLine[time] = timeLinePoint;
+							}
+							if(timeLinePoint.mmsi=="477550800" && timeLinePoint.time>="2018/1/6 19:50:12" && timeLinePoint.time<="2018/1/6 19:50:18"){
+								console.log(timeLinePoint);
 							}
 						}
 					}
@@ -701,9 +708,9 @@ ArGis={
 				], function(GraphicsLayer){
 				for (var i = 0; i < Ships.length; i++) {
 					ArGis["shipLayer_"+Ships[i].mmsi] = new GraphicsLayer({id:"shipGraphicsLayer_"+Ships[i].mmsi});
-					ArGis["shipCogLayer_"+Ships[i].mmsi] = new GraphicsLayer({id:"shipCogGraphicsLayer_"+Ships[i].mmsi});
+//					ArGis["shipCogLayer_"+Ships[i].mmsi] = new GraphicsLayer({id:"shipCogGraphicsLayer_"+Ships[i].mmsi});
 					ArGis.map.add(ArGis["shipLayer_"+Ships[i].mmsi]);
-					ArGis.map.add(ArGis["shipCogLayer_"+Ships[i].mmsi]);
+//					ArGis.map.add(ArGis["shipCogLayer_"+Ships[i].mmsi]);
 				}
 			});
 			for (var i = 0; i < Ships.length; i++) {
