@@ -25,7 +25,7 @@ var TimeLineEventData = [
 		Utils.animateShip(1, forTime, toTime, timeEvent);
 
 		if(timePoint == timeEvent.timeStart + 1){
-			ArGis.view.goTo({center:[124.9598,30.8506],zoom: 10}, {duration: 5000});
+			ArGis.view.goTo({center:[124.9598,30.8506],zoom: 10}, {duration: 1000});
 		}
 		if(timePoint == timeEvent.timeStart + 2){
 			Config.msgDesc.push("<b>1900时许</b> “1”轮航向340度，航速10.3节。三副上驾驶台接班。该轮VHF在16频道值守，两部雷达开启， 其中X波段雷达设置了6海里量程、北向上相对运动、偏心显示，物标真矢量、真尾迹显示，并设置了0.9海里、15分钟的物标报警。");
