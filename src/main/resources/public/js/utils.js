@@ -3,37 +3,31 @@ var Utils = {
 			var ship = Ships[shipIndex];
 			var shipGraphic = "";
 			
-			/*var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
+			var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
 			var shipGisPoint = {x: shipCenterPoint.x - ship.left, y: shipCenterPoint.y - ship.trail}; //以天线为原点
 			var distance = Math.sqrt(Math.pow(shipGisPoint.x, 2) + Math.pow(shipGisPoint.y, 2));
-			var sina = (shipGisPoint.y)/distance < 0 ? 1 - (shipGisPoint.y)/distance : (shipGisPoint.y)/distance;
-			var cos = (shipGisPoint.x)/distance < 0 ? 1 - (shipGisPoint.x)/distance : (shipGisPoint.x)/distance;
-
-			if(params.head >= 0 && params.head < 90){
-				params.xoffset = cos * distance/ArGis.view.state.resolution + "px";
-				params.yoffset = sina * distance/ArGis.view.state.resolution + "px";
-			}else if(params.head >= 90 && params.head < 180){
-				params.xoffset =  cos * distance/ArGis.view.state.resolution + "px";
-				params.yoffset = - sina * distance/ArGis.view.state.resolution + "px";
-			}else if(params.head >= 180 && params.head < 270){
-				params.xoffset = - cos * distance/ArGis.view.state.resolution + "px";
-				params.yoffset = - sina * distance/ArGis.view.state.resolution + "px";
-			}else{
-				params.xoffset = - cos * distance/ArGis.view.state.resolution + "px";
-				params.yoffset = sina * distance/ArGis.view.state.resolution + "px";
-			}*/
 			
-			var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
-			var shipGisPoint = {x: ship.left - shipCenterPoint.x, y: ship.trail - shipCenterPoint.y}; //以船中心为原点
-			var distance = Math.sqrt(Math.pow(shipGisPoint.x, 2) + Math.pow(shipGisPoint.y, 2));
-			
-			var deg = Math.atan(shipGisPoint.x/shipGisPoint.y)*180/Math.PI+180;
+			/*var deg = Math.atan(shipGisPoint.x/shipGisPoint.y)*180/Math.PI+180;
 			deg = deg + params.head > 360 ? deg + params.head - 360 : deg + params.head;
 			var angle = deg*Math.PI/180;
 			var lonlatPoint = Utils.lonLatToMercator(params.lon, params.lat);
 			var centerPoint = {
 					x: lonlatPoint.x - Math.sin(angle) * distance,
 					y: lonlatPoint.y - Math.cos(angle) * distance
+			};*/
+			var lonlatPoint = Utils.lonLatToMercator(params.lon, params.lat);
+			var shipD = (360-params.head)*Math.PI/180 - Math.atan(shipGisPoint.x/shipGisPoint.y);
+			var shipA = {
+					x: 0,
+					y: distance
+			};
+			var shipB = {
+					x: shipA.x*Math.cos(shipD) - shipA.y*Math.sin(shipD) + lonlatPoint.x,
+					y: shipA.y*Math.cos(shipD) + shipA.x*Math.sin(shipD) + lonlatPoint.y
+			};
+			var centerPoint = {
+					x: shipB.x,
+					y: shipB.y
 			};
 			
 			if(ArGis.view.zoom >= 0 && ArGis.view.zoom <= 14){
@@ -45,16 +39,12 @@ var Utils = {
 				});
 			}else{
 				shipGraphic = Utils.createShip({
-//					lon: params.lon,
-//					lat: params.lat,
 					lon: Utils.xToLon(centerPoint.x),
 					lat: Utils.yToLat(centerPoint.y),
 					angle: params.head,
 					url: ship.url,
-					width: ship.shipWidth/Number(Number(ArGis.view.state.resolution).toFixed(1)) + "px",
-					height: ship.shipLength/Number(Number(ArGis.view.state.resolution).toFixed(1)) + "px",
-//				    xoffset: params.xoffset,
-//				    yoffset: params.yoffset
+					width: ship.shipWidth/Math.floor(ArGis.view.state.resolution * 10-3)*10 + "px",
+					height: ship.shipLength/Math.floor(ArGis.view.state.resolution * 10-3)*10 + "px"
 				});
 			}
 			//画船首线
@@ -177,10 +167,6 @@ var Utils = {
 				var temp1 = ship.timeLine[formTime];
 				var temp2 = ship.timeLine[toTime];
 				
-				if(shipIndex==1 && formTime>="2018/1/6 19:50:10" && formTime<="2018/1/6 19:50:18"){
-					console.log(temp1);
-				}
-				
 				var count = 60;
 				var interval = 1/count;
 				var intervalCount = 0;
@@ -205,54 +191,8 @@ var Utils = {
 							cog: temp1.cog + intervalCount*cogSecond,
 							head: temp1.head + intervalCount*headSecond
 					};
-					//ship
 					ArGis["shipLayer_"+ship.mmsi].graphics.removeAll();
-					/*var shipGraphic = "";
-					if(ArGis.view.zoom >= 0 && ArGis.view.zoom <= 14){
-						shipGraphic = Utils.createShipSign({
-							lon: startPoint.lon,
-							lat: startPoint.lat,
-							angle: startPoint.head,
-							color: ship.color
-						});
-					}else{
-						shipGraphic = Utils.createShip({
-							lon: startPoint.lon,
-							lat: startPoint.lat,
-							angle: startPoint.head,
-							url: ship.url,
-							width: ship.shipWidth/ArGis.view.state.resolution + "px",
-							height: ship.shipLength/ArGis.view.state.resolution + "px"
-						});
-					}
-					
-					ArGis["shipLayer_"+ship.mmsi].graphics.add(shipGraphic);*/
 					this.setShip(shipIndex, startPoint);
-					//cog
-					/*ArGis["shipCogLayer_"+ship.mmsi].graphics.removeAll();
-					var cogLon = startPoint.cog;
-					var lon = ship.shipLength/ArGis.view.state.resolution;
-					var lat = lon/Math.atan(cogLon);
-					var cogLine = "";
-					if(ArGis.view.zoom >= 0 && ArGis.view.zoom <= 14){
-						cogLine = Utils.createLine({
-							paths:[[startPoint.lon, startPoint.lat],[startPoint.lon+lon, startPoint.lat+lat]],
-							spatialReference: {
-								wkid:102100
-							},
-							width: "1px"
-						});
-					}else{
-						cogLine = Utils.createLine({
-							paths:[[startPoint.lon, startPoint.lat],[startPoint.lon+lon, startPoint.lat+lat]],
-							spatialReference: {
-								wkid:102100
-							},
-							width: "1px"
-						});
-					}
-					ArGis["shipCogLayer_"+ship.mmsi].graphics.add(cogLine);*/
-					
 					intervalCount = intervalCount+1;
 					if(intervalCount >= 1/interval ){
 						clearInterval(tempInterval);
@@ -273,9 +213,7 @@ var Utils = {
 		  		    angle:  params.angle,
 		  		    url: params.url,
 		  		    width: params.width,
-				    height: params.height,
-				    xoffset: params.xoffset,
-				    yoffset: params.yoffset
+				    height: params.height
 		  		  };
 			return this.createGraphic(geometry, symbol, params.attr, params.template);
 		},

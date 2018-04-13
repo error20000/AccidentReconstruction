@@ -44,6 +44,10 @@ var TimeLineEventData = [
 		Utils.animateShip(0, forTime, toTime, timeEvent);
 		Utils.animateShip(1, forTime, toTime, timeEvent);
 		
+		if(timePoint == timeEvent.timeStart + 1){
+			ArGis.view.goTo({center:[124.9598,30.8506],zoom: 11}, {duration: 1000});
+		}
+		
 		if(timePoint == timeEvent.timeStart + 1){ //"2018/1/6 19:30:00"
 			Config.msgDesc.push("<b>1930时许</b> 1号轮航向358度，航速10.4节，“长峰水晶”轮距该轮7.5海里，方位022度，CPA约0.5海里。");
 			Utils.appendShipInfo(0, {
@@ -132,6 +136,10 @@ var TimeLineEventData = [
 		var toTime = Utils.formatDate(time, Config.defulatTimeFormat);
 		Utils.animateShip(0, forTime, toTime, timeEvent);
 		Utils.animateShip(1, forTime, toTime, timeEvent);
+		
+		if(timePoint == timeEvent.timeStart + 1){
+			ArGis.view.goTo({center:[124.9598,30.8506],zoom: 12}, {duration: 1000});
+		}
 		
 		if(timePoint == timeEvent.timeStart + 1*60/interval){ //"2018/1/6 19:41:00"
 			Config.msgDesc.push("<b>1941时许</b> “1”轮航向358度，航速10.4节，“2”轮距1轮3.5海里，方位025度，CPA约0.1海里、TCPA约9.5分钟。“浙岱渔03187”渔船距该轮约1.8海里，方位约040度。三副要求值班水手用莫氏信号灯警示“浙岱渔03187”轮，并说：“你看，她要采取行动了”，此时“浙岱渔03187”船开始大幅度向左转向。");
@@ -255,6 +263,10 @@ var TimeLineEventData = [
 		var toTime = Utils.formatDate(time, Config.defulatTimeFormat);
 		Utils.animateShip(0, forTime, toTime, timeEvent);
 		Utils.animateShip(1, forTime, toTime, timeEvent);
+		
+		if(timePoint == timeEvent.timeStart + 1){
+			ArGis.view.goTo({center:[124.9599,30.8525],zoom: 16}, {duration: 1000});
+		}
 		
 		if(timePoint == timeEvent.timeStart + 1){ 
 			Config.msgDesc.push("<b>1950时许</b> 1轮右舷2、3舱之间船体与“2”轮船艏发生碰撞，“1”轮货油舱破损、凝析油泄漏并发生燃爆。船长要求打开甲板灯、“左满舵”，并发出遇险报警 。");

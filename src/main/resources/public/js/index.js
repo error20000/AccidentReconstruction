@@ -198,23 +198,6 @@ ArGis={
 						label: ship.showName
 				};
 				Config.shipsSelect.push(select);
-				//select
-				/*if(Config.select == i){
-					for (var j = 0; j < ship.data.length; j++) {
-						CurShipInfo[ship.data[j].time] = ship.data[j];
-					}
-				}
-				//event
-				for (var j = 0; j < ship.data.length; j++) {
-					if(ship.data[j].event){
-						var events = TimeEvent[ship.data[j].time];
-						if(!events){
-							events = [];
-						}
-						events.push(ship.data[j]);
-						TimeEvent[ship.data[j].time] = events;
-					}
-				}*/
 			}
 			//处理时间线
 			// 1、创建实点
@@ -251,18 +234,6 @@ ArGis={
 					shipTimeTemp[key] = obj;
 				}
 			}
-			console.log("----------------------new---------------------");
-			for ( var key in shipTimeTemp) {
-				if(key=="477550800"){
-					for (var i = 0; i < shipTimeTemp[key].timePoints.length; i++) {
-						var timePoint = shipTimeTemp[key].timePoints[i];
-						if(timePoint.time>="2018/1/6 19:50:10" && timePoint.time<="2018/1/6 19:50:18"){
-							console.log(timePoint);
-						}
-					}
-				}
-			}
-			console.log("-------------------------------------------");
 			// 2、创建虚拟点(只设置被观察船只)
 			for (var i = 0; i < Ships.length && i < ShipInfoData.length; i++) {
 				var ship = Ships[i];
@@ -284,7 +255,7 @@ ArGis={
 						for (var k = 1; k < count; k++) {
 							var time = Utils.formatDate(new Date(tmp1.time).getTime() + k*1000, Config.defulatTimeFormat);
 							var timeLinePoint = {};
-							if(Math.abs(speedCount) >= 2){
+							/*if(Math.abs(speedCount) >= 2){
 								//不均分
 								timeLinePoint = {
 										mmsi: tmp1.mmsi,
@@ -296,7 +267,7 @@ ArGis={
 										head: tmp1.head + k*headCount/count,
 										real: false
 								};
-							}else{
+							}else{*/
 								//均分
 								timeLinePoint = {
 										mmsi: tmp1.mmsi,
@@ -308,12 +279,9 @@ ArGis={
 										head: tmp1.head + k*headCount/count,
 										real: false
 								};
-							}
+//							}
 							if(time >= Config.detailTime[0] && time <= Config.detailTime[1]){
 								ship.timeLine[time] = timeLinePoint;
-							}
-							if(timeLinePoint.mmsi=="477550800" && timeLinePoint.time>="2018/1/6 19:50:10" && timeLinePoint.time<="2018/1/6 19:50:18"){
-								console.log(timeLinePoint);
 							}
 						}
 						
@@ -321,37 +289,7 @@ ArGis={
 				}
 			}
 
-			console.log("-------------------------------------------");
 			console.log(Ships);
-			/*var blob = new Blob([JSON.stringify(Ships)],{type : 'application/json'});
-			var a = document.createElement('a');
-			var url = window.URL.createObjectURL(blob);
-			var filename = 'ship.txt';
-			a.href = url;
-			a.download = filename;
-			a.click();
-			window.URL.revokeObjectURL(url);*/
-			/*// 3、创建事件
-			var shipEventTemp = {};
-			for (var i = 0; i < Ships.length && i < Config.shipsSelect.length; i++) {
-				var ship = Ships[i];
-				if(ship.timeLine){
-					for (var j = 0; j < ship.timeLine.length; j++) {
-						var key = ship.mmsi+"_"+ship.timeLine[j].time;
-						shipEventTemp[key] = i+"_"+j;
-					}
-				}
-			}
-			for (var i = 0; i < ShipEventData.length; i++) {
-				var shipEvent = ShipEventData[i];
-				var key = shipEvent.Mmsi+"_"+shipEvent.UpdateTime;
-				if(shipEventTemp[key]){
-					var shipIndex = shipEventTemp[key].split("_")[0];
-					var timeLineIndex = shipEventTemp[key].split("_")[1];
-					Ships[shipIndex].timeLine[timeLineIndex].eventDesc = shipEvent.EventDesc;
-					Ships[shipIndex].timeLine[timeLineIndex].dcpaDesc = shipEvent.DcpaDesc;
-				}
-			}*/
 			//处理事件
 			for (var i = 0; i < TimeLineEventData.length; i++) {
 				TimeLineEventData[i].timeStart = Config.timeLength;
@@ -365,47 +303,15 @@ ArGis={
 			//加载工具
 
 			//绘制碰撞点
-			/*Utils.drawPoint({
-						lon: 124.9598,
-						lat: 30.8506,
-						color: [226, 119, 40],
-						width: 10,
-						attr: {
-							time: "2018/1/6 19:50:00",
-							lon: 124.9598,
-							lat: 30.8506,
-							content: "test"
-						},
-						template: {
-							title:"碰撞点",
-							content:[{
-							        type: "fields",
-							        fieldInfos: [{
-							          fieldName: "time",
-							          label: "碰撞时间"
-							        }, {
-							          fieldName: "lon",
-							          label: "碰撞经度"
-							        }, {
-								          fieldName: "lat",
-								          label: "碰撞纬度"
-							        }, {
-								          fieldName: "content",
-								          label: "碰撞描述"
-							        }]
-							      }]
-						}
-					});*/
 			Utils.drawPoint({
 				lon: 124.9597,
 				lat: 30.851,
 				color: "green",
 				width: 10,
 				attr: {
-					time: "2018/1/6 19:50:00",
-					lon: 124.9598,
-					lat: 30.8506,
-					content: "test"
+					time: "2018/1/6 19:50:10",
+					lon: 124.9597,
+					lat: 30.851
 				},
 				template: {
 					title:"碰撞点",
@@ -433,10 +339,9 @@ ArGis={
 				color: "red",
 				width: 10,
 				attr: {
-					time: "2018/1/6 19:50:00",
-					lon: 124.9598,
-					lat: 30.8506,
-					content: "test"
+					time: "2018/1/6 19:50:10",
+					lon: 124.9616,
+					lat: 30.8531
 				},
 				template: {
 					title:"碰撞点",
@@ -471,19 +376,12 @@ ArGis={
 					var ship = Ships[i];
 					
 					var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
-					var shipGisPoint = {x: ship.left - shipCenterPoint.x, y: ship.trail - shipCenterPoint.y}; //以天线为原点
+					var shipGisPoint = {x: shipCenterPoint.x - ship.left, y: shipCenterPoint.y - ship.trail}; //以天线为原点
 					var distance = Math.sqrt(Math.pow(shipGisPoint.x, 2) + Math.pow(shipGisPoint.y, 2));
 					
 					for (var j = 0; j < ship.data.length; j++) {
 						var point = ship.data[j];
-						if(point.real && (point.time == "2018/1/6 19:50:12" /*|| point.time == "2018/1/6 19:50:16"*/)){
-							Utils.drawPoint({
-								lon: point.lon,
-								lat: point.lat,
-								color: point.mmsi == "477550800" ? "red" : "green",
-								width: 10
-							});
-							console.log(point);
+						if(point.real){
 							//点
 							var createPoint = Utils.createPoint({
 								lon: point.lon,
@@ -509,167 +407,28 @@ ArGis={
 							}
 							Config.trackLine[ship.mmsi] = tempLine;
 							//形状
-							/*var ship={
-									shipWidth: 50,
-									shipLength: 274,
-									left:13,
-									trail: 43,
-									head: 350
-							};
-							var point = {
-									lon: 20,
-									lat: 20
-							}
-							var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
-							console.log(shipCenterPoint);
-							var shipGisPoint = {x: shipCenterPoint.x - ship.left, y: shipCenterPoint.y - ship.trail}; //以船中心为原点
-							console.log(shipGisPoint);
-							var distance = Math.sqrt(Math.pow(shipGisPoint.x, 2) + Math.pow(shipGisPoint.y, 2));
-							console.log(distance);
-							var sina = Math.asin(shipGisPoint.y/distance) - (360-ship.head)*Math.PI/180;
-							var cos = Math.PI/180 - Math.acos(shipGisPoint.x/distance) - (360-ship.head)*Math.PI/180;
-							console.log(sina);
-							console.log(cos);
-							var lonlatPoint = {x:point.lon,y:point.lat};//Utils.lonLatToMercator(point.lon, point.lat);
-							var centerPoint = {
-									x: lonlatPoint.x - Math.cos(cos) * distance,
-									y: lonlatPoint.y - Math.sin(sina) * distance
-							};
-							console.log(centerPoint);*/
-							
-							/*console.log(shipCenterPoint);
-							console.log(shipGisPoint);
-							console.log(distance);
-							console.log(deg);*/
-							
 							var lonlatPoint = Utils.lonLatToMercator(point.lon, point.lat);
-							var centerPoint = {};
-							var deg = Math.atan(shipGisPoint.x/shipGisPoint.y)*180/Math.PI+180;
-							deg = deg + point.head > 360 ? deg + point.head - 360 : deg + point.head;
-							var angle = deg*Math.PI/180;
-							centerPoint = {
-									x: lonlatPoint.x - Math.sin(angle) * distance,
-									y: lonlatPoint.y - Math.cos(angle) * distance
-							};
-							/*var x = Math.abs(Math.sin(angle) * distance);
-							var y = Math.abs(Math.cos(angle) * distance);
-							var degLimit = deg;
-							if(degLimit >= 0 && degLimit < 90){
-								centerPoint = {
-										x: lonlatPoint.x - x,
-										y: lonlatPoint.y - y
-								};
-							}else if(degLimit >= 90 && degLimit < 180){
-								centerPoint = {
-										x: lonlatPoint.x - x,
-										y: lonlatPoint.y + y
-								};
-							}else if(degLimit >= 180 && degLimit < 270){
-								centerPoint = {
-										x: lonlatPoint.x + x,
-										y: lonlatPoint.y + y
-								};
-							}else{
-								centerPoint = {
-										x: lonlatPoint.x + x,
-										y: lonlatPoint.y - y
-								};
-							}*/
-							
-							
-							/*var lonlatPoint = Utils.lonLatToMercator(point.lon, point.lat);
-							var centerPoint = {};
-							if(ship.head >= 0 && ship.head < 90){
-								centerPoint = {
-										x: lonlatPoint.x + Math.sqrt(1-Math.pow(Math.sin(sina), 2)) * distance,
-										y: lonlatPoint.y + Math.sin(sina) * distance
-								};
-							}else if(ship.head >= 90 && ship.head < 180){
-								centerPoint = {
-										x: lonlatPoint.x + Math.sqrt(1-Math.pow(Math.sin(sina), 2)) * distance,
-										y: lonlatPoint.y - Math.sin(sina) * distance
-								};
-							}else if(ship.head >= 180 && ship.head < 270){
-								centerPoint = {
-										x: lonlatPoint.x - Math.sqrt(1-Math.pow(Math.sin(sina), 2)) * distance,
-										y: lonlatPoint.y - Math.sin(sina) * distance
-								};
-							}else{
-								centerPoint = {
-										x: lonlatPoint.x - Math.sqrt(1-Math.pow(Math.sin(sina), 2)) * distance,
-										y: lonlatPoint.y + Math.sin(sina) * distance
-								};
-							}*/
-							
-//							console.log(centerPoint);
-							
-//							x2= (x1 - x0)*cos(a) - (y1 - y0)*sin(a) + x0 ; //x0,y0为原点，a逆时针旋转角度
-//							y2= (x1 - x0)*cos(a) + (y1 - y0)*sin(a) + y0 ;
-							//画船首线
-							var headD = (360-point.head)*Math.PI/180;
-							var headA = {
+							var shipD = (360-point.head)*Math.PI/180 - Math.atan(shipGisPoint.x/shipGisPoint.y);
+							var shipA = {
 									x: 0,
-									y: 600
+									y: distance
 							};
-							var headB = {
-									x: headA.x*Math.cos(headD) - headA.y*Math.sin(headD) + centerPoint.x,
-									y: headA.y*Math.cos(headD) + headA.x*Math.sin(headD) + centerPoint.y
+							var shipB = {
+									x: shipA.x*Math.cos(shipD) - shipA.y*Math.sin(shipD) + lonlatPoint.x,
+									y: shipA.y*Math.cos(shipD) + shipA.x*Math.sin(shipD) + lonlatPoint.y
 							};
-							var headLine = Utils.createLine({
-								paths:[
-									[Utils.xToLon(centerPoint.x), Utils.yToLat(centerPoint.y)],
-									[Utils.xToLon(headB.x), Utils.yToLat(headB.y)]
-								],
-								width: "1px",
-								color: ship.color
-							});
-							//画cog
-							var cogD = (360-point.cog)*Math.PI/180;
-							var pathPoint = [];
-							pathPoint.push([Utils.xToLon(lonlatPoint.x), Utils.yToLat(lonlatPoint.y)]);
-							for (var k = 1; k <= Math.ceil(point.speed); k++) {
-								var cogA={
-										x: 0,
-										y: k == Math.ceil(point.speed) ? point.speed * 300 : k * 300
-								};
-								var cogB = {
-										x: cogA.x*Math.cos(cogD) - cogA.y*Math.sin(cogD) + lonlatPoint.x,
-										y: cogA.y*Math.cos(cogD) + cogA.x*Math.sin(cogD) + lonlatPoint.y
-								};
-								pathPoint.push([Utils.xToLon(cogB.x), Utils.yToLat(cogB.y)]);
-								if(k != Math.ceil(point.speed)){
-									//加入刻度
-									var cogKD = (360-point.cog+90)*Math.PI/180;
-									var cogKA = {
-											x: 0,
-											y: 30
-									};
-									var cogKB = {
-											x: cogKA.x*Math.cos(cogKD) - cogKA.y*Math.sin(cogKD) + cogB.x,
-											y: cogKA.y*Math.cos(cogKD) + cogKA.x*Math.sin(cogKD) + cogB.y
-									};
-									pathPoint.push([Utils.xToLon(cogKB.x), Utils.yToLat(cogKB.y)]);
-									pathPoint.push([Utils.xToLon(cogB.x), Utils.yToLat(cogB.y)]);
-								}
-							}
-							console.log(point.speed);
-							console.log(point.cog);
-							console.log(pathPoint);
-							var cogLine = Utils.createLine({
-								paths: pathPoint,
-								width: "1px",
-								style: "short-dash"
-							});
-							ArGis.shipLayer.graphics.add(headLine);
-							ArGis.shipLayer.graphics.add(cogLine);
+							var centerPoint = {
+									x: shipB.x,
+									y: shipB.y
+							};
 							
 							var createShape = Utils.createShape({
-								lon: Utils.xToLon(centerPoint.x),/*point.lon,*/
-								lat: Utils.yToLat(centerPoint.y),/*point.lat,*/
+								lon: Utils.xToLon(centerPoint.x),
+								lat: Utils.yToLat(centerPoint.y),
 								angle: point.head,
 								url: ship.url,
-								width: /*ship.shipWidth/ArGis.view.zoom,*/ship.shipWidth/ArGis.view.state.resolution+"px" ,
-								height: /*ship.shipLength/ArGis.view.zoom,*/ship.shipLength/ArGis.view.state.resolution+"px",
+								width: ship.shipWidth/Math.floor(ArGis.view.state.resolution)+"px" ,
+								height: ship.shipLength/Math.floor(ArGis.view.state.resolution)+"px",
 								attr: {mmsi: ship.mmsi, type: "track_shape",
 									lon: point.lon,
 									lat: point.lat,
@@ -743,14 +502,10 @@ ArGis={
 				], function(GraphicsLayer){
 				for (var i = 0; i < Ships.length; i++) {
 					ArGis["shipLayer_"+Ships[i].mmsi] = new GraphicsLayer({id:"shipGraphicsLayer_"+Ships[i].mmsi});
-//					ArGis["shipCogLayer_"+Ships[i].mmsi] = new GraphicsLayer({id:"shipCogGraphicsLayer_"+Ships[i].mmsi});
 					ArGis.map.add(ArGis["shipLayer_"+Ships[i].mmsi]);
-//					ArGis.map.add(ArGis["shipCogLayer_"+Ships[i].mmsi]);
 				}
 			});
-			for (var i = 0; i < Ships.length; i++) {
-				
-			}
+			
 			//绘制船型
 			/*var cgp = Utils.createShip({
 				paths: "M150 0 L75 200 L225 200 Z",
