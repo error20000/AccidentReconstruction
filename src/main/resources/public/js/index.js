@@ -218,10 +218,11 @@ ArGis={
 			}
 			//处理时间线
 			// 1、创建实点
-			var shipTimeTemp = {};
+			var shipTimeTemp = {}, shipsTimeHash={};
 			for (var i = 0; i < ShipTrackData.length; i++) {
 				var shipData = ShipTrackData[i];
 				var key = shipData.Mmsi;
+				var uniKey = shipData.Mmsi+"_"+shipData.UpdateTime;
 				var timePoint = {
 						mmsi: shipData.Mmsi,
 						lat: Number(shipData.Lat),
@@ -238,16 +239,30 @@ ArGis={
 						timePoints: [timePoint]
 					};
 					shipTimeTemp[key] = obj;
+					shipsTimeHash[uniKey] = obj.timePoints.length;
 				}else{
-					obj.timePoints.push(timePoint);
+					var uniObj = shipsTimeHash[uniKey];
+					if(!uniObj){
+						obj.timePoints.push(timePoint);
+						shipsTimeHash[uniKey] = obj.timePoints.length;
+					}else{
+						obj.timePoints[uniObj-1] = timePoint;
+					}
 					shipTimeTemp[key] = obj;
 				}
-				
-				if(key=="477550800" && timePoint.time>="2018/1/6 19:50:12" && timePoint.time<="2018/1/6 19:50:18"){
-					console.log(timePoint);
+			}
+			console.log("----------------------new---------------------");
+			for ( var key in shipTimeTemp) {
+				if(key=="477550800"){
+					for (var i = 0; i < shipTimeTemp[key].timePoints.length; i++) {
+						var timePoint = shipTimeTemp[key].timePoints[i];
+						if(timePoint.time>="2018/1/6 19:50:10" && timePoint.time<="2018/1/6 19:50:18"){
+							console.log(timePoint);
+						}
+					}
 				}
 			}
-			
+			console.log("-------------------------------------------");
 			// 2、创建虚拟点(只设置被观察船只)
 			for (var i = 0; i < Ships.length && i < ShipInfoData.length; i++) {
 				var ship = Ships[i];
@@ -268,26 +283,45 @@ ArGis={
 						}
 						for (var k = 1; k < count; k++) {
 							var time = Utils.formatDate(new Date(tmp1.time).getTime() + k*1000, Config.defulatTimeFormat);
-							var timeLinePoint = {
-									mmsi: tmp1.mmsi,
-									lat: tmp1.lat + k*latCount/count,
-									lon: tmp1.lon + k*lonCount/count,
-									time: time,
-									speed: tmp1.speed + k*speedCount/count,
-									cog: tmp1.cog + k*cogCount/count,
-									head: tmp1.head + k*headCount/count,
-									real: false
-							};
+							var timeLinePoint = {};
+							if(Math.abs(speedCount) >= 2){
+								//不均分
+								timeLinePoint = {
+										mmsi: tmp1.mmsi,
+										lat: tmp1.lat + latCount,
+										lon: tmp1.lon + lonCount,
+										time: time,
+										speed: tmp1.speed,
+										cog: tmp1.cog + k*cogCount/count,
+										head: tmp1.head + k*headCount/count,
+										real: false
+								};
+							}else{
+								//均分
+								timeLinePoint = {
+										mmsi: tmp1.mmsi,
+										lat: tmp1.lat + k*latCount/count,
+										lon: tmp1.lon + k*lonCount/count,
+										time: time,
+										speed: tmp1.speed + k*speedCount/count,
+										cog: tmp1.cog + k*cogCount/count,
+										head: tmp1.head + k*headCount/count,
+										real: false
+								};
+							}
 							if(time >= Config.detailTime[0] && time <= Config.detailTime[1]){
 								ship.timeLine[time] = timeLinePoint;
 							}
-							if(timeLinePoint.mmsi=="477550800" && timeLinePoint.time>="2018/1/6 19:50:12" && timeLinePoint.time<="2018/1/6 19:50:18"){
+							if(timeLinePoint.mmsi=="477550800" && timeLinePoint.time>="2018/1/6 19:50:10" && timeLinePoint.time<="2018/1/6 19:50:18"){
 								console.log(timeLinePoint);
 							}
 						}
+						
 					}
 				}
 			}
+
+			console.log("-------------------------------------------");
 			console.log(Ships);
 			/*var blob = new Blob([JSON.stringify(Ships)],{type : 'application/json'});
 			var a = document.createElement('a');
@@ -442,13 +476,14 @@ ArGis={
 					
 					for (var j = 0; j < ship.data.length; j++) {
 						var point = ship.data[j];
-						if(point.real && (point.time == "2018/1/6 19:50:10" || point.time == "2018/1/6 19:50:23")){
+						if(point.real && (point.time == "2018/1/6 19:50:12" /*|| point.time == "2018/1/6 19:50:16"*/)){
 							Utils.drawPoint({
 								lon: point.lon,
 								lat: point.lat,
 								color: point.mmsi == "477550800" ? "red" : "green",
 								width: 10
 							});
+							console.log(point);
 							//点
 							var createPoint = Utils.createPoint({
 								lon: point.lon,

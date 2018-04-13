@@ -177,6 +177,10 @@ var Utils = {
 				var temp1 = ship.timeLine[formTime];
 				var temp2 = ship.timeLine[toTime];
 				
+				if(shipIndex==1 && formTime>="2018/1/6 19:50:10" && formTime<="2018/1/6 19:50:18"){
+					console.log(temp1);
+				}
+				
 				var count = 60;
 				var interval = 1/count;
 				var intervalCount = 0;
@@ -225,7 +229,7 @@ var Utils = {
 					ArGis["shipLayer_"+ship.mmsi].graphics.add(shipGraphic);*/
 					this.setShip(shipIndex, startPoint);
 					//cog
-					ArGis["shipCogLayer_"+ship.mmsi].graphics.removeAll();
+					/*ArGis["shipCogLayer_"+ship.mmsi].graphics.removeAll();
 					var cogLon = startPoint.cog;
 					var lon = ship.shipLength/ArGis.view.state.resolution;
 					var lat = lon/Math.atan(cogLon);
@@ -247,7 +251,7 @@ var Utils = {
 							width: "1px"
 						});
 					}
-					ArGis["shipCogLayer_"+ship.mmsi].graphics.add(cogLine);
+					ArGis["shipCogLayer_"+ship.mmsi].graphics.add(cogLine);*/
 					
 					intervalCount = intervalCount+1;
 					if(intervalCount >= 1/interval ){
