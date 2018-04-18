@@ -482,7 +482,7 @@ ArGis={
 								width: point.width,
 								text: point.time,
 								attr: {mmsi: ship.mmsi, type: "track_info"},
-								template:{}
+								template:""
 							});
 							var tempInfo = Config.trackInfo[ship.mmsi];
 							if(!tempInfo){
@@ -588,7 +588,7 @@ ArGis={
 				PlayController.handlePaused();
 			};
 			video.onended = function(evt){
-				PlayController.curPlayTime = 0;
+//				PlayController.curPlayTime = 0;
 				PlayController.handlePaused();
 			};
 			video.ontimeupdate = function(evt){
@@ -602,12 +602,12 @@ ArGis={
 			PlayController.paused= true;
 			PlayController.initPlay();
 			PlayController.emitPlay = function(){
-//				video.play();
-				PlayController.handlePlay();
+				video.play();
+//				PlayController.handlePlay();
 			};
 			PlayController.emitPaused = function(){
-//				video.pause();
-				PlayController.handlePaused();
+				video.pause();
+//				PlayController.handlePaused();
 			};
 			PlayController.emitRePlay = function(){
 				video.currentTime = 0;
@@ -659,7 +659,7 @@ ArGis={
 			Utils.removeTrackType("track_shape", ArGis.trackLayer.graphics);
 		},
 		clearTrackInfo: function(){
-//			Utils.removeTrackType("track_info", ArGis.map.findLayerById("infoFeatureLayer").source);
+			Utils.removeTrackType("track_info", ArGis.trackLayer.graphics);
 		},
 		showTrackPoint: function(ship){
 			if(Config.isTrackShowPoint){
@@ -694,58 +694,77 @@ ArGis={
 		},
 		showTrackShape: function(ship){
 			if(Config.isTrackShowShape){
+				for (var i = 0; i < Config.trackShape[ship.mmsi].length; i++) {
+					var graphic = Config.trackShape[ship.mmsi][i];
+					graphic.symbol.width = ship.shipWidth/Math.floor(ArGis.view.state.resolution)+"px" ;
+					graphic.symbol.height = ship.shipLength/Math.floor(ArGis.view.state.resolution)+"px";
+				}
 				ArGis.trackLayer.addMany(Config.trackShape[ship.mmsi]);
 			}
 		},
 		showTrackInfo: function(ship){
 			if(Config.isTrackShowInfo){
-				require(["esri/Color","esri/Graphic","esri/layers/FeatureLayer"], 
-						function (Color, Graphic, FeatureLayer) {
-					
-					var pointsRenderer = {
-							type: "unique-value", // autocasts as new UniqueValueRenderer()
-							field: "mmsi",
-							uniqueValueInfos: [{
-								value: "356137000",
-								symbol: {
-								    type: "simple-fill",  // autocasts as new SimpleFillSymbol()
-								    color: "blue"
+				var trackInfoPoint = [];
+				var trackInfoLine = [];
+				var timeInfo = ["2018/1/6 19:50:10"];
+				var height = 16 * Math.floor(ArGis.view.state.resolution);
+				for (var i = 0; i < Ships.length; i++) {
+					var ship = Ships[i];
+					for (var j = 0; j < timeInfo.length; j++) {
+						var point = "";
+						for (var m = 0; m < ship.data.length; m++) {
+							if(timeInfo[j] == ship.data[m].time){
+								point = ship.data[m];
+								break;
+							}
+						}
+						if(!point){
+							continue;
+						}
+						//标签
+						var geometry = {
+								type: "point",
+							    longitude: point.lon - 0.002,
+								latitude: point.lat + 0.0005
+							  };
+								
+						var symbol  = {
+								type: "text", 
+								  color: ship.color,
+								  haloColor: "black",
+								  haloSize: "1px",
+								  text: timeInfo[j],
+								  xoffset: 0,
+								  yoffset: 0,
+								  font: {  
+								    size: "12px",
+								    family: "sans-serif"
 								  }
-							}]
-					};
-					
-					var pointsLayer = new FeatureLayer({
-						id: "infoFeatureLayer",
-						title: "infoFeatureLayer",
-						fields: [
-						    {
-						     name: "ObjectID",
-						     alias: "ObjectID",
-						     type: "string"
-						   }],
-					   objectIdField: "ObjectID",
-					   geometryType: "point",
 
-						source: Config.trackInfo[ship.mmsi],
-						renderer: pointsRenderer,
-						labelingInfo:[{
-				            labelExpression: "12344",
-				            labelPlacement: "always-horizontal",
-				            symbol: {
-				              type: "text", // autocasts as new TextSymbol()
-				              color: [255, 255, 255, 0.7],
-				              haloColor: [0, 0, 0, 0.7],
-				              haloSize: 1,
-				              font: {
-				                size: 11
-				              }
-				            }
-				          }],
-						labelsVisible: true
-					});
-					ArGis.map.add(pointsLayer);
-				});
-//				ArGis.trackLayer.addMany(Config.trackInfo[ship.mmsi]);
+				  		  };
+						var attr = {mmsi: ship.mmsi, type: "track_info"};
+						var template = "";
+						trackInfoPoint.push(Utils.createGraphic(geometry, symbol, attr, template));
+						//连线
+						var geometry2 = {
+						        type: "polyline", 
+						        paths: [[point.lon, point.lat], [geometry.longitude, geometry.latitude]]
+						      };
+							
+					      var symbol2  = {
+					  		    type: "simple-line",  
+					  		    color: ship.color,
+					  		    width: "1px",
+					  		    style: "solid"
+					  		  };
+							var attr2 = {mmsi: ship.mmsi, type: "track_info"};
+							var template2 = "";
+					      trackInfoLine.push(Utils.createGraphic(geometry2, symbol2, attr2, template2));
+					}
+				}
+				ArGis.trackLayer.addMany(Config.trackInfo[ship.mmsi]);
+				ArGis.trackLayer.addMany(trackInfoPoint);
+				ArGis.trackLayer.addMany(trackInfoLine);
 			}
 		}
 };

@@ -2,7 +2,9 @@ var TimeLineEventData = [
 	{"name":"事故背景介绍","timeStart":0,"index":[],"timeLength":60,"time":["",""],event: function(timePoint, timeEvent){
 		if(timePoint == timeEvent.timeStart + 1){
 			Utils.setShip(0, {lon:52.60495876771754, lat:27.468084992891264});
-			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 8}, {duration: 5000});
+			setTimeout(function(){
+				ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 8}, {duration: 5000});
+			}, 1000/60);
 		}
 		if(timePoint == timeEvent.timeStart + 6){
 			Config.msgDesc.push("<b>2017年12月18日</b>，“1”轮从伊朗阿萨卢耶港装载凝析油约111,510吨驶往韩国瑞山港，离港时艏艉吃水均为13.4米，船上重油2974吨、轻油119吨、滑油42吨，预计抵达目的港时船上重油1900吨、轻油119吨、滑油42吨，开航时船上32人。1月6日，该船在东海海域航行。");
@@ -10,7 +12,16 @@ var TimeLineEventData = [
 		if(timePoint == timeEvent.timeStart + 20){
 			Config.msgDesc.push("<b>2017年12月15日</b>，“2”轮装载63997.817吨散装高梁从美国卡拉马港开航，目的港中国东莞，离港时艏吃水13.02米，艉吃水13.02米。2018年1月5日0106时许，该轮抵达韩国釜山港外锚地，在锚地完成加油（加重油1050吨、轻油90吨和润滑油17.43吨）后于当日1430时起锚续航，开航时航行灯开启，主机转速为87RPM。1月6日1200时许，船长指令将主机转速加到100RPM（实际97 RPM），此后该轮定速航行。");
 		}
-		
+		//test
+		if(timePoint == timeEvent.timeStart + 29){
+			var videoDiv = document.getElementById('videoDiv');
+			videoDiv.innerHTML = `
+				<video id="video" controls="controls" width="100%" height="100%">
+					<source src="video/2a1.mp4" type="video/mp4">
+					Your browser does not support the video tag.
+				</video>
+			`;
+		}
 	}},
 	{"name":"开始靠近（19001号交接班）","timeStart":0,"index":[],"timeLength":15,"time":["2018/1/6 19:00:00","2018/1/6 19:30:00"],event: function(timePoint, timeEvent){
 		var interval = 2 * 60;

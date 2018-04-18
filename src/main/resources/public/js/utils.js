@@ -183,7 +183,7 @@ var Utils = {
 				var cogSecond = cogCount/count;
 				var headSecond = headCount/count;
 				//动画
-				var tempInterval = setInterval(() => {
+				var tempInterval = setTimeout(() => {
 					var startPoint = {
 							lon: temp1.lon + intervalCount*lonSecond,
 							lat: temp1.lat + intervalCount*latSecond,
@@ -288,12 +288,12 @@ var Utils = {
 				  };
 					
 			var symbol  = {
-	  		    type: "simple-marker",  
-	  		    color: params.color ? params.color : [226, 119, 40],
-	  		     size: params.width ? params.width : "1px",
-			    outline: {
-			    	style:"none"
-			    }
+					type: "simple-marker",  
+		  		    color: params.color ? params.color : [226, 119, 40],
+		  		     size: params.width ? params.width : "4px",
+				    outline: {
+				    	style:"none"
+				    }
 	  		  };
 			return this.createGraphic(geometry, symbol, params.attr, params.template);
 		},
