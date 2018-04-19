@@ -17,7 +17,7 @@
 <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 
 <script>
-  	var Center = {lon: 52.60495876771754, lat: 27.468084992891264};
+  	var Center = {lon: 124.9602, lat: 30.85235};
     var ArGis={
     		baseUrl: "arcgis_js_api/library/4.5"
     };
@@ -51,8 +51,8 @@
 <script src="js/radar.js"></script>
 
 <script src="js/utils.js"></script>
-<script src="js/play.js"></script>
-<script src="js/index.js"></script>
+<script src="js/play2.js"></script>
+<script src="js/index2.js"></script>
 </head>
 <body>
 
@@ -79,7 +79,7 @@
 			</div>
 			<div class="content_right">
 				<div id="videoDiv">
-					<video id="video" controls="controls" width="100%" height="100%">
+					<video id="video" controls="true" controlslist="nodownload" width="100%" height="100%">
 					  <source src="video/1a1.mp4" type="video/mp4">
 						Your browser does not support the video tag.
 					</video>
@@ -314,7 +314,7 @@
 		        }, 50);
 			});
 			
-			ArGis.animation = "";
+			/* ArGis.animation = "";
 			ArGis.view.watch("animation", function(response){
 			  if(response && response.state == "running"){
 				  clearInterval(Utils.animateInterval);
@@ -328,7 +328,7 @@
 				  Utils.animating = true;
 				  clearTimeout(ArGis.animation);
 			  }
-			});
+			}); */
 	});
 	
 new Vue({
@@ -338,8 +338,9 @@ new Vue({
     },
     methods: {
     	handlerSelectChange: function(value) {
-    		PlayController.curPlayTime = value;
-    		PlayController.progress = Number(PlayController.curPlayTime/PlayController.endTime*100);
+    		//PlayController.curPlayTime = value;
+    		//PlayController.progress = Number(PlayController.curPlayTime/PlayController.endTime*100);
+    		PlayController.emitUpdateTime(value);
     		this.msgDesc = [];
   	    },
     	handlerTrack: function(evt) {

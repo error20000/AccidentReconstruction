@@ -592,10 +592,13 @@ ArGis={
 				PlayController.handlePaused();
 			};
 			video.ontimeupdate = function(evt){
-//				console.log(video.currentTime);
+				console.log(video.currentTime);
 			};
 			video.onwaiting = function(){
 				console.log("onwaiting");
+			};
+			video.onratechange = function(){
+				console.log("onratechange");
 			};
 			//插件
 			PlayController.endTime= Config.timeLength;

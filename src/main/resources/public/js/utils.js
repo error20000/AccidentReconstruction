@@ -171,7 +171,7 @@ var Utils = {
 				
 				var count = 60;
 				var interval = 1/count;
-//				var intervalCount = 0;
+				var intervalCount = 0;
 				//总差距
 				var lonCount = temp2.lon - temp1.lon;
 				var latCount = temp2.lat - temp1.lat;
@@ -197,8 +197,8 @@ var Utils = {
 						};
 						ArGis["shipLayer_"+ship.mmsi].graphics.removeAll();
 						this.setShip(shipIndex, startPoint);
-						/*intervalCount = intervalCount+1;
-						if(intervalCount >= 1/interval ){
+						intervalCount = intervalCount+1;
+						/*if(intervalCount >= 1/interval ){
 							clearInterval(tempInterval);
 						}*/
 					}, interval*1000);
