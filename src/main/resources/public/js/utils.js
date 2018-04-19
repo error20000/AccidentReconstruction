@@ -1,4 +1,6 @@
 var Utils = {
+		animating: true,
+		animateInterval: "",
 		setShip: function(shipIndex, params){
 			var ship = Ships[shipIndex];
 			var shipGraphic = "";
@@ -169,7 +171,7 @@ var Utils = {
 				
 				var count = 60;
 				var interval = 1/count;
-				var intervalCount = 0;
+//				var intervalCount = 0;
 				//总差距
 				var lonCount = temp2.lon - temp1.lon;
 				var latCount = temp2.lat - temp1.lat;
@@ -183,21 +185,24 @@ var Utils = {
 				var cogSecond = cogCount/count;
 				var headSecond = headCount/count;
 				//动画
-				var tempInterval = setTimeout(() => {
-					var startPoint = {
-							lon: temp1.lon + intervalCount*lonSecond,
-							lat: temp1.lat + intervalCount*latSecond,
-							speed: temp1.speed + intervalCount*speedSecond,
-							cog: temp1.cog + intervalCount*cogSecond,
-							head: temp1.head + intervalCount*headSecond
-					};
-					ArGis["shipLayer_"+ship.mmsi].graphics.removeAll();
-					this.setShip(shipIndex, startPoint);
-					intervalCount = intervalCount+1;
-					if(intervalCount >= 1/interval ){
-						clearInterval(tempInterval);
-					}
-				}, interval*1000);
+				clearInterval(this.animateInterval);
+				if(this.animating){
+					this.animateInterval = setInterval(() => {
+						var startPoint = {
+								lon: temp1.lon + intervalCount*lonSecond,
+								lat: temp1.lat + intervalCount*latSecond,
+								speed: temp1.speed + intervalCount*speedSecond,
+								cog: temp1.cog + intervalCount*cogSecond,
+								head: temp1.head + intervalCount*headSecond
+						};
+						ArGis["shipLayer_"+ship.mmsi].graphics.removeAll();
+						this.setShip(shipIndex, startPoint);
+						/*intervalCount = intervalCount+1;
+						if(intervalCount >= 1/interval ){
+							clearInterval(tempInterval);
+						}*/
+					}, interval*1000);
+				}
 				
 			}
 		},

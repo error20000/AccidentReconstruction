@@ -217,9 +217,13 @@
     margin: 10px 0px 10px 10px;
     font-size: 12px;
 	height: 263px;
+	color: gray;
 }
 .info_container .info_item{
 	margin: 5px 0px 5px 0px;
 	writing-mode: lr-tb;
+}
+.info_item.active{
+	color: black;
 }
 
