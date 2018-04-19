@@ -1,14 +1,18 @@
 var TimeLineEventData = [
 	{"name":"事故背景介绍","timeStart":0,"index":[],"timeLength":60,"time":["",""],event: function(timePoint, timeEvent){
 		if(timePoint == timeEvent.timeStart + 1){
-			ArGis.view.goTo({center:[52.60495876771754, 27.468084992891264],zoom: 8}, {duration: 5000});
-			Utils.setShip(0, {lon:52.60495876771754, lat:27.468084992891264});
+			ArGis.view.goTo({center:[-122.8474, 46.0085],zoom: 8}, {duration: 5000});
+			Utils.setShip(1, {lon: -122.8474, lat: 46.0085, head: 330, cog: 0});
 		}
 		if(timePoint == timeEvent.timeStart + 6){
-			Config.msgDesc.push("<b>2017年12月18日</b>，“1”轮从伊朗阿萨卢耶港装载凝析油约111,510吨驶往韩国瑞山港，离港时艏艉吃水均为13.4米，船上重油2974吨、轻油119吨、滑油42吨，预计抵达目的港时船上重油1900吨、轻油119吨、滑油42吨，开航时船上32人。1月6日，该船在东海海域航行。");
-		}
-		if(timePoint == timeEvent.timeStart + 20){
 			Config.msgDesc.push("<b>2017年12月15日</b>，“2”轮装载63997.817吨散装高梁从美国卡拉马港开航，目的港中国东莞，离港时艏吃水13.02米，艉吃水13.02米。2018年1月5日0106时许，该轮抵达韩国釜山港外锚地，在锚地完成加油（加重油1050吨、轻油90吨和润滑油17.43吨）后于当日1430时起锚续航，开航时航行灯开启，主机转速为87RPM。1月6日1200时许，船长指令将主机转速加到100RPM（实际97 RPM），此后该轮定速航行。");
+		}
+		if(timePoint == timeEvent.timeStart + 30){
+			ArGis.view.goTo({center:[50.3169, 29.2473],zoom: 8}, {duration: 5000});
+			Utils.setShip(0, {lon:50.3169, lat:29.2473});
+		}
+		if(timePoint == timeEvent.timeStart + 30){
+			Config.msgDesc.push("<b>2017年12月18日</b>，“1”轮从伊朗阿萨卢耶港装载凝析油约111,510吨驶往韩国瑞山港，离港时艏艉吃水均为13.4米，船上重油2974吨、轻油119吨、滑油42吨，预计抵达目的港时船上重油1900吨、轻油119吨、滑油42吨，开航时船上32人。1月6日，该船在东海海域航行。");
 		}
 	}},
 	{"name":"开始靠近（19001号交接班）","timeStart":0,"index":[],"timeLength":15,"time":["2018/1/6 19:00:00","2018/1/6 19:30:00"],event: function(timePoint, timeEvent){
@@ -22,6 +26,26 @@ var TimeLineEventData = [
 		var toTime = Utils.formatDate(time, Config.defulatTimeFormat);
 		Utils.animateShip(0, forTime, toTime, timeEvent);
 		Utils.animateShip(1, forTime, toTime, timeEvent);
+		
+		//radar
+		var radarUrls = [];
+		for (var i = 0; i < interval; i++) {
+			var forTemp = Utils.formatDate(time + i * 1000 , Config.defulatTimeFormat);
+			var radarUrl = RadarData[forTemp];
+			if(radarUrl){
+				radarUrls.push({time: forTemp, url: radarUrl});
+			}
+		}
+		for (var i = 0; i < radarUrls.length; i++) {
+			if(i == 0){
+				$("#radar").attr("src", radarUrls[i].url);
+			}else{
+				setTimeout(() => {
+					$("#radar").attr("src", radarUrls[i+1].url);
+				}, (new Date(radarUrls[i].time).getTime() - new Date(radarUrls[i-1].time).getTime())/interval * 1000);
+			}
+			
+		}
 
 		if(timePoint == timeEvent.timeStart + 1){
 			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 10}, {duration: 1000});

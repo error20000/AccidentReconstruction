@@ -346,7 +346,7 @@ ArGis={
 			};
 			ArGis.trackLayer.add(Utils.createGraphic(geometry, symbol, attr, template));
 			
-			require([
+			/*require([
 				  "esri/geometry/Geometry"
 				], function(Geometry, TextSymbol3DLayer, ScaleBar, BasemapToggle, GraphicsLayer, Fullscreen){
 				
@@ -417,7 +417,7 @@ ArGis={
 			        labelsVisible: true
 			      });
 					ArGis.trackLayer.add(graphic);
-			})
+			})*/
 			
 			/*Utils.drawPoint({
 				lon: 124.9597,
@@ -738,8 +738,6 @@ ArGis={
 				PlayController.progress = PlayController.progressSpeed * PlayController.curPlayTime;
 			};
 			PlayController.timePointEvent = function(timePoint){
-				console.log("----------------");
-				console.log(timePoint);
 				var timeEvent;
 				for (var i = 0; i < TimeLineEventData.length; i++) {
 					if(timePoint >= TimeLineEventData[i].index[0] && timePoint < TimeLineEventData[i].index[1]){
