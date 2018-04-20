@@ -1,6 +1,6 @@
 var Utils = {
 		animating: true,
-		animateInterval: "",
+		animateInterval: {},
 		setShip: function(shipIndex, params){
 			var ship = Ships[shipIndex];
 			var shipGraphic = "";
@@ -185,9 +185,9 @@ var Utils = {
 				var cogSecond = cogCount/count;
 				var headSecond = headCount/count;
 				//动画
-				clearInterval(this.animateInterval);
+				clearInterval(this.animateInterval[ship.mmsi]);
 				if(this.animating){
-					this.animateInterval = setInterval(() => {
+					this.animateInterval[ship.mmsi] = setInterval(() => {
 						var startPoint = {
 								lon: temp1.lon + intervalCount*lonSecond,
 								lat: temp1.lat + intervalCount*latSecond,
@@ -199,12 +199,17 @@ var Utils = {
 						this.setShip(shipIndex, startPoint);
 						intervalCount = intervalCount+1;
 						/*if(intervalCount >= 1/interval ){
-							clearInterval(tempInterval);
+							clearInterval(this.animateInterval[ship.mmsi]);
 						}*/
 					}, interval*1000);
 				}
 				
 			}
+		},
+		animateClear: function(){
+			for ( var key in this.animateInterval) {
+			   clearInterval(this.animateInterval[key]);
+		    }
 		},
 		createShip: function(params){
 			var geometry = {

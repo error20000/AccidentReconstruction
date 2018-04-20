@@ -65,6 +65,7 @@ var PlayController = {
       },
 	  handlePaused: function(){
 		  this.paused = true;
+		  Utils.animateClear();
 //		  this.progressGo();
 	  },
 	  handlePlay: function(){

@@ -542,7 +542,7 @@ ArGis={
 								lon: Utils.xToLon(centerPoint.x),
 								lat: Utils.yToLat(centerPoint.y),
 								angle: point.head,
-								url: ship.url,
+								url: ship.trackUrl,
 								width: ship.shipWidth/Math.floor(ArGis.view.state.resolution)+"px" ,
 								height: ship.shipLength/Math.floor(ArGis.view.state.resolution)+"px",
 								attr: {mmsi: ship.mmsi, type: "track_shape",
