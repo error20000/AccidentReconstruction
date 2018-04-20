@@ -28,24 +28,7 @@ var TimeLineEventData = [
 		Utils.animateShip(1, forTime, toTime, timeEvent);
 		
 		//radar
-		var radarUrls = [];
-		for (var i = 0; i < interval; i++) {
-			var forTemp = Utils.formatDate(time + i * 1000 , Config.defulatTimeFormat);
-			var radarUrl = RadarData[forTemp];
-			if(radarUrl){
-				radarUrls.push({time: forTemp, url: radarUrl});
-			}
-		}
-		for (var i = 0; i < radarUrls.length; i++) {
-			if(i == 0){
-				$("#radar").attr("src", radarUrls[i].url);
-			}else{
-				setTimeout(() => {
-					$("#radar").attr("src", radarUrls[i+1].url);
-				}, (new Date(radarUrls[i].time).getTime() - new Date(radarUrls[i-1].time).getTime())/interval * 1000);
-			}
-			
-		}
+		Utils.drawRadar(time, interval);
 
 		if(timePoint == timeEvent.timeStart + 1){
 			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 10}, {duration: 1000});
@@ -66,6 +49,9 @@ var TimeLineEventData = [
 		var toTime = Utils.formatDate(time, Config.defulatTimeFormat);
 		Utils.animateShip(0, forTime, toTime, timeEvent);
 		Utils.animateShip(1, forTime, toTime, timeEvent);
+
+		//radar
+		Utils.drawRadar(time, interval);
 		
 		if(timePoint == timeEvent.timeStart + 1){
 			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 11}, {duration: 1000});
@@ -159,6 +145,10 @@ var TimeLineEventData = [
 		var toTime = Utils.formatDate(time, Config.defulatTimeFormat);
 		Utils.animateShip(0, forTime, toTime, timeEvent);
 		Utils.animateShip(1, forTime, toTime, timeEvent);
+
+		//radar
+		Utils.drawRadar(time, interval);
+		
 		
 		if(timePoint == timeEvent.timeStart + 1){
 			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 12}, {duration: 1000});
@@ -286,6 +276,10 @@ var TimeLineEventData = [
 		var toTime = Utils.formatDate(time, Config.defulatTimeFormat);
 		Utils.animateShip(0, forTime, toTime, timeEvent);
 		Utils.animateShip(1, forTime, toTime, timeEvent);
+
+		//radar
+		Utils.drawRadar(time, interval);
+		
 		
 		if(timePoint == timeEvent.timeStart + 1){
 			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 16}, {duration: 1000});
@@ -308,6 +302,10 @@ var TimeLineEventData = [
 		var toTime = Utils.formatDate(time, Config.defulatTimeFormat);
 		Utils.animateShip(0, forTime, toTime, timeEvent);
 		Utils.animateShip(1, forTime, toTime, timeEvent);
+
+		//radar
+		Utils.drawRadar(time, interval);
+		
 		
 		if(timePoint == timeEvent.timeStart + 1){
 			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 16}, {duration: 1000});

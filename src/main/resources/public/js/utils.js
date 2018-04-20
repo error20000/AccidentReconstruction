@@ -335,6 +335,26 @@ var Utils = {
 		drawInfo: function(params){
 			
 		},
+		drawRadar: function(time, interval){
+			var radarUrls = [];
+			for (var i = 0; i < interval; i++) {
+				var forTemp = Utils.formatDate(time + i * 1000 , Config.defulatTimeFormat);
+				var radarUrl = RadarData[forTemp];
+				if(radarUrl){
+					radarUrls.push({time: forTemp, url: radarUrl});
+				}
+			}
+			for (var i = 0; i < radarUrls.length; i++) {
+				if(i == 0){
+					$("#radar").attr("src", radarUrls[i].url);
+				}else{
+					setTimeout(() => {
+						$("#radar").attr("src", radarUrls[i+1].url);
+					}, (new Date(radarUrls[i].time).getTime() - new Date(radarUrls[i-1].time).getTime())/interval * 1000);
+				}
+				
+			}
+		},
 		removeTrackType: function(type, graphics) {
 			var delArray = [];
 			graphics.forEach(function(item, i){
