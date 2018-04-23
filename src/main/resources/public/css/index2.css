@@ -68,6 +68,12 @@
 	border-radius: 10px;
     overflow: hidden;
 }
+.content_left #mapDiv{
+	height: 290px;
+}
+.content_left #playDiv{
+	height: 62px;
+}
 
 .content_1 .content_right{
 	width: 617px; 
@@ -232,4 +238,37 @@
 .info_item.active{
 	color: black;
 }
+
+/** map full screen **/
+.map_full{
+	height: 685px;
+}
+.map_full .content_left{
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+	margin: 0 7px;
+}
+.map_full .content_right{
+	display: none;
+}
+.map_full #mapDiv{
+	width: 100%;
+	height: 623px;
+}
+
+/** video full screen **/
+.video_full{
+	height: 685px;
+}
+.video_full .content_right{
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+	margin: 0 7px;
+}
+.video_full .content_left{
+	display: none;
+}
+
 

@@ -887,6 +887,13 @@ ArGis={
 				ArGis.trackLayer.addMany(trackInfoPoint);
 				ArGis.trackLayer.addMany(trackInfoLine);
 			}
+		},
+		fullScreen: function(type){
+			if(type == 'map'){
+				$('.content_1').toggleClass('map_full');
+			}else{
+				$('.content_1').toggleClass('video_full');
+			}
 		}
 };
 

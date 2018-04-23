@@ -72,8 +72,8 @@
 	<div class="content">
 		<div class="content_1">
 			<div class="content_left">
-				<div id="mapDiv" style="height: 290px;"></div>
-				<div id="playDiv" style="height: 62px;">
+				<div id="mapDiv"></div>
+				<div id="playDiv">
 					<play-controller ></play-controller>
 				</div>
 			</div>
@@ -244,6 +244,8 @@
 			</div>
 		</div>
 	</div>
+	<button onclick="ArGis.fullScreen('map')">test</button>
+	<button onclick="ArGis.fullScreen('video')">test2</button>
 </div>
 <script type="text/javascript">
 	
@@ -266,6 +268,7 @@
 		    zoom: 1,  
 		    center: ArGis.center
 		  });
+		ArGis.view.ui.empty("top-left");
 		
 		  var toggle = new BasemapToggle({
 		    view: ArGis.view, 
@@ -333,6 +336,10 @@
 				  clearTimeout(ArGis.animation);
 			  }
 			}); */
+
+			ArGis.view.on("resize", function(evt){
+				console.log(evt);
+			});
 	});
 	
 new Vue({
