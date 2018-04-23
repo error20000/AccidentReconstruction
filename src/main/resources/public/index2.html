@@ -244,8 +244,19 @@
 			</div>
 		</div>
 	</div>
-	<button onclick="ArGis.fullScreen('map')">test</button>
-	<button onclick="ArGis.fullScreen('video')">test2</button>
+	<div class="map_full_button" onclick="ArGis.fullScreen('map')">
+		<div class="esri-component esri-fullscreen esri-widget-button esri-widget" title="进入全屏模式">
+			<span class="esri-icon esri-icon-zoom-out-fixed" aria-hidden="true"></span>
+			<span class="esri-icon-font-fallback-text">进入全屏模式</span>
+		</div>
+	</div>
+	<div class="video_full_button" onclick="ArGis.fullScreen('video')">
+		<div class="esri-component esri-fullscreen esri-widget-button esri-widget" title="进入全屏模式">
+			<span class="esri-icon esri-icon-zoom-out-fixed" aria-hidden="true"></span>
+			<span class="esri-icon-font-fallback-text">进入全屏模式</span>
+		</div>
+	</div>
+	
 </div>
 <script type="text/javascript">
 	
@@ -275,7 +286,7 @@
 		    nextBasemap: "hybrid"
 		  });
 	
-		  ArGis.view.ui.add(toggle, "top-right");
+		  ArGis.view.ui.add(toggle, "top-left");
 		  /* ArGis.view.ui.add(new Fullscreen({
 		        view: ArGis.view
 		  }), "top-right"); */

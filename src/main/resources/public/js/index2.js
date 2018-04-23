@@ -890,9 +890,37 @@ ArGis={
 		},
 		fullScreen: function(type){
 			if(type == 'map'){
+				//内容
 				$('.content_1').toggleClass('map_full');
+				//按钮
+				$('.video_full_button').hide();
+				if($('.map_full').length > 0){
+					$('.map_full_button .esri-fullscreen').attr('title', '退出全屏模式');
+					$('.map_full_button .esri-icon').addClass('esri-icon-zoom-in-fixed');
+					$('.map_full_button .esri-icon-font-fallback-text').html('退出全屏模式');
+					$('.map_full_button').css('left', '1226px');
+				}else{
+					$('.map_full_button .esri-fullscreen').attr('title', '进入全屏模式');
+					$('.map_full_button .esri-icon').addClass('esri-icon-zoom-out-fixed');
+					$('.map_full_button .esri-icon-font-fallback-text').html('进入全屏模式');
+					$('.map_full_button').css('left', '594px');
+					$('.video_full_button').show();
+				}
 			}else{
+				//内容
 				$('.content_1').toggleClass('video_full');
+				//按钮
+				$('.map_full_button').hide();
+				if($('.video_full').length > 0){
+					$('.video_full_button .esri-fullscreen').attr('title', '退出全屏模式');
+					$('.video_full_button .esri-icon').addClass('esri-icon-zoom-in-fixed');
+					$('.video_full_button .esri-icon-font-fallback-text').html('退出全屏模式');
+				}else{
+					$('.video_full_button .esri-fullscreen').attr('title', '进入全屏模式');
+					$('.video_full_button .esri-icon').addClass('esri-icon-zoom-out-fixed');
+					$('.video_full_button .esri-icon-font-fallback-text').html('进入全屏模式');
+					$('.map_full_button').show();
+				}
 			}
 		}
 };

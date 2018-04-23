@@ -256,6 +256,12 @@
 	width: 100%;
 	height: 623px;
 }
+/**button*/
+.map_full_button{
+	position: absolute;
+	top: 70px;
+	left: 594px;
+}
 
 /** video full screen **/
 .video_full{
@@ -269,6 +275,12 @@
 }
 .video_full .content_left{
 	display: none;
+}
+/**button*/
+.video_full_button{
+	position: absolute;
+	top: 70px;
+	left: 1226px;
 }
 
 
