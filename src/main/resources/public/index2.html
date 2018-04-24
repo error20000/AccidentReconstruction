@@ -61,7 +61,7 @@
 		<div class="select">
 			<el-select v-model="timeSelect" @change="handlerSelectChange">
 			    <el-option
-			      v-for="item in timeEvent"
+			      v-for="item in timeEvents"
 			      :label="item.name"
 			      :value="item.timeStart">
 			    </el-option>

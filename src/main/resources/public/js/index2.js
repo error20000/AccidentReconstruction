@@ -75,7 +75,7 @@ var Config = {
 			tcpa: ''
 		}],
 		shipsShape: [],
-		timeEvent: [],
+		timeEvents: [],
 		timeSelect: 0,
 		msgDesc: [],
 		weatherDesc: "",
@@ -293,7 +293,9 @@ ArGis={
 			//处理事件
 			for (var i = 0; i < TimeLineEventData.length; i++) {
 				TimeLineEventData[i].timeStart = Config.timeLength;
-				Config.timeEvent.push({name:TimeLineEventData[i].name, timeStart:TimeLineEventData[i].timeStart});
+				if(TimeLineEventData[i].select){
+					Config.timeEvents.push({name:TimeLineEventData[i].name, timeStart:TimeLineEventData[i].timeStart});
+				}
 				TimeLineEventData[i].index.push(Config.timeLength);
 				Config.timeLength += TimeLineEventData[i].timeLength;
 				TimeLineEventData[i].index.push(Config.timeLength);
@@ -494,7 +496,8 @@ ArGis={
 					var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
 					var shipGisPoint = {x: shipCenterPoint.x - ship.left, y: shipCenterPoint.y - ship.trail}; //以天线为原点
 					var distance = Math.sqrt(Math.pow(shipGisPoint.x, 2) + Math.pow(shipGisPoint.y, 2));
-					
+					//shipe
+					var tempShipe = {};
 					for (var j = 0; j < ship.data.length; j++) {
 						var point = ship.data[j];
 						if(point.real){
@@ -708,7 +711,11 @@ ArGis={
 				PlayController.handlePaused();
 			};
 			video.ontimeupdate = function(evt){
-				PlayController.handleTimeUpdate(video.currentTime);
+				if(video.paused){
+					PlayController.emitUpdateTime(video.currentTime);
+				}else{
+					PlayController.handleTimeUpdate(video.currentTime);
+				}
 			};
 			video.onwaiting = function(){
 				console.log("onwaiting");
@@ -736,6 +743,8 @@ ArGis={
 				video.currentTime = updateTime;
 				PlayController.curPlayTime = updateTime;
 				PlayController.progress = PlayController.progressSpeed * PlayController.curPlayTime;
+				//切换地图效果
+				
 			};
 			PlayController.timePointEvent = function(timePoint){
 				var timeEvent;
@@ -922,6 +931,38 @@ ArGis={
 					$('.map_full_button').show();
 				}
 			}
+		},
+		canAddShipe: function(older, newer){
+			if(Utils.isEmpty(older)){
+				older = newer;
+				return true;
+			}
+			//
+			var c1 = {
+				x: Utils.lonTox(older.lon),
+				y: Utils.latToy(older.lat)
+			};
+			var s1 = {
+				width: 	Number(older.width.replace("px", "")),
+				height: Number(older.height.replace("px", ""))
+			};
+			var d1 = older.angle;
+			var p1 = {
+				x: c1.x - s1.width/2,
+				y: c1.y + s1.height/2,
+			};
+			var p2 = {
+				x: c1.x + s1.width/2,
+				y: c1.y + s1.height/2,
+			};
+			var p3 = {
+				x: c1.x + s1.width/2,
+				y: c1.y - s1.height/2,
+			};
+			var p1 = {
+				x: c1.x - s1.width/2,
+				y: c1.y - s1.height/2,
+			};
 		}
 };
 

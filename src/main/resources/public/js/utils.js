@@ -464,5 +464,10 @@ var Utils = {
 		},
 		latTodfm: function(lat){
 			return this.lonlatTodfm(lat).replace("-","") + (lat < 0 ? "S" : "N");
+		},
+		isEmpty: function(obj){
+			for(var k in obj)
+				return !1;
+		    return !0;
 		}
 };

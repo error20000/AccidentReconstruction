@@ -1,24 +1,42 @@
+var TimeLineEventCache = {};
 var TimeLineEventData = [
-	{"name":"事故背景介绍","timeStart":0,"index":[],"timeLength":60,"time":["",""],event: function(timePoint, timeEvent){
-		if(timePoint == timeEvent.timeStart + 1){
+	{"name":"事故背景介绍","timeStart":0,"index":[],"timeLength":60,"time":["",""],select:true,event: function(timePoint, timeEvent){
+		//map
+		var eventCache = TimeLineEventCache['map_event_1'];
+		if(!eventCache){
 			ArGis.view.goTo({center:[-122.8474, 46.0085],zoom: 8}, {duration: 5000});
 			Utils.setShip(1, {lon: -122.8474, lat: 46.0085, head: 330, cog: 0});
+			TimeLineEventCache['map_event_1'] = 1;
 		}
 		if(timePoint == timeEvent.timeStart + 6){
 			Config.msgDesc.push("<b>2017年12月15日</b>，“2”轮装载63997.817吨散装高梁从美国卡拉马港开航，目的港中国东莞，离港时艏吃水13.02米，艉吃水13.02米。2018年1月5日0106时许，该轮抵达韩国釜山港外锚地，在锚地完成加油（加重油1050吨、轻油90吨和润滑油17.43吨）后于当日1430时起锚续航，开航时航行灯开启，主机转速为87RPM。1月6日1200时许，船长指令将主机转速加到100RPM（实际97 RPM），此后该轮定速航行。");
 		}
-		if(timePoint == timeEvent.timeStart + 30){
+		//map
+		var eventCache1 = TimeLineEventCache['map_event_1_1'];
+		if(timePoint == timeEvent.timeStart + 30 || !eventCache1){
 			ArGis.view.goTo({center:[50.3169, 29.2473],zoom: 8}, {duration: 5000});
 			Utils.setShip(0, {lon:50.3169, lat:29.2473});
+			TimeLineEventCache['map_event_1_1'] = 1;
 		}
 		if(timePoint == timeEvent.timeStart + 30){
 			Config.msgDesc.push("<b>2017年12月18日</b>，“1”轮从伊朗阿萨卢耶港装载凝析油约111,510吨驶往韩国瑞山港，离港时艏艉吃水均为13.4米，船上重油2974吨、轻油119吨、滑油42吨，预计抵达目的港时船上重油1900吨、轻油119吨、滑油42吨，开航时船上32人。1月6日，该船在东海海域航行。");
 		}
 	}},
-	{"name":"开始靠近（19001号交接班）","timeStart":0,"index":[],"timeLength":15,"time":["2018/1/6 19:00:00","2018/1/6 19:30:00"],event: function(timePoint, timeEvent){
-		var interval = 2 * 60;
-		var time = new Date("2018/1/6 19:00:00").getTime();
-		time += (timePoint-timeEvent.timeStart) * interval * 1000;
+	{"name":"开始靠近（19001号交接班）","timeStart":0,"index":[],"timeLength":15,"time":["2018/1/6 19:00:00","2018/1/6 19:30:00"],select:true,event: function(timePoint, timeEvent){
+		//time
+		var startTime = timeEvent.time[0];
+		var endTime = timeEvent.time[1];
+		var interval = (Math.floor(new Date(endTime).getTime()/1000) - Math.floor(new Date(startTime).getTime()/1000))/timeEvent.timeLength; //单位秒
+		interval = interval < 1 ? 1 : interval;
+		var time = new Date(startTime).getTime();
+		time += (timePoint - timeEvent.timeStart) * interval * 1000;
+		//map
+		var eventCache = TimeLineEventCache['map_event_2'];
+		if(!eventCache){
+			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 10}, {duration: 1000});
+			TimeLineEventCache['map_event_2'] = 1;
+		}
+		//ship
 		Utils.updateShipInfo(0, Utils.formatDate(time, Config.defulatTimeFormat), {});
 		Utils.updateShipInfo(1, Utils.formatDate(time, Config.defulatTimeFormat), {});
 		
@@ -30,18 +48,28 @@ var TimeLineEventData = [
 		//radar
 		Utils.drawRadar(time, interval);
 
-		if(timePoint == timeEvent.timeStart + 1){
-			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 10}, {duration: 1000});
-		}
+		//message
 		if(timePoint == timeEvent.timeStart + 2){
 			Config.msgDesc.push("<b>1900时许</b> “1”轮航向340度，航速10.3节。三副上驾驶台接班。该轮VHF在16频道值守，两部雷达开启， 其中X波段雷达设置了6海里量程、北向上相对运动、偏心显示，物标真矢量、真尾迹显示，并设置了0.9海里、15分钟的物标报警。");
 			Utils.appendShipInfo(0, {driver: '三副'});
 		}
+		
 	}},
-	{"name":"继续靠近（1930-1939）","timeStart":0,"index":[],"timeLength":180,"time":["2018/1/6 19:30:00","2018/1/6 19:39:00"],event: function(timePoint, timeEvent){
-		var interval = 3;
-		var time = new Date("2018/1/6 19:30:00").getTime();
-		time += (timePoint-timeEvent.timeStart) * interval * 1000;
+	{"name":"继续靠近（1930-1939）","timeStart":0,"index":[],"timeLength":180,"time":["2018/1/6 19:30:00","2018/1/6 19:39:00"],select:true,event: function(timePoint, timeEvent){
+		//time
+		var startTime = timeEvent.time[0];
+		var endTime = timeEvent.time[1];
+		var interval = (Math.floor(new Date(endTime).getTime()/1000) - Math.floor(new Date(startTime).getTime()/1000))/timeEvent.timeLength; //单位秒
+		interval = interval < 1 ? 1 : interval;
+		var time = new Date(startTime).getTime();
+		time += (timePoint - timeEvent.timeStart) * interval * 1000;
+		//map
+		var eventCache = TimeLineEventCache['map_event_3'];
+		if(!eventCache){
+			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 11}, {duration: 1000});
+			TimeLineEventCache['map_event_3'] = 1;
+		}
+		//ship
 		Utils.updateShipInfo(0, Utils.formatDate(time, Config.defulatTimeFormat), {});
 		Utils.updateShipInfo(1, Utils.formatDate(time, Config.defulatTimeFormat), {});
 		
@@ -52,11 +80,8 @@ var TimeLineEventData = [
 
 		//radar
 		Utils.drawRadar(time, interval);
-		
-		if(timePoint == timeEvent.timeStart + 1){
-			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 11}, {duration: 1000});
-		}
-		
+
+		//message
 		if(timePoint == timeEvent.timeStart + 1){ //"2018/1/6 19:30:00"
 			Config.msgDesc.push("<b>1930时许</b> 1号轮航向358度，航速10.4节，“长峰水晶”轮距该轮7.5海里，方位022度，CPA约0.5海里。");
 			Utils.appendShipInfo(0, {
@@ -134,10 +159,21 @@ var TimeLineEventData = [
 			});
 		}
 	}},
-	{"name":"碰撞前10分钟（1940-1949）","timeStart":0,"index":[],"timeLength":600,"time":["2018/1/6 19:40:00","2018/1/6 19:49:00"],event: function(timePoint, timeEvent){
-		var interval = 1;
-		var time = new Date("2018/1/6 19:40:00").getTime();
-		time += (timePoint-timeEvent.timeStart) * interval * 1000;
+	{"name":"碰撞前10分钟（1940-1949）","timeStart":0,"index":[],"timeLength":600,"time":["2018/1/6 19:40:00","2018/1/6 19:49:00"],select:true,event: function(timePoint, timeEvent){
+		//time
+		var startTime = timeEvent.time[0];
+		var endTime = timeEvent.time[1];
+		var interval = (Math.floor(new Date(endTime).getTime()/1000) - Math.floor(new Date(startTime).getTime()/1000))/timeEvent.timeLength; //单位秒
+		interval = interval < 1 ? 1 : interval;
+		var time = new Date(startTime).getTime();
+		time += (timePoint - timeEvent.timeStart) * interval * 1000;
+		//map
+		var eventCache = TimeLineEventCache['map_event_4'];
+		if(!eventCache){
+			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 12}, {duration: 1000});
+			TimeLineEventCache['map_event_4'] = 1;
+		}
+		//ship
 		Utils.updateShipInfo(0, Utils.formatDate(time, Config.defulatTimeFormat), {});
 		Utils.updateShipInfo(1, Utils.formatDate(time, Config.defulatTimeFormat), {});
 		
@@ -149,11 +185,7 @@ var TimeLineEventData = [
 		//radar
 		Utils.drawRadar(time, interval);
 		
-		
-		if(timePoint == timeEvent.timeStart + 1){
-			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 12}, {duration: 1000});
-		}
-		
+		//message
 		if(timePoint == timeEvent.timeStart + 1*60/interval){ //"2018/1/6 19:41:00"
 			Config.msgDesc.push("<b>1941时许</b> “1”轮航向358度，航速10.4节，“2”轮距1轮3.5海里，方位025度，CPA约0.1海里、TCPA约9.5分钟。“浙岱渔03187”渔船距该轮约1.8海里，方位约040度。三副要求值班水手用莫氏信号灯警示“浙岱渔03187”轮，并说：“你看，她要采取行动了”，此时“浙岱渔03187”船开始大幅度向左转向。");
 			Utils.appendShipInfo(0, {
@@ -266,10 +298,21 @@ var TimeLineEventData = [
 			Config.msgDesc.push("<b>1949时许</b> 此时，2轮值班水手提醒三副 “1”轮CPA约0.1海里，三副随即要求水手使用手操舵操右舵但未给出具体舵令，舵角操至右舵20度时水手报告三副。");
 		}
 	}},
-	{"name":"碰撞过程（1950-1952）","timeStart":0,"index":[],"timeLength":60,"time":["2018/1/6 19:50:00","2018/1/6 19:52:00"],event: function(timePoint, timeEvent){
-		var interval = 1;
-		var time = new Date("2018/1/6 19:50:00").getTime();
-		time += (timePoint-timeEvent.timeStart) * interval * 1000;
+	{"name":"碰撞过程（1950-1952）","timeStart":0,"index":[],"timeLength":60,"time":["2018/1/6 19:50:00","2018/1/6 19:52:00"],select:true,event: function(timePoint, timeEvent){
+		//time
+		var startTime = timeEvent.time[0];
+		var endTime = timeEvent.time[1];
+		var interval = (Math.floor(new Date(endTime).getTime()/1000) - Math.floor(new Date(startTime).getTime()/1000))/timeEvent.timeLength; //单位秒
+		interval = interval < 1 ? 1 : interval;
+		var time = new Date(startTime).getTime();
+		time += (timePoint - timeEvent.timeStart) * interval * 1000;
+		//map
+		var eventCache = TimeLineEventCache['map_event_5'];
+		if(!eventCache){
+			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 16}, {duration: 1000});
+			TimeLineEventCache['map_event_5'] = 1;
+		}
+		//ship
 		Utils.updateShipInfo(0, Utils.formatDate(time, Config.defulatTimeFormat), {});
 		Utils.updateShipInfo(1, Utils.formatDate(time, Config.defulatTimeFormat), {});
 		var forTime = Utils.formatDate(time - ((timePoint-timeEvent.timeStart) == 0 ? 0 : interval * 1000), Config.defulatTimeFormat);
@@ -280,21 +323,28 @@ var TimeLineEventData = [
 		//radar
 		Utils.drawRadar(time, interval);
 		
-		
-		if(timePoint == timeEvent.timeStart + 1){
-			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 16}, {duration: 1000});
-		}
-		
+		//message
 		if(timePoint == timeEvent.timeStart + 1){ 
 			Config.msgDesc.push("<b>1950时许</b> 1轮右舷2、3舱之间船体与“2”轮船艏发生碰撞，“1”轮货油舱破损、凝析油泄漏并发生燃爆。船长要求打开甲板灯、“左满舵”，并发出遇险报警 。");
 		}else if(timePoint == timeEvent.timeStart + 2){ 
 			Config.msgDesc.push("<b>1950时许</b> “2”轮船首与“桑吉”轮右舷2、3舱之间船体碰撞，碰撞夹角约50度，“长峰水晶”轮船艏撞入“桑吉”轮船艏破损，3号货舱之前甲板、舱盖受损变形，左舷舷墙及部分甲板设施过火受损。碰撞后，船长立即上驾驶台，将车钟拉至“停车”位置。");
 		}
 	}},
-	{"name":"燃烧起火漏油（1950-1952）","timeStart":0,"index":[],"timeLength":60,"time":["2018/1/6 19:50:00","2018/1/6 19:52:00"],event: function(timePoint, timeEvent){
-		var interval = 1;
-		var time = new Date("2018/1/6 19:50:00").getTime();
-		time += (timePoint-timeEvent.timeStart) * interval * 1000;
+	{"name":"燃烧起火漏油（1950-1952）","timeStart":0,"index":[],"timeLength":60,"time":["2018/1/6 19:50:00","2018/1/6 19:52:00"],select:true,event: function(timePoint, timeEvent){
+		//time
+		var startTime = timeEvent.time[0];
+		var endTime = timeEvent.time[1];
+		var interval = (Math.floor(new Date(endTime).getTime()/1000) - Math.floor(new Date(startTime).getTime()/1000))/timeEvent.timeLength; //单位秒
+		interval = interval < 1 ? 1 : interval;
+		var time = new Date(startTime).getTime();
+		time += (timePoint - timeEvent.timeStart) * interval * 1000;
+		//map
+		var eventCache = TimeLineEventCache['map_event_6'];
+		if(!eventCache){
+			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 16}, {duration: 1000});
+			TimeLineEventCache['map_event_6'] = 1;
+		}
+		//ship
 		Utils.updateShipInfo(0, Utils.formatDate(time, Config.defulatTimeFormat), {});
 		Utils.updateShipInfo(1, Utils.formatDate(time, Config.defulatTimeFormat), {});
 		
@@ -306,18 +356,17 @@ var TimeLineEventData = [
 		//radar
 		Utils.drawRadar(time, interval);
 		
+		//message
 		
-		if(timePoint == timeEvent.timeStart + 1){
-			ArGis.view.goTo({center:[Center.lon,Center.lat],zoom: 16}, {duration: 1000});
-		}
 	}},
-	{"name":"2号轮弃船脱离（1952分后）","timeStart":0,"index":[],"timeLength":20,"time":["2018/1/6 19:52:00","2018/1/6 19:52:00"],event: function(timePoint, timeEvent){
+	{"name":"2号轮弃船脱离（1952分后）","timeStart":0,"index":[],"timeLength":20,"time":["2018/1/6 19:52:00","2018/1/6 19:52:00"],select:true,event: function(timePoint, timeEvent){
+		//message
 		if(timePoint == timeEvent.timeStart + 1){ 
 			Config.msgDesc.push("<b>1952分后</b> 2轮船长通过VHF16频道发出“MAYDAY”的遇险呼叫，并采取了全速倒车措施。随后两轮逐渐脱离。船长下达弃船指令。全员弃船乘坐全封闭救生艇逃生。");
 		}
 		
 	}},
-	{"name":"救援、灭火（1.7-1.12）","timeStart":0,"index":[],"timeLength":55,"time":["2018/1/7 00:00:00","2018/1/12 23:59:59"],event: function(timePoint, timeEvent){
+	{"name":"救援、灭火（1.7-1.12）","timeStart":0,"index":[],"timeLength":55,"time":["2018/1/7 00:00:00","2018/1/12 23:59:59"],select:true,event: function(timePoint, timeEvent){
 		if(timePoint == timeEvent.timeStart + 1){ 
 			Config.msgDesc.push("<b>1月7日0230时</b> “东海救101”轮抵达现场后从渔船上接下遇险船员。“2号船”轮处于失控状态，船艏凹陷破损。");
 		}else if(timePoint == timeEvent.timeStart + 10){ 
@@ -326,7 +375,7 @@ var TimeLineEventData = [
 			Config.msgDesc.push("<b>1月7日1628时</b> 所有船员全部返船，对船上设备进行检修，由“东海救118”轮全程伴航，驶往舟山靠泊接受海事调查。");
 		}
 	}},
-	{"name":"碰撞后沉没前1轮情况（1.7-1.12）","timeStart":0,"index":[],"timeLength":60,"time":["2018/1/7 00:00:00","2018/1/12 23:59:59"],event: function(timePoint, timeEvent){
+	{"name":"碰撞后沉没前1轮情况（1.7-1.12）","timeStart":0,"index":[],"timeLength":60,"time":["2018/1/7 00:00:00","2018/1/12 23:59:59"],select:true,event: function(timePoint, timeEvent){
 		if(timePoint == timeEvent.timeStart + 1){ 
 			Config.msgDesc.push("<b>1月7日</b> “1号船”轮艏部右舷侧持续剧烈燃烧，船体右倾。");
 		}else if(timePoint == timeEvent.timeStart + 16){ 
@@ -337,12 +386,12 @@ var TimeLineEventData = [
 			Config.msgDesc.push("<b>1月12日</b> “1号船”轮依然右倾，右舷侧火势明显（配图说明）。动画现场深潜号灭火。");
 		}
 	}},
-	{"name":"打捞局登船救援（1.13）","timeStart":0,"index":[],"timeLength":20,"time":["2018/1/13 00:00:00","2018/1/13 23:59:59"],event: function(timePoint, timeEvent){
+	{"name":"打捞局登船救援（1.13）","timeStart":0,"index":[],"timeLength":20,"time":["2018/1/13 00:00:00","2018/1/13 23:59:59"],select:true,event: function(timePoint, timeEvent){
 		if(timePoint == timeEvent.timeStart + 1){ 
 			Config.msgDesc.push("<b>1月13日0837时</b> 上海打捞局4名搜救人员从“深潜”号通过吊篮登上“1号船”轮尾部甲板。搜救人员在救生甲板发现2名船员遗体，在驾驶台取下航行数据记录仪，驾驶台内未发现遇险船员。");
 		}
 	}},
-	{"name":"沉没（1.14）","timeStart":0,"index":[],"timeLength":30,"time":["2018/1/14 00:00:00","2018/1/14 23:59:59"],event: function(timePoint, timeEvent){
+	{"name":"沉没（1.14）","timeStart":0,"index":[],"timeLength":30,"time":["2018/1/14 00:00:00","2018/1/14 23:59:59"],select:true,event: function(timePoint, timeEvent){
 		if(timePoint == timeEvent.timeStart + 1){ 
 			Config.msgDesc.push("<b>1月14日1258时</b> “1号船”轮火势继续增大，全船被火包围，船头已在水下 。");
 		}else if(timePoint == timeEvent.timeStart + 15){ 

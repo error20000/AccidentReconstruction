@@ -14,7 +14,7 @@ var PlayController = {
 		  if(this.curPlayTime > this.endTime){
 			  this.curPlayTime = this.endTime
 		  }
-		  this.progressSpeed= Number((100 / this.endTime).toFixed(2));
+		  this.progressSpeed= 100 / this.endTime;
     	  this.progress = this.progressSpeed * this.curPlayTime;
     	  if(this.progress > 100){
     		  this.progress = 100;
@@ -146,22 +146,23 @@ Vue.component('play-controller',{
       },
       // 切歌 上一首 or 下一首
       changePlay(operate) {
+    	  var step = 20;
           if(operate === "next"){
-        	  this.progress += this.progressSpeed * 5;
-        	  this.curPlayTime += 5;
+        	  this.progress += this.progressSpeed * step;
+        	  this.curPlayTime += step;
         	  if(this.curPlayTime >= this.endTime) {
         		  this.progress = 100;
         		  this.curPlayTime = this.endTime;
         	  }
           }else{
-        	  this.progress -= this.progressSpeed * 5;
-        	  this.curPlayTime -=  5;
+        	  this.progress -= this.progressSpeed * step;
+        	  this.curPlayTime -=  step;
         	  if(this.curPlayTime <= 0) {
         		  this.progress = 0;
         		  this.curPlayTime = 0;
         	  }
           }     
-          //PlayController.emitUpdateTime(this.curPlayTime);
+          PlayController.emitUpdateTime(this.curPlayTime);
       }
   },
   filters: {
