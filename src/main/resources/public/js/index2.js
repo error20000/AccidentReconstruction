@@ -954,7 +954,7 @@ ArGis={
 			if(Utils.isEmpty(older)){
 				return true;
 			}
-			//矩形B
+			//矩形A
 			var c1 = {
 				x: older.x,
 				y: older.y
@@ -976,49 +976,35 @@ ArGis={
 			};
 			var d2 = (360 - newer.angle) * Math.PI / 180;
 			var B = this.rectVertex(c2, s2, d2);
-			//判断外包络线的宽高是不是的大于两个矩形的和，如果大于不想交，如果小于相交
-			var minAx = A.x1 < A.x2 ? A.x1 : A.x2 < A.x3 ? A.x2 : A.x3 < A.x4 ? A.x3 : A.x4;
-			var minAy = A.y1 < A.y2 ? A.y1 : A.y2 < A.y3 ? A.y2 : A.y3 < A.y4 ? A.y3 : A.y4;
-			var maxAx = A.x1 > A.x2 ? A.x1 : A.x2 > A.x3 ? A.x2 : A.x3 > A.x4 ? A.x3 : A.x4;
-			var maxAy = A.y1 > A.y2 ? A.y1 : A.y2 > A.y3 ? A.y2 : A.y3 > A.y4 ? A.y3 : A.y4;
+			//OBB
+			var flag = false; //默认
+			// 1 以A为轴，B在A上的映射
+			// x
+			var vectorAx = {x: A.x3-A.x4, y: A.y3-A.y4};
+			flag = this.collisionTesting(A, B, c1, c2, vectorAx);
+			if(flag) return flag;
+			// y
+			var vectorAy = {x: A.x1-A.x4, y: A.y1-A.y4};
+			flag = this.collisionTesting(A, B, c1, c2, vectorAy);
+			if(flag) return flag;
+			// 2 以B为轴，A在B上的映射
+			// x
+			var vectorBx = {x: B.x3-B.x4, y: B.y3-B.y4};
+			flag = this.collisionTesting(B, A, c2, c1, vectorBx);
+			if(flag) return flag;
+			// y
+			var vectorBy = {x: B.x1-B.x4, y: B.y1-B.y4};
+			flag = this.collisionTesting(B, A, c2, c1, vectorBy);
+			if(flag) return flag;
 			
-			var minBx = B.x1 < B.x2 ? B.x1 : B.x2 < B.x3 ? B.x2 : B.x3 < B.x4 ? B.x3 : B.x4;
-			var minBy = B.y1 < B.y2 ? B.y1 : B.y2 < B.y3 ? B.y2 : B.y3 < B.y4 ? B.y3 : B.y4;
-			var maxBx = B.x1 > B.x2 ? B.x1 : B.x2 > B.x3 ? B.x2 : B.x3 > B.x4 ? B.x3 : B.x4;
-			var maxBy = B.y1 > B.y2 ? B.y1 : B.y2 > B.y3 ? B.y2 : B.y3 > B.y4 ? B.y3 : B.y4;
-			
-			var minx = minAx < minBx ? minAx : minBx;
-			var miny = minAy < minBy ? minAy : minBy;
-			var maxx = maxAx > maxBx ? maxAx : maxBx;
-			var maxy = maxAy > maxBy ? maxAy : maxBy;
-			
-			var c3 = {
-					x: minx + (maxx - minx)/2,
-					y: miny + (maxy - miny)/2
-			};
-			var C = {
-					x1: minx*Math.cos(d2) - miny*Math.sin(d2) + c3.x,
-					y1: miny*Math.cos(d2) + minx*Math.sin(d2) + c3.y,
-					x2: maxx*Math.cos(d2) - miny*Math.sin(d2) + c3.x,
-					y2: miny*Math.cos(d2) + maxx*Math.sin(d2) + c3.y,
-					x3: maxx*Math.cos(d2) - maxy*Math.sin(d2) + c3.x,
-					y3: maxy*Math.cos(d2) + maxx*Math.sin(d2) + c3.y,
-					x4: minx*Math.cos(d2) - maxy*Math.sin(d2) + c3.x,
-					y4: maxy*Math.cos(d2) + minx*Math.sin(d2) + c3.y
-			};
-			var minCx = C.x1 < C.x2 ? C.x1 : C.x2 < C.x3 ? C.x2 : C.x3 < C.x4 ? C.x3 : C.x4;
-			var minCy = C.y1 < C.y2 ? C.y1 : C.y2 < C.y3 ? C.y2 : C.y3 < C.y4 ? C.y3 : C.y4;
-			var maxCx = C.x1 > C.x2 ? C.x1 : C.x2 > C.x3 ? C.x2 : C.x3 > C.x4 ? C.x3 : C.x4;
-			var maxCy = C.y1 > C.y2 ? C.y1 : C.y2 > C.y3 ? C.y2 : C.y3 > C.y4 ? C.y3 : C.y4;
-			
-//			var flag = maxx - minx < (maxAx - minAx) + (maxBx - minBx) ? false : true;
-//			var flag2 = maxy - miny < (maxAy - minAy) + (maxBy - minBy) ? false : true;
-			var flag = maxCx - minCx < (maxAx - minAx) + (maxBx - minBx) ? false : true;
-			var flag2 = maxCy - minCy < (maxAy - minAy) + (maxBy - minBy) ? false : true;
-			return (flag || flag2);
+			return flag;
 		},
 		rectVertex: function(c1, s1, d1){
 			//矩形四个顶点
+			/*
+			 * p1	p2
+			 * p4	p3
+			 */
 			var p1 = {
 				x: c1.x - s1.width/2,
 				y: c1.y + s1.height/2,
@@ -1062,6 +1048,35 @@ ArGis={
 				x4: p14.x,
 				y4: p14.y,
 			};
+		},
+		collisionTesting: function(A, B, c1, c2, axis){
+			/*
+			 * 向量公式：
+			 * 两点 A(x1,y1) ，B(x2,y2)
+                                                    向量a=AB=(x2-x1,y2-y1)
+			 * 向量夹角公式：
+			   cosA=a*b/(|a|*|b|)
+			               先求出两个向量的模
+				再求出两个向量的向量积
+				|a|=√(x1^2+y1^2)
+				|b|=√(x2^2+y2^2)
+				a*b=(x1,y1)(x2,y2)=x1x2+y1y2
+				cos=a*b/(|a|*|b|)
+			 * */
+			// 中心点
+			var vectorAB = {x: c2.x-c1.x, y: c2.y-c1.y};
+			var cosAB = (vectorAB.x*axis.x+vectorAB.y*axis.y)/(Math.sqrt(Math.pow(vectorAB.x,2) + Math.pow(vectorAB.y,2)) * Math.sqrt(Math.pow(axis.x,2) + Math.pow(axis.y,2)));
+			var dABx = Math.abs(cosAB * Math.sqrt(Math.pow(vectorAB.x,2) + Math.pow(vectorAB.y,2)));
+			// B1B4 + B1B2 = B2B3 + B3B4
+			var vectorB1B4 = {x: B.x1-B.x4, y: B.y1-B.y4};
+			var vectorB1B2 = {x: B.x2-B.x1, y: B.y2-B.y1};
+			var cosB1B4 = (vectorB1B4.x*axis.x+vectorB1B4.y*axis.y)/(Math.sqrt(Math.pow(vectorB1B4.x,2) + Math.pow(vectorB1B4.y,2)) * Math.sqrt(Math.pow(axis.x,2) + Math.pow(axis.y,2)));
+			var cosB1B2 = (vectorB1B2.x*axis.x+vectorB1B2.y*axis.y)/(Math.sqrt(Math.pow(vectorB1B2.x,2) + Math.pow(vectorB1B2.y,2)) * Math.sqrt(Math.pow(axis.x,2) + Math.pow(axis.y,2)));
+			var dB1B4x = Math.abs(cosB1B4 * Math.sqrt(Math.pow(vectorB1B4.x,2) + Math.pow(vectorB1B4.y,2)));
+			var dB1B2x = Math.abs(cosB1B2 * Math.sqrt(Math.pow(vectorB1B2.x,2) + Math.pow(vectorB1B2.y,2)));
+			if(dABx > (dB1B4x + dB1B2x)/2)
+				return true; //未碰撞
+			return false //已碰撞
 		}
 };
 
