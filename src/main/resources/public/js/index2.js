@@ -540,59 +540,77 @@ ArGis={
 									x: shipB.x,
 									y: shipB.y
 							};
-							
-							var createShape = Utils.createShape({
-								lon: Utils.xToLon(centerPoint.x),
-								lat: Utils.yToLat(centerPoint.y),
-								angle: point.head,
-								url: ship.trackUrl,
-								width: ship.shipWidth/Math.floor(ArGis.view.state.resolution)+"px" ,
-								height: ship.shipLength/Math.floor(ArGis.view.state.resolution)+"px",
-								attr: {mmsi: ship.mmsi, type: "track_shape",
-									lon: point.lon,
-									lat: point.lat,
-									time: point.time,
-									speed: point.speed,
-									head: point.head,
-									cog: point.cog,
-									showName: ship.showName
-								},
-								template:{
-									title:"详细信息",
-									content:[{
-									        type: "fields",
-									        fieldInfos: [{
-										          fieldName: "showName",
-										          label: "名称"
-										    },{
-									          fieldName: "time",
-									          label: "时间"
-									        }, {
-									          fieldName: "lon",
-									          label: "经度"
-									        }, {
-										          fieldName: "lat",
-										          label: "纬度"
-									        }, {
-										          fieldName: "speed",
-										          label: "船速"
-									        }, {
-										          fieldName: "head",
-										          label: "船首向"
-									        }, {
-										          fieldName: "cog",
-										          label: "COG"
-									        }]
-									      }]
+							var tempShipe2 ={
+									x: centerPoint.x,
+									y: centerPoint.y,
+									angle: point.head,
+									width: ship.shipWidth,
+									height: ship.shipLength,
+							};
+							var flag = this.canAddShipe(tempShipe, tempShipe2);
+//							var flag = true;
+							if(flag){
+								tempShipe = {
+										x: centerPoint.x,
+										y: centerPoint.y,
+										angle: point.head,
+										width: ship.shipWidth,
+										height: ship.shipLength,
+								};
+								console.log(ship.mmsi);
+								var createShape = Utils.createShape({
+										lon: Utils.xToLon(centerPoint.x),
+										lat: Utils.yToLat(centerPoint.y),
+										angle: point.head,
+										url: ship.trackUrl,
+										width: ship.shipWidth/Math.floor(ArGis.view.state.resolution)+"px" ,
+										height: ship.shipLength/Math.floor(ArGis.view.state.resolution)+"px",
+										attr: {mmsi: ship.mmsi, type: "track_shape",
+											lon: point.lon,
+											lat: point.lat,
+											time: point.time,
+											speed: point.speed,
+											head: point.head,
+											cog: point.cog,
+											showName: ship.showName
+										},
+										template:{
+											title:"详细信息",
+											content:[{
+											        type: "fields",
+											        fieldInfos: [{
+												          fieldName: "showName",
+												          label: "名称"
+												    },{
+											          fieldName: "time",
+											          label: "时间"
+											        }, {
+											          fieldName: "lon",
+											          label: "经度"
+											        }, {
+												          fieldName: "lat",
+												          label: "纬度"
+											        }, {
+												          fieldName: "speed",
+												          label: "船速"
+											        }, {
+												          fieldName: "head",
+												          label: "船首向"
+											        }, {
+												          fieldName: "cog",
+												          label: "COG"
+											        }]
+											      }]
+										}
+								});
+								var tempShape = Config.trackShape[ship.mmsi];
+								if(!tempShape){
+									tempShape = [createShape];
+								}else{
+									tempShape.push(createShape);
 								}
-							});
-							var tempShape = Config.trackShape[ship.mmsi];
-							if(!tempShape){
-								tempShape = [createShape];
-							}else{
-								tempShape.push(createShape);
+								Config.trackShape[ship.mmsi] = tempShape;
 							}
-							Config.trackShape[ship.mmsi] = tempShape;
 							//事件
 							var createInfo = Utils.createInfo({
 								lon: point.lon,
@@ -934,19 +952,73 @@ ArGis={
 		},
 		canAddShipe: function(older, newer){
 			if(Utils.isEmpty(older)){
-				older = newer;
 				return true;
 			}
-			//
+			//矩形B
 			var c1 = {
-				x: Utils.lonTox(older.lon),
-				y: Utils.latToy(older.lat)
+				x: older.x,
+				y: older.y
 			};
 			var s1 = {
-				width: 	Number(older.width.replace("px", "")),
-				height: Number(older.height.replace("px", ""))
+				width: 	older.width,
+				height: older.height
 			};
-			var d1 = older.angle;
+			var d1 = (360 - older.angle) * Math.PI / 180;
+			var A = this.rectVertex(c1, s1, d1);
+			//矩形B
+			var c2 = {
+					x: newer.x,
+					y: newer.y
+			};
+			var s2 = {
+					width: 	newer.width,
+					height: newer.height
+			};
+			var d2 = (360 - newer.angle) * Math.PI / 180;
+			var B = this.rectVertex(c2, s2, d2);
+			//判断外包络线的宽高是不是的大于两个矩形的和，如果大于不想交，如果小于相交
+			var minAx = A.x1 < A.x2 ? A.x1 : A.x2 < A.x3 ? A.x2 : A.x3 < A.x4 ? A.x3 : A.x4;
+			var minAy = A.y1 < A.y2 ? A.y1 : A.y2 < A.y3 ? A.y2 : A.y3 < A.y4 ? A.y3 : A.y4;
+			var maxAx = A.x1 > A.x2 ? A.x1 : A.x2 > A.x3 ? A.x2 : A.x3 > A.x4 ? A.x3 : A.x4;
+			var maxAy = A.y1 > A.y2 ? A.y1 : A.y2 > A.y3 ? A.y2 : A.y3 > A.y4 ? A.y3 : A.y4;
+			
+			var minBx = B.x1 < B.x2 ? B.x1 : B.x2 < B.x3 ? B.x2 : B.x3 < B.x4 ? B.x3 : B.x4;
+			var minBy = B.y1 < B.y2 ? B.y1 : B.y2 < B.y3 ? B.y2 : B.y3 < B.y4 ? B.y3 : B.y4;
+			var maxBx = B.x1 > B.x2 ? B.x1 : B.x2 > B.x3 ? B.x2 : B.x3 > B.x4 ? B.x3 : B.x4;
+			var maxBy = B.y1 > B.y2 ? B.y1 : B.y2 > B.y3 ? B.y2 : B.y3 > B.y4 ? B.y3 : B.y4;
+			
+			var minx = minAx < minBx ? minAx : minBx;
+			var miny = minAy < minBy ? minAy : minBy;
+			var maxx = maxAx > maxBx ? maxAx : maxBx;
+			var maxy = maxAy > maxBy ? maxAy : maxBy;
+			
+			var c3 = {
+					x: minx + (maxx - minx)/2,
+					y: miny + (maxy - miny)/2
+			};
+			var C = {
+					x1: minx*Math.cos(d2) - miny*Math.sin(d2) + c3.x,
+					y1: miny*Math.cos(d2) + minx*Math.sin(d2) + c3.y,
+					x2: maxx*Math.cos(d2) - miny*Math.sin(d2) + c3.x,
+					y2: miny*Math.cos(d2) + maxx*Math.sin(d2) + c3.y,
+					x3: maxx*Math.cos(d2) - maxy*Math.sin(d2) + c3.x,
+					y3: maxy*Math.cos(d2) + maxx*Math.sin(d2) + c3.y,
+					x4: minx*Math.cos(d2) - maxy*Math.sin(d2) + c3.x,
+					y4: maxy*Math.cos(d2) + minx*Math.sin(d2) + c3.y
+			};
+			var minCx = C.x1 < C.x2 ? C.x1 : C.x2 < C.x3 ? C.x2 : C.x3 < C.x4 ? C.x3 : C.x4;
+			var minCy = C.y1 < C.y2 ? C.y1 : C.y2 < C.y3 ? C.y2 : C.y3 < C.y4 ? C.y3 : C.y4;
+			var maxCx = C.x1 > C.x2 ? C.x1 : C.x2 > C.x3 ? C.x2 : C.x3 > C.x4 ? C.x3 : C.x4;
+			var maxCy = C.y1 > C.y2 ? C.y1 : C.y2 > C.y3 ? C.y2 : C.y3 > C.y4 ? C.y3 : C.y4;
+			
+//			var flag = maxx - minx < (maxAx - minAx) + (maxBx - minBx) ? false : true;
+//			var flag2 = maxy - miny < (maxAy - minAy) + (maxBy - minBy) ? false : true;
+			var flag = maxCx - minCx < (maxAx - minAx) + (maxBx - minBx) ? false : true;
+			var flag2 = maxCy - minCy < (maxAy - minAy) + (maxBy - minBy) ? false : true;
+			return (flag || flag2);
+		},
+		rectVertex: function(c1, s1, d1){
+			//矩形四个顶点
 			var p1 = {
 				x: c1.x - s1.width/2,
 				y: c1.y + s1.height/2,
@@ -959,9 +1031,36 @@ ArGis={
 				x: c1.x + s1.width/2,
 				y: c1.y - s1.height/2,
 			};
-			var p1 = {
+			var p4 = {
 				x: c1.x - s1.width/2,
 				y: c1.y - s1.height/2,
+			};
+			//旋转
+			var p11 = {
+					x: p1.x*Math.cos(d1) - p1.y*Math.sin(d1) + c1.x,
+					y: p1.y*Math.cos(d1) + p1.x*Math.sin(d1) + c1.y
+			};
+			var p12 = {
+					x: p2.x*Math.cos(d1) - p2.y*Math.sin(d1) + c1.x,
+					y: p2.y*Math.cos(d1) + p2.x*Math.sin(d1) + c1.y
+			};
+			var p13 = {
+					x: p3.x*Math.cos(d1) - p3.y*Math.sin(d1) + c1.x,
+					y: p3.y*Math.cos(d1) + p3.x*Math.sin(d1) + c1.y
+			};
+			var p14 = {
+					x: p4.x*Math.cos(d1) - p4.y*Math.sin(d1) + c1.x,
+					y: p4.y*Math.cos(d1) + p4.x*Math.sin(d1) + c1.y
+			};
+			return {
+				x1: p11.x,
+				y1: p11.y,
+				x2: p12.x,
+				y2: p12.y,
+				x3: p13.x,
+				y3: p13.y,
+				x4: p14.x,
+				y4: p14.y,
 			};
 		}
 };
