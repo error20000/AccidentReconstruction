@@ -1074,7 +1074,9 @@ ArGis={
 			var cosB1B2 = (vectorB1B2.x*axis.x+vectorB1B2.y*axis.y)/(Math.sqrt(Math.pow(vectorB1B2.x,2) + Math.pow(vectorB1B2.y,2)) * Math.sqrt(Math.pow(axis.x,2) + Math.pow(axis.y,2)));
 			var dB1B4x = Math.abs(cosB1B4 * Math.sqrt(Math.pow(vectorB1B4.x,2) + Math.pow(vectorB1B4.y,2)));
 			var dB1B2x = Math.abs(cosB1B2 * Math.sqrt(Math.pow(vectorB1B2.x,2) + Math.pow(vectorB1B2.y,2)));
-			if(dABx > (dB1B4x + dB1B2x)/2)
+			// axis
+			var dAxis = Math.sqrt(Math.pow(axis.x,2) + Math.pow(axis.y,2));
+			if(dABx > Math.abs(dB1B2x - dB1B4x)/2 + dAxis/2)
 				return true; //未碰撞
 			return false //已碰撞
 		}
