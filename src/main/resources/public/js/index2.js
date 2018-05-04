@@ -496,8 +496,11 @@ ArGis={
 					var shipCenterPoint = {x: ship.shipWidth/2, y: ship.shipLength/2}; 
 					var shipGisPoint = {x: shipCenterPoint.x - ship.left, y: shipCenterPoint.y - ship.trail}; //以天线为原点
 					var distance = Math.sqrt(Math.pow(shipGisPoint.x, 2) + Math.pow(shipGisPoint.y, 2));
-					//shipe
+					//形状
 					var tempShipe = {};
+					//事件
+					var tempInfo = {};
+					
 					for (var j = 0; j < ship.data.length; j++) {
 						var point = ship.data[j];
 						if(point.real){
@@ -612,22 +615,54 @@ ArGis={
 								Config.trackShape[ship.mmsi] = tempShape;
 							}
 							//事件
-							var createInfo = Utils.createInfo({
-								lon: point.lon,
-								lat: point.lat,
-								color: point.color || ship.trackColor,
-								width: point.width,
-								text: point.time,
-								attr: {mmsi: ship.mmsi, type: "track_info"},
-								template:""
-							});
-							var tempInfo = Config.trackInfo[ship.mmsi];
-							if(!tempInfo){
-								tempInfo = [createInfo];
-							}else{
-								tempInfo.push(createInfo);
+							var lonlatPoint = Utils.lonLatToMercator(point.lon, point.lat);
+							var shipD = (360-point.head)*Math.PI/180 - Math.atan(shipGisPoint.x/shipGisPoint.y);
+							var shipA = {
+									x: 0,
+									y: distance
+							};
+							var shipB = {
+									x: shipA.x*Math.cos(shipD) - shipA.y*Math.sin(shipD) + lonlatPoint.x,
+									y: shipA.y*Math.cos(shipD) + shipA.x*Math.sin(shipD) + lonlatPoint.y
+							};
+							var centerPoint = {
+									x: shipB.x,
+									y: shipB.y
+							};
+							var tempInfo2 ={
+									x: centerPoint.x,
+									y: centerPoint.y,
+									angle: point.head,
+									width: ship.shipWidth,
+									height: ship.shipLength,
+							};
+							var flag = this.canAddShipe(tempInfo, tempInfo2);
+							if(flag){
+								tempInfo = {
+										x: centerPoint.x,
+										y: centerPoint.y,
+										angle: point.head,
+										width: ship.shipWidth,
+										height: ship.shipLength,
+								};
+								var createInfo = Utils.createInfo({
+									lon: point.lon,
+									lat: point.lat,
+									color: point.color || ship.trackColor,
+									width: point.width,
+									text: point.time,
+									attr: {mmsi: ship.mmsi, type: "track_info"},
+									template:""
+								});
+								var tempInfo = Config.trackInfo[ship.mmsi];
+								if(!tempInfo){
+									tempInfo = [createInfo];
+								}else{
+									tempInfo.push(createInfo);
+								}
+								Config.trackInfo[ship.mmsi] = tempInfo;
 							}
-							Config.trackInfo[ship.mmsi] = tempInfo;
+							
 						}
 					}
 				}
@@ -854,20 +889,22 @@ ArGis={
 			if(Config.isTrackShowInfo){
 				var trackInfoPoint = [];
 				var trackInfoLine = [];
-				var timeInfo = ["2018/1/6 19:50:10"];
+				var timeInfo = []; //显示过滤
 				var height = 16 * Math.floor(ArGis.view.state.resolution);
 				for (var i = 0; i < Ships.length; i++) {
 					var ship = Ships[i];
-					for (var j = 0; j < timeInfo.length; j++) {
-						var point = "";
-						for (var m = 0; m < ship.data.length; m++) {
-							if(timeInfo[j] == ship.data[m].time){
-								point = ship.data[m];
-								break;
+					for (var j = 0; j < ship.data.length; j++) {
+						if(timeInfo.length > 0){
+							var point = "";
+							for (var m = 0; m < timeInfo.length; m++) {
+								if(timeInfo[m] == ship.data[j].time){
+									point = ship.data[j];
+									break;
+								}
 							}
-						}
-						if(!point){
-							continue;
+							if(!point){
+								continue;
+							}
 						}
 						//标签
 						var geometry = {
