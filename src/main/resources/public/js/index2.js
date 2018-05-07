@@ -560,7 +560,6 @@ ArGis={
 										width: ship.shipWidth,
 										height: ship.shipLength,
 								};
-								console.log(ship.mmsi);
 								var createShape = Utils.createShape({
 										lon: Utils.xToLon(centerPoint.x),
 										lat: Utils.yToLat(centerPoint.y),
@@ -651,7 +650,7 @@ ArGis={
 									color: point.color || ship.trackColor,
 									width: point.width,
 									text: point.time,
-									attr: {mmsi: ship.mmsi, type: "track_info"},
+									attr: {mmsi: ship.mmsi, time: point.time, type: "track_info"},
 									template:""
 								});
 								var tempInfo = Config.trackInfo[ship.mmsi];
@@ -661,10 +660,12 @@ ArGis={
 									tempInfo.push(createInfo);
 								}
 								Config.trackInfo[ship.mmsi] = tempInfo;
+								console.log(Config.trackInfo[ship.mmsi]);
 							}
 							
 						}
 					}
+					
 				}
 //			}, 10);
 		},
@@ -765,6 +766,7 @@ ArGis={
 			};
 			video.ontimeupdate = function(evt){
 				if(video.paused){
+					PlayController.timeEventCache = {};
 					PlayController.emitUpdateTime(video.currentTime);
 				}else{
 					PlayController.handleTimeUpdate(video.currentTime);
@@ -887,15 +889,16 @@ ArGis={
 		},
 		showTrackInfo: function(ship){
 			if(Config.isTrackShowInfo){
-				var trackInfoPoint = [];
+				/*var trackInfoPoint = [];
 				var trackInfoLine = [];
 				var timeInfo = []; //显示过滤
 				var height = 16 * Math.floor(ArGis.view.state.resolution);
 				for (var i = 0; i < Ships.length; i++) {
 					var ship = Ships[i];
 					for (var j = 0; j < ship.data.length; j++) {
+						var point = ship.data[j];
 						if(timeInfo.length > 0){
-							var point = "";
+							point = "";
 							for (var m = 0; m < timeInfo.length; m++) {
 								if(timeInfo[m] == ship.data[j].time){
 									point = ship.data[j];
@@ -949,7 +952,28 @@ ArGis={
 				}
 				ArGis.trackLayer.addMany(Config.trackInfo[ship.mmsi]);
 				ArGis.trackLayer.addMany(trackInfoPoint);
-				ArGis.trackLayer.addMany(trackInfoLine);
+				ArGis.trackLayer.addMany(trackInfoLine);*/
+				console.log(Config.trackInfo[ship.mmsi].length);
+				var trackInfoPoint = [];
+				for (var i = 0; i < Config.trackInfo[ship.mmsi].length; i++) {
+					var graphic = Config.trackInfo[ship.mmsi][i];
+					graphic.symbol  = {
+							type: "text", 
+							  color: ship.color,
+							  haloColor: "black",
+							  haloSize: "1px",
+							  text: graphic.attributes.time,
+							  xoffset: 0,
+							  yoffset: 0,
+							  font: {  
+							    size: "12px",
+							    family: "sans-serif"
+							  }
+
+			  		  };
+					trackInfoPoint.push(graphic);
+				}
+				ArGis.trackLayer.addMany(trackInfoPoint);
 			}
 		},
 		fullScreen: function(type){

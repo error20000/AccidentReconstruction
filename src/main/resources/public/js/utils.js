@@ -378,7 +378,7 @@ var Utils = {
 		            if(isNaN(d)){
 		                date = new Date(d.replace(/-/g, "/").replace(/年/g, "/").replace(/月/g, "/").replace(/日/g, " ").replace(/时/g, ":").replace(/分/g, ":").replace(/秒/g, ""));
 		            }else{
-		                d = String(d).length == 10 ? d + "000" : String(d).length == 13 ? d : new Date().getTime() + Number(d);
+		                d = String(d).length == 10 ? d + "000" : String(d).length >= 13 ? d : new Date().getTime() + Number(d);
 		                date = new Date(Number(d));
 		            }
 		        }
