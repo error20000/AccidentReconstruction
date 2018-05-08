@@ -589,6 +589,7 @@ ArGis={
 							var flag = this.canAddShipe(tempShipe, tempShipe2);
 //							var flag = true;
 							if(flag){
+								console.log(ship.mmsi);
 								tempShipe = {
 										x: centerPoint.x,
 										y: centerPoint.y,
@@ -1016,11 +1017,11 @@ ArGis={
 						  color: ship.color,
 						  haloColor: "black",
 						  haloSize: "1px",
-						  text: ArGis.view.zoom > 12 ? graphic.attributes.time : "test test test",
+						  text: graphic.attributes.time,
 						  xoffset: 0,
 						  yoffset: 0,
 						  font: {  
-						    size: ArGis.view.zoom > 12 ? "12px": "2px",
+						    size: "12px",//ArGis.view.zoom > 12 ? "12px": "2px",
 						    family: "sans-serif"
 						  }
 
@@ -1028,9 +1029,7 @@ ArGis={
 					trackInfoPoint.push(graphic);
 				}
 				ArGis.trackLayer.addMany(trackInfoPoint);
-				console.log(trackInfoPoint);
-				console.log(Config.trackInfo[ship.mmsi]);
-				console.log(ArGis.trackLayer);
+				
 				for (var i = 0; i < Config.trackInfo2[ship.mmsi].length; i++) {
 					var graphic = Config.trackInfo2[ship.mmsi][i];
 					graphic.symbol.width = ship.shipWidth/Math.floor(ArGis.view.state.resolution)+"px" ;
