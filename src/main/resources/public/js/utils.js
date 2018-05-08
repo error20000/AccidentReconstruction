@@ -163,10 +163,10 @@ var Utils = {
 				Config.weatherDesc = params.weather || Config.weatherDesc; //天气
 			}
 		},
-		animateShip: function(shipIndex, formTime, toTime, timeEvent){
+		animateShip: function(shipIndex, fromTime, toTime, timeEvent){
 			var ship = Ships[shipIndex];
 			if(timeEvent){
-				var temp1 = ship.timeLine[formTime];
+				var temp1 = ship.timeLine[fromTime];
 				var temp2 = ship.timeLine[toTime];
 				
 				var count = 60;
@@ -183,7 +183,25 @@ var Utils = {
 				var latSecond = latCount/count;
 				var speedSecond = speedCount/count;
 				var cogSecond = cogCount/count;
+				if(Math.abs(cogCount) > 180){
+					if(cogCount > 0){
+						cogSecond = (Math.abs(cogCount) - 360)/count
+					}else{
+						cogSecond = (360 - Math.abs(cogCount))/count
+					}
+				}else{
+					cogSecond = cogCount/count;
+				}
 				var headSecond = headCount/count;
+				if(Math.abs(headCount) > 180){
+					if(headCount > 0){
+						headSecond = (Math.abs(headCount) - 360)/count
+					}else{
+						headSecond = (360 - Math.abs(headCount))/count
+					}
+				}else{
+					headSecond = headCount/count;
+				}
 				//动画
 				clearInterval(this.animateInterval[ship.mmsi]);
 				if(this.animating){

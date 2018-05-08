@@ -91,7 +91,8 @@ var Config = {
 		trackLine: {},
 		trackDashed: {},
 		trackShape: {},
-		trackInfo: {}
+		trackInfo: {},
+		trackInfo2: {}
 		
 };
 
@@ -269,14 +270,49 @@ ArGis={
 								};
 							}else{*/
 								//均分
+								//head
+								var tempHead =  tmp1.head;
+								if(Math.abs(headCount) > 180){
+									if(headCount > 0){
+										tempHead = tmp1.head + k*(Math.abs(headCount) - 360)/count
+										if(tempHead < 0){
+											tempHead = 360 + tempHead;
+										}
+									}else{
+										tempHead = tmp1.head + k*(360 - Math.abs(headCount))/count
+										if(tempHead > 360){
+											tempHead = tempHead - 360;
+										}
+									}
+								}else{
+									tempHead = tmp1.head + k*headCount/count;
+								}
+								//cog
+								var tempCog =  tmp1.cog;
+								if(Math.abs(cogCount) > 180){
+									if(cogCount > 0){
+										tempCog = tmp1.cog + k*(Math.abs(cogCount) - 360)/count
+										if(tempCog < 0){
+											tempCog = 360 + tempCog;
+										}
+									}else{
+										tempCog = tmp1.cog + k*(360 - Math.abs(cogCount))/count
+										if(tempCog > 360){
+											tempCog = tempCog - 360;
+										}
+									}
+								}else{
+									tempCog = tmp1.cog + k*cogCount/count;
+								}
+								
 								timeLinePoint = {
 										mmsi: tmp1.mmsi,
 										lat: tmp1.lat + k*latCount/count,
 										lon: tmp1.lon + k*lonCount/count,
 										time: time,
 										speed: tmp1.speed + k*speedCount/count,
-										cog: tmp1.cog + k*cogCount/count,
-										head: tmp1.head + k*headCount/count,
+										cog: tempCog,
+										head: tempHead,
 										real: false
 								};
 //							}
@@ -547,8 +583,8 @@ ArGis={
 									x: centerPoint.x,
 									y: centerPoint.y,
 									angle: point.head,
-									width: ship.shipWidth,
-									height: ship.shipLength,
+									width: ship.shipWidth*2,
+									height: ship.shipLength*2,
 							};
 							var flag = this.canAddShipe(tempShipe, tempShipe2);
 //							var flag = true;
@@ -557,8 +593,8 @@ ArGis={
 										x: centerPoint.x,
 										y: centerPoint.y,
 										angle: point.head,
-										width: ship.shipWidth,
-										height: ship.shipLength,
+										width: ship.shipWidth*2,
+										height: ship.shipLength*2,
 								};
 								var createShape = Utils.createShape({
 										lon: Utils.xToLon(centerPoint.x),
@@ -614,7 +650,7 @@ ArGis={
 								Config.trackShape[ship.mmsi] = tempShape;
 							}
 							//事件
-							var lonlatPoint = Utils.lonLatToMercator(point.lon, point.lat);
+							/*var lonlatPoint = Utils.lonLatToMercator(point.lon, point.lat);
 							var shipD = (360-point.head)*Math.PI/180 - Math.atan(shipGisPoint.x/shipGisPoint.y);
 							var shipA = {
 									x: 0,
@@ -635,15 +671,15 @@ ArGis={
 									width: ship.shipWidth,
 									height: ship.shipLength,
 							};
-							var flag = this.canAddShipe(tempInfo, tempInfo2);
+							var flag = this.canAddShipe(tempInfo, tempInfo2);*/
 							if(flag){
-								tempInfo = {
+								/*tempInfo = {
 										x: centerPoint.x,
 										y: centerPoint.y,
 										angle: point.head,
 										width: ship.shipWidth,
 										height: ship.shipLength,
-								};
+								};*/
 								var createInfo = Utils.createInfo({
 									lon: point.lon,
 									lat: point.lat,
@@ -660,7 +696,25 @@ ArGis={
 									tempInfo.push(createInfo);
 								}
 								Config.trackInfo[ship.mmsi] = tempInfo;
-								console.log(Config.trackInfo[ship.mmsi]);
+								
+								var createInfo2 = Utils.createShape({
+									lon: Utils.xToLon(centerPoint.x),
+									lat: Utils.yToLat(centerPoint.y),
+									angle: point.head,
+									url: ship.trackUrl,
+									width: ship.shipWidth/Math.floor(ArGis.view.state.resolution)+"px" ,
+									height: ship.shipLength/Math.floor(ArGis.view.state.resolution)+"px",
+									attr: {mmsi: ship.mmsi, type: "track_info"},
+									template:""
+								});
+								var tempInfo2 = Config.trackInfo2[ship.mmsi];
+								if(!tempInfo2){
+									tempInfo2 = [createInfo2];
+								}else{
+									tempInfo2.push(createInfo2);
+								}
+								Config.trackInfo2[ship.mmsi] = tempInfo2;
+								
 							}
 							
 						}
@@ -953,27 +1007,36 @@ ArGis={
 				ArGis.trackLayer.addMany(Config.trackInfo[ship.mmsi]);
 				ArGis.trackLayer.addMany(trackInfoPoint);
 				ArGis.trackLayer.addMany(trackInfoLine);*/
-				console.log(Config.trackInfo[ship.mmsi].length);
+				console.log(ArGis.view.zoom);
 				var trackInfoPoint = [];
 				for (var i = 0; i < Config.trackInfo[ship.mmsi].length; i++) {
 					var graphic = Config.trackInfo[ship.mmsi][i];
 					graphic.symbol  = {
-							type: "text", 
-							  color: ship.color,
-							  haloColor: "black",
-							  haloSize: "1px",
-							  text: graphic.attributes.time,
-							  xoffset: 0,
-							  yoffset: 0,
-							  font: {  
-							    size: "12px",
-							    family: "sans-serif"
-							  }
+						  type: "text", 
+						  color: ship.color,
+						  haloColor: "black",
+						  haloSize: "1px",
+						  text: ArGis.view.zoom > 12 ? graphic.attributes.time : "test test test",
+						  xoffset: 0,
+						  yoffset: 0,
+						  font: {  
+						    size: ArGis.view.zoom > 12 ? "12px": "2px",
+						    family: "sans-serif"
+						  }
 
 			  		  };
 					trackInfoPoint.push(graphic);
 				}
 				ArGis.trackLayer.addMany(trackInfoPoint);
+				console.log(trackInfoPoint);
+				console.log(Config.trackInfo[ship.mmsi]);
+				console.log(ArGis.trackLayer);
+				for (var i = 0; i < Config.trackInfo2[ship.mmsi].length; i++) {
+					var graphic = Config.trackInfo2[ship.mmsi][i];
+					graphic.symbol.width = ship.shipWidth/Math.floor(ArGis.view.state.resolution)+"px" ;
+					graphic.symbol.height = ship.shipLength/Math.floor(ArGis.view.state.resolution)+"px";
+				}
+				ArGis.trackLayer.addMany(Config.trackInfo2[ship.mmsi]);
 			}
 		},
 		fullScreen: function(type){
