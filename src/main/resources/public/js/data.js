@@ -35,6 +35,7 @@ var TimeLineEventData = [
 		var time = new Date(startTime).getTime();
 		time += (timePoint - timeEvent.timeStart) * interval * 1000;
 		Config.timeSelect = timeEvent.timeStart;
+		ArGis.initAccident();
 		//map
 		var eventCache = TimeLineEventCache['map_event_2'];
 		if(timePoint == timeEvent.timeStart + 1 || !eventCache){
@@ -74,6 +75,7 @@ var TimeLineEventData = [
 		var time = new Date(startTime).getTime();
 		time += (timePoint - timeEvent.timeStart) * interval * 1000;
 		Config.timeSelect = timeEvent.timeStart;
+		ArGis.initAccident();
 		//map
 		var eventCache = TimeLineEventCache['map_event_3'];
 		if(timePoint == timeEvent.timeStart + 1 || !eventCache){
@@ -179,6 +181,7 @@ var TimeLineEventData = [
 		var time = new Date(startTime).getTime();
 		time += (timePoint - timeEvent.timeStart) * interval * 1000;
 		Config.timeSelect = timeEvent.timeStart;
+		ArGis.initAccident();
 		//map
 		var eventCache = TimeLineEventCache['map_event_4'];
 		if(timePoint == timeEvent.timeStart + 1 || !eventCache){
@@ -319,6 +322,7 @@ var TimeLineEventData = [
 		var time = new Date(startTime).getTime();
 		time += (timePoint - timeEvent.timeStart) * interval * 1000;
 		Config.timeSelect = timeEvent.timeStart;
+		ArGis.initAccident();
 		//map
 		var eventCache = TimeLineEventCache['map_event_5'];
 		if(timePoint == timeEvent.timeStart + 1 || !eventCache){
@@ -385,6 +389,7 @@ var TimeLineEventData = [
 		var time = new Date(startTime).getTime();
 		time += (timePoint - timeEvent.timeStart) * interval * 1000;
 		Config.timeSelect = timeEvent.timeStart;
+		ArGis.initAccident();
 		//map
 		var eventCache = TimeLineEventCache['map_event_6'];
 		if(timePoint == timeEvent.timeStart + 1 || !eventCache){
@@ -408,6 +413,7 @@ var TimeLineEventData = [
 	}},
 	{"name":"2号轮弃船脱离（1952分后）","timeStart":0,"index":[],"timeLength":39,"time":["2018/1/6 19:52:00","2018/1/6 19:52:00"],select:true,event: function(timePoint, timeEvent){
 		Config.timeSelect = timeEvent.timeStart;
+		ArGis.initAccident();
 		Utils.animateClear();
 		//map
 		var eventCache = TimeLineEventCache['map_event_7'];
@@ -423,6 +429,7 @@ var TimeLineEventData = [
 	}},
 	{"name":"救援、灭火（1.7-1.12）","timeStart":0,"index":[],"timeLength":34,"time":["2018/1/7 00:00:00","2018/1/12 23:59:59"],select:true,event: function(timePoint, timeEvent){
 		Config.timeSelect = timeEvent.timeStart;
+		ArGis.initAccident();
 		Utils.animateClear();
 		//map
 		var eventCache = TimeLineEventCache['map_event_8'];
@@ -441,6 +448,7 @@ var TimeLineEventData = [
 	}},
 	{"name":"碰撞后沉没前1轮情况（1.7-1.12）","timeStart":0,"index":[],"timeLength":13,"time":["2018/1/7 00:00:00","2018/1/12 23:59:59"],select:true,event: function(timePoint, timeEvent){
 		Config.timeSelect = timeEvent.timeStart;
+		ArGis.initAccident();
 		Utils.animateClear();
 		//map
 		var eventCache = TimeLineEventCache['map_event_9'];
@@ -461,6 +469,7 @@ var TimeLineEventData = [
 	}},
 	{"name":"打捞局登船救援（1.13）","timeStart":0,"index":[],"timeLength":29,"time":["2018/1/13 00:00:00","2018/1/13 23:59:59"],select:true,event: function(timePoint, timeEvent){
 		Config.timeSelect = timeEvent.timeStart;
+		ArGis.initAccident();
 		Utils.animateClear();
 		//map
 		var eventCache = TimeLineEventCache['map_event_10'];
@@ -475,6 +484,7 @@ var TimeLineEventData = [
 	}},
 	{"name":"沉没（1.14）","timeStart":0,"index":[],"timeLength":30,"time":["2018/1/14 00:00:00","2018/1/14 23:59:59"],select:true,event: function(timePoint, timeEvent){
 		Config.timeSelect = timeEvent.timeStart;
+		ArGis.initAccident();
 		Utils.animateClear();
 		//map
 		var eventCache = TimeLineEventCache['map_event_11'];

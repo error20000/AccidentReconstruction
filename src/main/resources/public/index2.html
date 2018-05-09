@@ -327,9 +327,8 @@
 			ArGis.view.on("mouse-wheel", function(evt){
 				clearTimeout(ArGis.mouseWheel);
 				ArGis.mouseWheel = setTimeout(() => {
-					ArGis.clearTrack();
-					ArGis.drawTrack();
-		        }, 50);
+					ArGis.zoom();
+		        }, 100); 
 			});
 			
 			/* ArGis.animation = "";

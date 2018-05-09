@@ -37,16 +37,18 @@ var Utils = {
 					lon: params.lon,
 					lat: params.lat,
 					angle: params.head || 0,
-					color: ship.color
+					color: ship.color,
+					attr:{type:'ship', base: ship, params: params, change: {lon: Utils.xToLon(centerPoint.x),lat: Utils.yToLat(centerPoint.y)}}
 				});
 			}else{
 				shipGraphic = Utils.createShip({
 					lon: Utils.xToLon(centerPoint.x),
 					lat: Utils.yToLat(centerPoint.y),
-					angle: params.head,
+					angle: params.head || 0,
 					url: ship.url,
 					width: ship.shipWidth/Math.floor(ArGis.view.state.resolution * 10-3)*10 + "px",
-					height: ship.shipLength/Math.floor(ArGis.view.state.resolution * 10-3)*10 + "px"
+					height: ship.shipLength/Math.floor(ArGis.view.state.resolution * 10-3)*10 + "px",
+					attr:{type:'ship', base: ship, params: params, change: {lon: Utils.xToLon(centerPoint.x),lat: Utils.yToLat(centerPoint.y)}}
 				});
 			}
 			//画船首线

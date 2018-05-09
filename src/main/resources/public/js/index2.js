@@ -339,51 +339,6 @@ ArGis={
 		},
 		initMap: function(){
 			//加载工具
-
-			//绘制碰撞点
-			//标签
-			var geometry = {
-					type: "point",
-				    longitude: Center.lon,
-					latitude: Center.lat
-				  };
-					
-			var symbol  = {
-		  		    type: "simple-marker",  
-		  		    color: [255, 255, 255, 0],
-		  		     size: 100,
-				    outline: {
-				    	color : [226, 119, 40],
-				    	width: "1px",
-				    	style: "short-dash"
-				    }
-		  		  };
-			var attr = {
-					time: "2018/1/6 19:50:10",
-					lon: Center.lon,
-					lat: Center.lat
-			};
-			var template = {
-				title:"碰撞区域",
-				content:[{
-				        type: "fields",
-				        fieldInfos: [{
-				          fieldName: "time",
-				          label: "碰撞时间"
-				        }, {
-				          fieldName: "lon",
-				          label: "碰撞经度"
-				        }, {
-					          fieldName: "lat",
-					          label: "碰撞纬度"
-				        }, {
-					          fieldName: "content",
-					          label: "碰撞描述"
-				        }]
-				      }]
-			};
-			ArGis.trackLayer.add(Utils.createGraphic(geometry, symbol, attr, template));
-			
 			/*require([
 				  "esri/geometry/Geometry"
 				], function(Geometry, TextSymbol3DLayer, ScaleBar, BasemapToggle, GraphicsLayer, Fullscreen){
@@ -517,6 +472,62 @@ ArGis={
 					      }]
 				}
 			});*/
+			
+		},
+		initAccident: function(){
+			//绘制碰撞区域
+			var draw = true;
+			var graphics = ArGis.labelLayer.graphics;
+			graphics.forEach(function(item, i){
+				if(item.attributes && item.attributes.type == "accident"){
+					draw = false;
+				}
+			});
+			if(!draw){
+				return;
+			}
+			var geometry = {
+					type: "point",
+				    longitude: Center.lon,
+					latitude: Center.lat
+				  };
+					
+			var symbol  = {
+		  		    type: "simple-marker",  
+		  		    color: [255, 255, 255, 0],
+		  		     size: 100,
+				    outline: {
+				    	color : [226, 119, 40],
+				    	width: "1px",
+				    	style: "short-dash"
+				    }
+		  		  };
+			var attr = {
+					time: "2018/1/6 19:50:10",
+					lon: Center.lon,
+					lat: Center.lat,
+					type: "accident"
+			};
+			var template = {
+				title:"碰撞区域",
+				content:[{
+				        type: "fields",
+				        fieldInfos: [{
+				          fieldName: "time",
+				          label: "碰撞时间"
+				        }, {
+				          fieldName: "lon",
+				          label: "碰撞经度"
+				        }, {
+					          fieldName: "lat",
+					          label: "碰撞纬度"
+				        }, {
+					          fieldName: "content",
+					          label: "碰撞描述"
+				        }]
+				      }]
+			};
+			ArGis.labelLayer.add(Utils.createGraphic(geometry, symbol, attr, template));
 			
 		},
 		initTrack: function(){
@@ -682,8 +693,8 @@ ArGis={
 										height: ship.shipLength,
 								};*/
 								var createInfo = Utils.createInfo({
-									lon: point.lon,
-									lat: point.lat,
+									lon: Utils.xToLon(centerPoint.x),
+									lat: Utils.yToLat(centerPoint.y),
 									color: point.color || ship.trackColor,
 									width: point.width,
 									text: point.time,
@@ -705,7 +716,7 @@ ArGis={
 									url: ship.trackUrl,
 									width: ship.shipWidth/Math.floor(ArGis.view.state.resolution)+"px" ,
 									height: ship.shipLength/Math.floor(ArGis.view.state.resolution)+"px",
-									attr: {mmsi: ship.mmsi, type: "track_info"},
+									attr: {mmsi: ship.mmsi, type: "track_info", base: ship},
 									template:""
 								});
 								var tempInfo2 = Config.trackInfo2[ship.mmsi];
@@ -936,82 +947,18 @@ ArGis={
 			if(Config.isTrackShowShape){
 				for (var i = 0; i < Config.trackShape[ship.mmsi].length; i++) {
 					var graphic = Config.trackShape[ship.mmsi][i];
-					graphic.symbol.width = ship.shipWidth/Math.floor(ArGis.view.state.resolution)+"px" ;
-					graphic.symbol.height = ship.shipLength/Math.floor(ArGis.view.state.resolution)+"px";
+					graphic.symbol.width = ship.shipWidth/Math.floor(ArGis.view.state.resolution * 10-3)*10+"px" ;
+					graphic.symbol.height = ship.shipLength/Math.floor(ArGis.view.state.resolution * 10-3)*10+"px";
 				}
 				ArGis.trackLayer.addMany(Config.trackShape[ship.mmsi]);
 			}
 		},
 		showTrackInfo: function(ship){
 			if(Config.isTrackShowInfo){
-				/*var trackInfoPoint = [];
-				var trackInfoLine = [];
-				var timeInfo = []; //显示过滤
-				var height = 16 * Math.floor(ArGis.view.state.resolution);
-				for (var i = 0; i < Ships.length; i++) {
-					var ship = Ships[i];
-					for (var j = 0; j < ship.data.length; j++) {
-						var point = ship.data[j];
-						if(timeInfo.length > 0){
-							point = "";
-							for (var m = 0; m < timeInfo.length; m++) {
-								if(timeInfo[m] == ship.data[j].time){
-									point = ship.data[j];
-									break;
-								}
-							}
-							if(!point){
-								continue;
-							}
-						}
-						//标签
-						var geometry = {
-								type: "point",
-							    longitude: point.lon - 0.002,
-								latitude: point.lat + 0.0005
-							  };
-								
-						var symbol  = {
-								type: "text", 
-								  color: ship.color,
-								  haloColor: "black",
-								  haloSize: "1px",
-								  text: timeInfo[j],
-								  xoffset: 0,
-								  yoffset: 0,
-								  font: {  
-								    size: "12px",
-								    family: "sans-serif"
-								  }
-
-				  		  };
-						var attr = {mmsi: ship.mmsi, type: "track_info"};
-						var template = "";
-						trackInfoPoint.push(Utils.createGraphic(geometry, symbol, attr, template));
-						//连线
-						var geometry2 = {
-						        type: "polyline", 
-						        paths: [[point.lon, point.lat], [geometry.longitude, geometry.latitude]]
-						      };
-							
-					      var symbol2  = {
-					  		    type: "simple-line",  
-					  		    color: ship.color,
-					  		    width: "1px",
-					  		    style: "solid"
-					  		  };
-							var attr2 = {mmsi: ship.mmsi, type: "track_info"};
-							var template2 = "";
-					      trackInfoLine.push(Utils.createGraphic(geometry2, symbol2, attr2, template2));
-					}
-				}
-				ArGis.trackLayer.addMany(Config.trackInfo[ship.mmsi]);
-				ArGis.trackLayer.addMany(trackInfoPoint);
-				ArGis.trackLayer.addMany(trackInfoLine);*/
-				console.log(ArGis.view.zoom);
+				
 				var trackInfoPoint = [];
 				for (var i = 0; i < Config.trackInfo[ship.mmsi].length; i++) {
-					var graphic = Config.trackInfo[ship.mmsi][i];
+					var graphic = Config.trackInfo[ship.mmsi][i].clone();
 					graphic.symbol  = {
 						  type: "text", 
 						  color: ship.color,
@@ -1021,7 +968,7 @@ ArGis={
 						  xoffset: 0,
 						  yoffset: 0,
 						  font: {  
-						    size: "12px",//ArGis.view.zoom > 12 ? "12px": "2px",
+						    size: ArGis.view.zoom > 13 ? "12px" : ArGis.view.zoom > 10 ? "4px" : "2px",
 						    family: "sans-serif"
 						  }
 
@@ -1032,10 +979,46 @@ ArGis={
 				
 				for (var i = 0; i < Config.trackInfo2[ship.mmsi].length; i++) {
 					var graphic = Config.trackInfo2[ship.mmsi][i];
-					graphic.symbol.width = ship.shipWidth/Math.floor(ArGis.view.state.resolution)+"px" ;
-					graphic.symbol.height = ship.shipLength/Math.floor(ArGis.view.state.resolution)+"px";
+					graphic.symbol.width = ship.shipWidth/Math.floor(ArGis.view.state.resolution * 10-3)*10+"px" ;
+					graphic.symbol.height = ship.shipLength/Math.floor(ArGis.view.state.resolution * 10-3)*10+"px";
 				}
 				ArGis.trackLayer.addMany(Config.trackInfo2[ship.mmsi]);
+			}
+		},
+		zoom: function(){
+			ArGis.view.zoom = Math.round(ArGis.view.zoom);
+			//轨迹
+			ArGis.clearTrack();
+			ArGis.drawTrack(); 
+			//ship
+			for (var i = 0; i < Ships.length; i++) {
+				var graphics = ArGis["shipLayer_"+Ships[i].mmsi].graphics;
+				graphics.forEach(function(item, i){
+					if(item.attributes && item.attributes.type == "ship"){
+						var shipGraphic;
+						if(ArGis.view.zoom >= 0 && ArGis.view.zoom <= 14){
+							shipGraphic = Utils.createShipSign({
+								lon: item.attributes.params.lon,
+								lat: item.attributes.params.lat,
+								angle: item.attributes.params.head || 0,
+								color: item.attributes.base.color,
+								attr: item.attributes
+							});
+						}else{
+							shipGraphic = Utils.createShip({
+								lon: item.attributes.change.lon,
+								lat: item.attributes.change.lat,
+								angle: item.attributes.params.head || 0,
+								url: item.attributes.base.url,
+								width: item.attributes.base.shipWidth/Math.floor(ArGis.view.state.resolution * 10-3)*10 + "px",
+								height: item.attributes.base.shipLength/Math.floor(ArGis.view.state.resolution * 10-3)*10 + "px",
+								attr:item.attributes
+							});
+						}
+						graphics.removeAt(i);
+						graphics.add(shipGraphic, i);
+					}
+				});
 			}
 		},
 		fullScreen: function(type){
@@ -1046,11 +1029,13 @@ ArGis={
 				$('.video_full_button').hide();
 				if($('.map_full').length > 0){
 					$('.map_full_button .esri-fullscreen').attr('title', '退出全屏模式');
+					$('.map_full_button .esri-icon').removeClass('esri-icon-zoom-out-fixed');
 					$('.map_full_button .esri-icon').addClass('esri-icon-zoom-in-fixed');
 					$('.map_full_button .esri-icon-font-fallback-text').html('退出全屏模式');
 					$('.map_full_button').css('left', '1226px');
 				}else{
 					$('.map_full_button .esri-fullscreen').attr('title', '进入全屏模式');
+					$('.map_full_button .esri-icon').removeClass('esri-icon-zoom-in-fixed');
 					$('.map_full_button .esri-icon').addClass('esri-icon-zoom-out-fixed');
 					$('.map_full_button .esri-icon-font-fallback-text').html('进入全屏模式');
 					$('.map_full_button').css('left', '594px');
@@ -1063,10 +1048,12 @@ ArGis={
 				$('.map_full_button').hide();
 				if($('.video_full').length > 0){
 					$('.video_full_button .esri-fullscreen').attr('title', '退出全屏模式');
+					$('.video_full_button .esri-icon').removeClass('esri-icon-zoom-out-fixed');
 					$('.video_full_button .esri-icon').addClass('esri-icon-zoom-in-fixed');
 					$('.video_full_button .esri-icon-font-fallback-text').html('退出全屏模式');
 				}else{
 					$('.video_full_button .esri-fullscreen').attr('title', '进入全屏模式');
+					$('.video_full_button .esri-icon').removeClass('esri-icon-zoom-in-fixed');
 					$('.video_full_button .esri-icon').addClass('esri-icon-zoom-out-fixed');
 					$('.video_full_button .esri-icon-font-fallback-text').html('进入全屏模式');
 					$('.map_full_button').show();
