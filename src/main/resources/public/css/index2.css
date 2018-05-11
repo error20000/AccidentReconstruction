@@ -7,6 +7,7 @@
 .main{
 	width:1280px;
 	height: 788px;
+	margin: 0 auto;
 }
 
 .header{
@@ -260,7 +261,8 @@
 .map_full_button{
 	position: absolute;
 	top: 70px;
-	left: 594px;
+	left: 50%;
+    transform: translateX(-135%);
 }
 
 /** video full screen **/
@@ -280,7 +282,8 @@
 .video_full_button{
 	position: absolute;
 	top: 70px;
-	left: 1226px;
+    left: 50%;
+    transform: translateX(585px);
 }
 
 
