@@ -60,7 +60,7 @@ var PlayController = {
           }
           
       },
-      clearTimer() {
+      clearTimer: function() {
           clearTimeout(this.progressTimer);
       },
 	  handlePaused: function(){
@@ -95,7 +95,7 @@ var PlayController = {
 };
 
 Vue.component('play-controller',{
-  template: `
+  /*template: `
 	  <div class="play-container">
  			 <div class="time-wrap">
                    <div class="start-time">{{ curPlayTime | formatDate }}</div>
@@ -114,9 +114,29 @@ Vue.component('play-controller',{
 				    </div>
                </div>
       </div>
-  `,
+  `,*/
+  template: ''
+	  +'<div class="play-container">'
+	  +'	 <div class="time-wrap">'
+	  +'             <div class="start-time">{{ curPlayTime | formatDate }}</div>'
+	  +'             <div class="progress-wrap">'
+	  +'                 <div class="progress-bar-p" @click = "updateProgress" ref = "progressBar"></div>'
+	  +'                 <div class="progress" :style = "{width: progress + \'%\'}"></div>'
+	  +'                 <div class="progress-dot" ref = "progressDot" :style = "{\'margin-left\': progress + \'%\'}"></div>'
+	  +'             </div>'
+	  +'             <div class="end-time">{{ endTime | formatDate }}</div>'
+	  +'         </div>'
+	  +'         <div class="play-operateBox">'
+	  +'             <div class="play-detail">'
+	  +'		        <span class = "prev" @click = "changePlay(\'prev\')"></span>'
+	  +'		        <span class = "play" @click = "changePlayState" :class = "{pause: paused}"></span>'
+	  +'		        <span class = "next" @click = "changePlay(\'next\')"></span>'
+	  +'		    </div>'
+	  +'        </div>'
+	  +'</div>'
+  ,
   props: [],
-  data() {
+  data: function() {
       return PlayController
   },
   methods: {
@@ -129,7 +149,7 @@ Vue.component('play-controller',{
           PlayController.emitUpdateTime(this.curPlayTime);
       },
       // 切换状态 play or paused
-      changePlayState() {
+      changePlayState: function() {
           this.paused = !this.paused;
           if(this.progress == 100){
     		  this.progress = 0;
@@ -145,7 +165,7 @@ Vue.component('play-controller',{
     	  
       },
       // 切歌 上一首 or 下一首
-      changePlay(operate) {
+      changePlay: function(operate) {
     	  var step = 20;
           if(operate === "next"){
         	  this.progress += this.progressSpeed * step;
@@ -167,16 +187,16 @@ Vue.component('play-controller',{
   },
   filters: {
       // 进度条时间过滤器
-      formatDate(time) {
+      formatDate: function(time) {
           let minutes = parseInt(time / 60);
           let seconds = parseInt(time % 60);
           if(minutes < 10) {
-              minutes = `0${minutes}`;
+              minutes = '0'+minutes;
           }
           if(seconds < 10) {
-              seconds = `0${seconds}`;
+              seconds = '0'+seconds;
           }
-          return `${minutes}:${seconds}`;
+          return minutes+':'+seconds;
       }
   }
 	  

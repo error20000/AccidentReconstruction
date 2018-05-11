@@ -600,7 +600,6 @@ ArGis={
 							var flag = this.canAddShipe(tempShipe, tempShipe2);
 //							var flag = true;
 							if(flag){
-								console.log(ship.mmsi);
 								tempShipe = {
 										x: centerPoint.x,
 										y: centerPoint.y,
@@ -843,6 +842,9 @@ ArGis={
 			};
 			video.onratechange = function(){
 				console.log("onratechange");
+			};
+			video.onloadeddata = function(){
+				console.log("onloadeddata");
 			};
 			//插件
 			PlayController.endTime= Config.timeLength;

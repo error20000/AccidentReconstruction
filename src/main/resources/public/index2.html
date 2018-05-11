@@ -45,12 +45,13 @@
 <script src="js/shipTimeData.js"></script>
 <script src="js/shipTrackData.js"></script>
 
+<script src="js/utils.js"></script>
+
 <!--<script src="js/ship.js"></script>-->
 <script src="js/data.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/radar.js"></script>
 
-<script src="js/utils.js"></script>
 <script src="js/play2.js"></script>
 <script src="js/index2.js"></script>
 </head>
@@ -326,7 +327,7 @@
 			ArGis.mouseWheel = "";
 			ArGis.view.on("mouse-wheel", function(evt){
 				clearTimeout(ArGis.mouseWheel);
-				ArGis.mouseWheel = setTimeout(() => {
+				ArGis.mouseWheel = setTimeout(function(){
 					ArGis.zoom();
 		        }, 100); 
 			});
@@ -361,6 +362,7 @@ new Vue({
     	handlerSelectChange: function(value) {
     		//PlayController.curPlayTime = value;
     		//PlayController.progress = Number(PlayController.curPlayTime/PlayController.endTime*100);
+			PlayController.timeEventCache = {};
     		PlayController.emitUpdateTime(value);
     		this.msgDesc = [];
   	    },
@@ -402,7 +404,7 @@ new Vue({
 	        	}
 	        } 
 	        animate(); */
-	        setTimeout(() => {
+	        setTimeout(function(){
 	        	div.scrollTop = div.scrollHeight;
 
 				$("#info_container .info_item").removeClass("active");

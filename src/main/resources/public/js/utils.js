@@ -207,7 +207,7 @@ var Utils = {
 				//动画
 				clearInterval(this.animateInterval[ship.mmsi]);
 				if(this.animating){
-					this.animateInterval[ship.mmsi] = setInterval(() => {
+					this.animateInterval[ship.mmsi] = setInterval(function() {
 						var startPoint = {
 								lon: temp1.lon + intervalCount*lonSecond,
 								lat: temp1.lat + intervalCount*latSecond,
@@ -216,10 +216,10 @@ var Utils = {
 								head: temp1.head + intervalCount*headSecond
 						};
 						ArGis["shipLayer_"+ship.mmsi].graphics.removeAll();
-						this.setShip(shipIndex, startPoint);
+						Utils.setShip(shipIndex, startPoint);
 						intervalCount = intervalCount+1;
 						/*if(intervalCount >= 1/interval ){
-							clearInterval(this.animateInterval[ship.mmsi]);
+							clearInterval(Utils.animateInterval[ship.mmsi]);
 						}*/
 					}, interval*1000);
 				}
@@ -373,7 +373,7 @@ var Utils = {
 				if(i == 0){
 					$("#radar").attr("src", radarUrls[i].url);
 				}else{
-					setTimeout(() => {
+					setTimeout(function(){
 						$("#radar").attr("src", radarUrls[i+1].url);
 					}, (new Date(radarUrls[i].time).getTime() - new Date(radarUrls[i-1].time).getTime())/interval * 1000);
 				}
@@ -489,5 +489,10 @@ var Utils = {
 			for(var k in obj)
 				return !1;
 		    return !0;
+		},
+		timeLength: function(start, end){
+			var endTime = Math.floor(new Date("2018/01/06 00:"+end).getTime()/1000);
+			var startTime = Math.floor(new Date("2018/01/06 00:"+start).getTime()/1000);
+			return endTime - startTime + 1;
 		}
 };
