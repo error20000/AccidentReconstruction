@@ -476,7 +476,7 @@ ArGis={
 		},
 		initAccident: function(){
 			//绘制碰撞区域
-			var draw = true;
+			/*var draw = true;
 			var graphics = ArGis.labelLayer.graphics;
 			graphics.forEach(function(item, i){
 				if(item.attributes && item.attributes.type == "accident"){
@@ -528,7 +528,7 @@ ArGis={
 				      }]
 			};
 			ArGis.labelLayer.add(Utils.createGraphic(geometry, symbol, attr, template));
-			
+			*/
 		},
 		initTrack: function(){
 //			setTimeout(() => {
