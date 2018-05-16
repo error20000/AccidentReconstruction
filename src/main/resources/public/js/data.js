@@ -201,20 +201,20 @@ var TimeLineEventData = [
 		Utils.animateShip(0, fromTime, toTime, timeEvent);
 		Utils.animateShip(1, fromTime, toTime, timeEvent);
 		
-		if(timePoint > timeEvent.timeStart + 110){
-			time += 60 * interval * 1000;
+		if(timePoint > timeEvent.timeStart + 110){ //45
+			time += 100 * interval * 1000;
 
 		}
-		if(timePoint > timeEvent.timeStart + 170){ //1
-			time += 60 * interval * 1000;
+		if(timePoint > timeEvent.timeStart + 170){ //46
+			time += 40 * interval * 1000;
 
 		}
-		if(timePoint > timeEvent.timeStart + 260){ //1
-			time += 2*60* interval * 1000;
+		if(timePoint > timeEvent.timeStart + 260){ //48
+			time += 2*40* interval * 1000;
 
 		}
-		if(timePoint > timeEvent.timeStart + 350){ //1
-			time += 60 * interval * 1000;
+		if(timePoint > timeEvent.timeStart + 350){ //49
+			time += 40 * interval * 1000;
 		}
 
 		Utils.updateShipInfo(0, Utils.formatDate(time, Config.defulatTimeFormat), {});
