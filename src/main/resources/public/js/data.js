@@ -195,59 +195,30 @@ var TimeLineEventData = [
 			TimeLineEventCache['map_event_4'] = 1;
 		}
 		//ship
-		/*Utils.updateShipInfo(0, Utils.formatDate(time, Config.defulatTimeFormat), {});
-		Utils.updateShipInfo(1, Utils.formatDate(time, Config.defulatTimeFormat), {});
 		
 		var fromTime = Utils.formatDate(time - ((timePoint-timeEvent.timeStart) == 0 ? 0 : interval * 1000), Config.defulatTimeFormat);
 		var toTime = Utils.formatDate(time, Config.defulatTimeFormat);
 		Utils.animateShip(0, fromTime, toTime, timeEvent);
-		Utils.animateShip(1, fromTime, toTime, timeEvent);*/
+		Utils.animateShip(1, fromTime, toTime, timeEvent);
 		
-		if(timePoint < timeEvent.timeStart + 110){
-			Utils.updateShipInfo(0, Utils.formatDate(time, Config.defulatTimeFormat), {});
-			Utils.updateShipInfo(1, Utils.formatDate(time, Config.defulatTimeFormat), {});
-			var fromTime = Utils.formatDate(time - ((timePoint-timeEvent.timeStart) == 0 ? 0 : interval * 1000), Config.defulatTimeFormat);
-			var toTime = Utils.formatDate(time, Config.defulatTimeFormat);
-			Utils.animateShip(0, fromTime, toTime, timeEvent);
-			Utils.animateShip(1, fromTime, toTime, timeEvent);
+		if(timePoint > timeEvent.timeStart + 110){
+			time += 60 * interval * 1000;
 
-		}else if(timePoint > timeEvent.timeStart + 110 && timePoint < 733){ //1
-			var backTime = timeEvent.timeStart + 110;
-			time = new Date(startTime).getTime();
-			time += (timePoint - (backTime-timeEvent.timeStart) - timeEvent.timeStart) * interval * 1000;
-			Utils.updateShipInfo(0, Utils.formatDate(time, Config.defulatTimeFormat), {});
-			Utils.updateShipInfo(1, Utils.formatDate(time, Config.defulatTimeFormat), {});
-			var fromTime = Utils.formatDate(time - ((timePoint - (backTime-timeEvent.timeStart)-timeEvent.timeStart) == 0 ? 0 : interval * 1000), Config.defulatTimeFormat);
-			var toTime = Utils.formatDate(time, Config.defulatTimeFormat);
-			Utils.animateShip(0, fromTime, toTime, timeEvent);
-			Utils.animateShip(1, fromTime, toTime, timeEvent);
-			
-			if(timePoint == backTime + 2){ 
-				Utils.addDescMsg(27, "<b>1950时许</b> “2”轮船首与“桑吉”轮右舷2、3舱之间船体碰撞，碰撞夹角约50度，“长峰水晶”轮船艏撞入“桑吉”轮船艏破损，3号货舱之前甲板、舱盖受损变形，左舷舷墙及部分甲板设施过火受损。");
-			}
-
-		}else if(timePoint > 733 && timePoint < 773){ //2
-			var backTime = 733;
-			time = new Date(startTime).getTime();
-			time += (timePoint - (backTime-timeEvent.timeStart) - timeEvent.timeStart) * interval * 1000;
-			Utils.updateShipInfo(0, Utils.formatDate(time, Config.defulatTimeFormat), {});
-			Utils.updateShipInfo(1, Utils.formatDate(time, Config.defulatTimeFormat), {});
-			var fromTime = Utils.formatDate(time - ((timePoint - (backTime-timeEvent.timeStart)-timeEvent.timeStart) == 0 ? 0 : interval * 1000), Config.defulatTimeFormat);
-			var toTime = Utils.formatDate(time, Config.defulatTimeFormat);
-			Utils.animateShip(0, fromTime, toTime, timeEvent);
-			Utils.animateShip(1, fromTime, toTime, timeEvent);
-
-		}else if(timePoint > 773 && timePoint < timeEvent.timeStart+timeEvent.timeLength){ //3
-			var backTime = 773;
-			time = new Date(startTime).getTime();
-			time += (timePoint - (backTime-timeEvent.timeStart) - timeEvent.timeStart) * interval * 1000;
-			Utils.updateShipInfo(0, Utils.formatDate(time, Config.defulatTimeFormat), {});
-			Utils.updateShipInfo(1, Utils.formatDate(time, Config.defulatTimeFormat), {});
-			var fromTime = Utils.formatDate(time - ((timePoint - (backTime-timeEvent.timeStart)-timeEvent.timeStart) == 0 ? 0 : interval * 1000), Config.defulatTimeFormat);
-			var toTime = Utils.formatDate(time, Config.defulatTimeFormat);
-			Utils.animateShip(0, fromTime, toTime, timeEvent);
-			Utils.animateShip(1, fromTime, toTime, timeEvent);
 		}
+		if(timePoint > timeEvent.timeStart + 170){ //1
+			time += 60 * interval * 1000;
+
+		}
+		if(timePoint > timeEvent.timeStart + 260){ //1
+			time += 2*60* interval * 1000;
+
+		}
+		if(timePoint > timeEvent.timeStart + 350){ //1
+			time += 60 * interval * 1000;
+		}
+
+		Utils.updateShipInfo(0, Utils.formatDate(time, Config.defulatTimeFormat), {});
+		Utils.updateShipInfo(1, Utils.formatDate(time, Config.defulatTimeFormat), {});
 
 		//radar
 		Utils.drawRadar(time, interval);
