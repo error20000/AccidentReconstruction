@@ -5,11 +5,11 @@ var TimeLineEventData = [
 		//map
 		var eventCache = true;//TimeLineEventCache['map_event_1'];
 		if(timePoint == timeEvent.timeStart+1 || !eventCache){
-			ArGis.view.goTo({center:[50.3169, 29.2473],zoom: 8}, {duration: 3000});
+			ArGis.view.goTo({center:[52.3156, 27.5066],zoom: 8}, {duration: 3000});
 			TimeLineEventCache['map_event_1'] = 1;
 		}
 		if(timePoint == timeEvent.timeStart + 4){
-			Utils.setShip(0, {lon:50.3169, lat:29.2473, head: 140, cog: 0});
+			Utils.setShip(0, {lon:52.3156, lat:27.5066, head: 140, cog: 0});
 		}
 				
 		if(timePoint == timeEvent.timeStart + 1){
