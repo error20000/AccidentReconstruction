@@ -837,6 +837,14 @@ ArGis={
 					PlayController.handleTimeUpdate(video.currentTime);
 				}
 			};
+			/*video.onseeking = function(){
+				console.log("onseeking");
+				PlayController.timeEventCache = {};
+				TimeLineEventCache = {};
+			};
+			video.onseeked = function(){
+				PlayController.timeEventCache = {};
+			};*/
 			video.onwaiting = function(){
 				console.log("onwaiting");
 			};
@@ -879,6 +887,11 @@ ArGis={
 				}
 				if(timeEvent && typeof timeEvent.event == "function"){
 					timeEvent.event(Math.floor(timePoint), timeEvent);
+					if(Math.floor(timePoint) > 80){
+						Utils.appendShipInfo(0, {
+							weather: '能见度良好、风向东北偏北、风力4-5级、轻浪'
+						});
+					}
 				}
 			};
 		},

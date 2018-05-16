@@ -494,5 +494,20 @@ var Utils = {
 			var endTime = Math.floor(new Date("2018/01/06 00:"+end).getTime()/1000);
 			var startTime = Math.floor(new Date("2018/01/06 00:"+start).getTime()/1000);
 			return endTime - startTime + 1;
+		},
+		addDescMsg: function(index, msg){
+			if($("#info_container .info_item[index="+index+"]").length == 0){
+				Config.msgDesc.push({index:index, msg: msg});
+			}else {
+				$("#info_container .info_item").removeClass("active");
+				$("#info_container .info_item[index="+index+"]").addClass("active");
+				//scroll top
+				var parent = $("#info_container").offset().top;
+				$("#info_container").scrollTop(parent);
+				var target = $("#info_container .info_item[index="+index+"]").offset().top;
+				var scrollHeight = $("#info_container .info_item[index="+index+"]")[0].scrollHeight;
+				$("#info_container").scrollTop(target - parent + scrollHeight + index*10);
+			}
+			
 		}
 };

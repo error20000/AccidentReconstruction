@@ -236,7 +236,7 @@
 						<div class="title">重要描述</div>
 						<div class="info">
 							<div class="info_container" id="info_container">
-								<div class="info_item" v-for="item in msgDesc" v-html='item'>
+								<div class="info_item" v-for="item in msgDesc" v-html='item.msg' v-bind:index="item.index">
 								</div>
 							</div>
 						</div>
