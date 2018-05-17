@@ -233,7 +233,8 @@ var TimeLineEventData = [
 				cpa: '0.1nmi', 
 				tcpa: '9.5min'
 			});
-		}else if(timePoint == Math.floor(timeEvent.timeStart + 1*60/interval)){ //"2018/1/6 19:42:00"
+		}
+		if(timePoint == Math.floor(timeEvent.timeStart + 1*60/interval)){ //"2018/1/6 19:42:00"
 //			Utils.addDescMsg(14, "<b>1942时许</b> 2轮航向约225度，航速约13.2节，“1”轮位于本船约3.1海里、方位205度，CPA约0.1海里、TCPA约8.5分钟，航向调整结束。大副在雷达观察到“1”轮AIS物标，CPA显示为0.4海里。据大副笔录其判断该轮为小船，不存在碰撞危险。");
 			Utils.appendShipInfo(1, {
 				driver: '大副',
@@ -259,7 +260,8 @@ var TimeLineEventData = [
 				cpa: '0nmi', 
 				tcpa: '6.3min'
 			});
-		}else if(timePoint == timeEvent.timeStart + 110){ //"2018/1/6 19:45:00"
+		}
+		if(timePoint == timeEvent.timeStart + 110){ //"2018/1/6 19:45:00"
 			Utils.addDescMsg(17, "<b>1945时许</b> “2”轮距1轮约2海里，方位025度，CPA约0海里、TCPA约5.3分钟，“浙岱渔03187”轮位于“1”轮右正横。“1”轮三副说“我们右边有个物标，我们应该采取行动，但是我能采取什么行动呢？右侧都是船”，并要求值班水手用莫氏信号灯警示“2”轮。");
 			Utils.appendShipInfo(1, {
 				distance: '2nmi',
@@ -267,7 +269,8 @@ var TimeLineEventData = [
 				cpa: '0nmi', 
 				tcpa: '5.3min'
 			});
-		}else if(timePoint == Math.floor(timeEvent.timeStart + 4*60/interval+10)){ //"2018/1/6 19:45:00"
+		}
+		if(timePoint == Math.floor(timeEvent.timeStart + 4*60/interval+10)){ //"2018/1/6 19:45:00"
 //			Utils.addDescMsg(18, "<b>1945时许</b> 2轮大副接船长电话，征得三副同意后，离开驾驶台。大副离开后不久，三副班水手上驾驶台与大副班水手交接班，大副班水手告知三副班水手船舶当前使用自动舵航行以及船舶当前的航向，之后大副班水手离开驾驶台。");
 			Utils.appendShipInfo(1, {
 				sailor: '三副班',
@@ -276,7 +279,8 @@ var TimeLineEventData = [
 				cpa: '0nmi', 
 				tcpa: '5.3min'
 			});
-		}else if(timePoint == timeEvent.timeStart + 170){ //"2018/1/6 19:46:00"
+		}
+		if(timePoint == timeEvent.timeStart + 170){ //"2018/1/6 19:46:00"
 			Utils.addDescMsg(19, "<b>1946时许</b> “2”轮距1轮1.6海里，方位026度，CPA约0海里、TCPA约4.5分钟。值班水手说：“C[后被证实为“浙岱渔03817”轮]物标已经通过了，对吧？可以向右让一点吧？”。三副回复：“C物标已经通过了，我们就剩下B[后被证实为“2”轮]物标了。为什么向右让呢？”水手说：“CPA已经0，如果我们向右让，CPA会增大”。三副说：“这是一艘小船，对吗?”,值班水手说：“不，是艘大船”。");
 			Utils.appendShipInfo(1, {
 				distance: '1.6nmi',
@@ -284,7 +288,8 @@ var TimeLineEventData = [
 				cpa: '0nmi', 
 				tcpa: '4.5min'
 			});
-		}else if(timePoint == Math.floor(timeEvent.timeStart + 5*60/interval+10)){ //"2018/1/6 19:47:00"
+		}
+		if(timePoint == Math.floor(timeEvent.timeStart + 5*60/interval+10)){ //"2018/1/6 19:47:00"
 //			Utils.addDescMsg(20, "<b>1946时许</b> “2”轮距1轮1.3海里，方位026度，CPA约0海里、TCPA约3.5分钟。1轮三副说：“这是一艘小船，对吗?”,值班水手说：“不，是艘大船”。");
 			Utils.appendShipInfo(1, {
 				distance: '1.3nmi',
@@ -303,7 +308,8 @@ var TimeLineEventData = [
 		}else if(timePoint == Math.floor(timeEvent.timeStart + 6*60/interval+10)){ //"2018/1/6 19:47:00"
 //			Utils.addDescMsg(22, "<b>1947时许</b> 2号值班水手提醒三副，在雷达上观察到“1”轮AIS物标，CPA约0.2海里，三副也注意到该物标并判断来船为小船。");
 			
-		}else if(timePoint == timeEvent.timeStart + 260){ //"2018/1/6 19:48:00"
+		}
+		if(timePoint == timeEvent.timeStart + 260){ //"2018/1/6 19:48:00"
 			Utils.addDescMsg(23, "<b>1948时许</b> “2”轮距1轮0.9海里，方位026度，CPA约0海里、TCPA约2.5分钟。1轮三副打电话给船长：“船长，有一艘船在我右舷，CPA为0，距离很近，是条大船”。");
 			Utils.appendShipInfo(1, {
 				distance: '0.9nmi',
@@ -337,7 +343,8 @@ var TimeLineEventData = [
 			Utils.appendShipInfo(0, {
 				ro: '左满舵'
 			});
-		}else if(timePoint == Math.floor(timeEvent.timeStart + 8*60/interval+10)){ //"2018/1/6 19:49:00"
+		}
+		if(timePoint == Math.floor(timeEvent.timeStart + 8*60/interval+10)){ //"2018/1/6 19:49:00"
 //			Utils.addDescMsg(25, "<b>1949时许</b> 此时，2轮值班水手提醒三副 “1”轮CPA约0.1海里，三副随即要求水手使用手操舵操右舵但未给出具体舵令，舵角操至右舵20度时水手报告三副。");
 		}
 	}},
