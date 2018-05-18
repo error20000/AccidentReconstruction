@@ -150,6 +150,7 @@
 
 .content_2_2_1{
 	width: 75px;
+	display: none;
 }
 
 .content_2_2_1 .n{
@@ -158,7 +159,7 @@
 }
 
 .content_2_2_2{
-	width: 300px;
+	width: 375px;
 	margin-right: 11px;
 	border: 1px #2a4e7a solid;
 }
@@ -263,6 +264,12 @@
 	top: 70px;
 	left: 50%;
     transform: translateX(-135%);
+}
+.map_full_button_fulled{
+	position: absolute;
+	top: 70px;
+    left: 50%;
+    transform: translateX(585px);
 }
 
 /** video full screen **/

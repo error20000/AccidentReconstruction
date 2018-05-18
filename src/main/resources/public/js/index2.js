@@ -1047,13 +1047,13 @@ ArGis={
 					$('.map_full_button .esri-icon').removeClass('esri-icon-zoom-out-fixed');
 					$('.map_full_button .esri-icon').addClass('esri-icon-zoom-in-fixed');
 					$('.map_full_button .esri-icon-font-fallback-text').html('退出全屏模式');
-					$('.map_full_button').css('left', '1226px');
+					$('.map_full_button').addClass('map_full_button_fulled');
 				}else{
 					$('.map_full_button .esri-fullscreen').attr('title', '进入全屏模式');
 					$('.map_full_button .esri-icon').removeClass('esri-icon-zoom-in-fixed');
 					$('.map_full_button .esri-icon').addClass('esri-icon-zoom-out-fixed');
 					$('.map_full_button .esri-icon-font-fallback-text').html('进入全屏模式');
-					$('.map_full_button').css('left', '594px');
+					$('.map_full_button').removeClass('map_full_button_fulled');
 					$('.video_full_button').show();
 				}
 			}else{
