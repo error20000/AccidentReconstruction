@@ -832,6 +832,7 @@ ArGis={
 			video.ontimeupdate = function(evt){
 				if(video.paused){
 					PlayController.timeEventCache = {};
+					TimeLineEventSlideCache = true;
 					PlayController.emitUpdateTime(video.currentTime);
 				}else{
 					PlayController.handleTimeUpdate(video.currentTime);
@@ -840,7 +841,6 @@ ArGis={
 			/*video.onseeking = function(){
 				console.log("onseeking");
 				PlayController.timeEventCache = {};
-				TimeLineEventCache = {};
 			};
 			video.onseeked = function(){
 				PlayController.timeEventCache = {};

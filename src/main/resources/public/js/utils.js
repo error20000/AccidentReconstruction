@@ -1,6 +1,12 @@
 var Utils = {
 		animating: true,
 		animateInterval: {},
+		setShip2: function(shipIndex, timePoint){
+			var ship = Ships[shipIndex];
+			var params = ship.timeLine[timePoint];
+			ArGis["shipLayer_"+ship.mmsi].graphics.removeAll();
+			this.setShip(shipIndex, params);
+		},
 		setShip: function(shipIndex, params){
 			var ship = Ships[shipIndex];
 			var shipGraphic = "";
@@ -143,6 +149,11 @@ var Utils = {
 				var date = new Date(curPoint.time);
 				Config.timeUTCDesc = date.getUTCHours()+":"+(date.getUTCMinutes() < 10 ? "0"+date.getUTCMinutes() : date.getUTCMinutes())+" UTC"; 
 			}
+		},
+		updateTimeInfo: function(timeStr){
+			Config.timeDesc = Utils.formatDate(timeStr, "HH:mm:ss DATE JAN/dd/18"); 
+			var date = new Date(timeStr);
+			Config.timeUTCDesc = date.getUTCHours()+":"+(date.getUTCMinutes() < 10 ? "0"+date.getUTCMinutes() : date.getUTCMinutes())+" UTC"; 
 		},
 		appendShipInfo: function(shipIndex, params){
 			var curShip = Ships[shipIndex];
